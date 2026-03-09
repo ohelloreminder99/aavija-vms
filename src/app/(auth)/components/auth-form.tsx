@@ -276,7 +276,10 @@ export function AuthForm({ mode }: AuthFormProps) {
         options: {
           // Pass ref= through the OAuth roundtrip so /auth/callback can apply it
           redirectTo: `${window.location.origin}/auth/callback${refCode ? `?ref=${refCode}` : ''}`,
-          queryParams: captchaToken ? { captchaToken } : undefined,
+          queryParams: {
+            prompt: 'select_account',
+            ...(captchaToken ? { captchaToken } : {})
+          },
         }
       });
       // The redirect happens automatically here, we don't need to do the user profile creation
