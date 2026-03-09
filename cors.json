@@ -1,0 +1,19 @@
+[
+  {
+    "origin": [
+      "http://localhost:9002",
+      "https://studio-6484028168-db516.web.app"
+    ],
+    "method": [
+      "GET",
+      "PUT",
+      "POST",
+      "DELETE"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "x-goog-resumable"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

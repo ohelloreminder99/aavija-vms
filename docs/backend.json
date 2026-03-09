@@ -1,0 +1,533 @@
+
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents any user in the system. A user has a base role and can have specific, elevated roles at different premises.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the User (matches Firebase Auth UID)." },
+        "name": { "type": "string", "description": "User's full name." },
+        "email": { "type": "string", "description": "User's email address.", "format": "email" },
+        "role": { "type": "string", "description": "The user's base role, defining their default access level (e.g., 'visitor', 'admin').", "enum": ["admin", "owner", "staff", "gatekeeper", "visitor", "host"] },
+        "countryCode": { "type": "string", "description": "User's international dialing code (e.g., '+91')." },
+        "phone": { "type": "string", "description": "User's local phone number, without the country code." },
+        "is_verified": { "type": "boolean", "description": "Flag indicating if the user's phone is verified." },
+        "is_active": { "type": "boolean", "description": "Flag indicating if the user account is active. Defaults to true." },
+        "token_balance_visitor": { "type": "number", "description": "The user's token balance when acting as a visitor." },
+        "global_rating": { "type": "number", "description": "Visitor's global average star rating." },
+        "active_checkin_id": { "type": ["string", "null"], "description": "ID of the current active visit, if any." },
+        "photo_url": { "type": "string", "description": "URL of the user's profile image.", "format": "uri" },
+        "city": { "type": "string", "description": "The city associated with the user (primarily for Staff)." },
+        "companyName": { "type": "string", "description": "The user's company name." },
+        "premise_roles": {
+          "type": "object",
+          "description": "A map of premise IDs to a list of the user's roles at that premise (e.g., owner, host).",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["owner", "host", "gatekeeper"]
+            }
+          }
+        },
+        "vehicles": {
+          "type": "array",
+          "description": "A list of the user's registered vehicles.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["car", "bike", "tempo", "other", "walking"] },
+              "number": { "type": "string" }
+            },
+            "required": ["type", "number"]
+          }
+        },
+        "selected_vehicle_number": {
+          "type": ["string", "null"],
+          "description": "The number plate of the vehicle currently selected for check-in."
+        },
+        "products": {
+          "type": "array",
+          "description": "A list of products the visitor deals in. Maximum 10 products.",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["id", "name", "email", "role", "phone", "is_verified", "token_balance_visitor"]
+    },
+    "AdminRole": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Admin Role",
+      "type": "object",
+      "description": "A document indicating a user has admin privileges. The existence of a document with the user's UID as the ID is sufficient.",
+      "properties": {
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Confirms admin status."
+        }
+      },
+      "required": ["isAdmin"]
+    },
+    "Premise": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Premise",
+      "type": "object",
+      "description": "Represents a physical location or building managed in the system.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Premise." },
+        "name": { "type": "string", "description": "Name of the premise (e.g., 'Building A')." },
+        "address": { "type": "string", "description": "Full address of the premise." },
+        "city": { "type": "string", "description": "City where the premise is located." },
+        "is_active": { "type": "boolean", "description": "Whether the premise is currently active." },
+        "owner_id": { "type": "string", "description": "The UID of the User who owns this premise." },
+        "ownerName": { "type": "string", "description": "Denormalized name of the premise's owner." },
+        "token_balance": { "type": "number", "description": "The token balance for this specific premise." },
+        "agent_id": { "type": ["string", "null"], "description": "The ID of the agent who brought this premise onboard." },
+        "categoryId": { "type": ["string", "null"], "description": "The ID of the premise's category." },
+        "categoryName": { "type": ["string", "null"], "description": "Denormalized name of the premise's category." },
+        "host_count": { "type": "number", "description": "The number of hosts assigned to this premise." },
+        "gatekeeper_count": { "type": "number", "description": "The number of gatekeepers assigned to this premise." },
+        "visit_count": { "type": "number", "description": "The total number of visits that have occurred at this premise." },
+        "staff": {
+          "type": "array",
+          "description": "A list of staff members (hosts, gatekeepers) at this premise.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "uid": { "type": "string" },
+              "name": { "type": "string" },
+              "email": { "type": "string", "format": "email" },
+              "role": { "type": "string", "enum": ["host", "gatekeeper"] },
+              "is_active": { "type": "boolean" },
+              "photo_url": { "type": "string", "format": "uri" },
+              "identity": { "type": "string", "description": "A unique identifier for the host within the premise, like a flat number or department name." },
+              "availability": { "type": "string", "enum": ["available", "busy", "do-not-disturb"], "description": "The host's current availability status." }
+            },
+            "required": ["uid", "name", "email", "role", "is_active", "identity"]
+          }
+        }
+      },
+      "required": ["id", "name", "address", "city", "is_active", "owner_id", "token_balance"]
+    },
+    "Visit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Visit",
+      "type": "object",
+      "description": "Represents a single visit record, as an audit trail.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Visit." },
+        "visitor_id": { "type": "string", "description": "Reference to the visiting User." },
+        "visitor_name": { "type": "string", "description": "Denormalized name of the visitor for quick display." },
+        "host_id": { "type": "string", "description": "Reference to the host User." },
+        "host_name": { "type": "string", "description": "Denormalized name of the host for quick display." },
+        "premise_id": { "type": "string", "description": "Reference to the Premise where the visit occurred." },
+        "checkin_time": { "type": "string", "format": "date-time", "description": "Timestamp of the check-in." },
+        "checkout_time": { "type": ["string", "null"], "format": "date-time", "description": "Timestamp of the check-out." },
+        "expiresAt": { "type": "string", "format": "date-time", "description": "The server timestamp when this visit document should be automatically deleted by the Firestore TTL policy." },
+        "vehicle_details": { "type": "object", "properties": { "plate": { "type": "string" }, "model": { "type": "string" } } },
+        "visitor_snapshot_url": { "type": "string", "format": "uri", "description": "Permanent URL to the visitor's image at time of check-in." },
+        "status": { "type": "string", "enum": ["active", "completed", "declined", "force_closed"] }
+      },
+      "required": ["id", "visitor_id", "host_id", "premise_id", "checkin_time", "status"]
+    },
+    "Rating": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Rating",
+      "type": "object",
+      "description": "Represents a single rating given by a host to a visitor for a specific visit.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Rating." },
+        "visitId": { "type": "string", "description": "The ID of the visit being rated." },
+        "visitorId": { "type": "string", "description": "The UID of the visitor being rated." },
+        "hostId": { "type": "string", "description": "The UID of the host giving the rating." },
+        "premiseId": { "type": "string", "description": "The premise where the visit occurred." },
+        "rating": { "type": "number", "description": "The star rating given (e.g., 1-5)." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of when the rating was created." }
+      },
+      "required": ["id", "visitId", "visitorId", "hostId", "premiseId", "rating", "createdAt"]
+    },
+    "PremiseBlock": {
+      "title": "Premise Block",
+      "type": "object",
+      "description": "Represents a premise-wide block on a visitor, initiated by an owner. The document ID is the visitor's UID.",
+      "properties": {
+        "blockedAt": { "type": "string", "format": "date-time" },
+        "blockedBy": { "type": "string", "description": "The UID of the owner who initiated the block." },
+        "visitorName": { "type": "string", "description": "Denormalized name of the blocked visitor." },
+        "visitorPhotoUrl": { "type": "string", "description": "Denormalized photo URL of the blocked visitor." }
+      },
+      "required": ["blockedAt", "blockedBy", "visitorName"]
+    },
+    "HostBlock": {
+        "title": "Host Block",
+        "type": "object",
+        "description": "Represents a host-specific block on a visitor. The document ID is the visitor's UID.",
+        "properties": {
+            "blockedAt": { "type": "string", "format": "date-time" },
+            "blockedBy": { "type": "string", "description": "The UID of the host who initiated the block." },
+            "visitorName": { "type": "string", "description": "Denormalized name of the blocked visitor." },
+            "visitorPhotoUrl": { "type": "string", "description": "Denormalized photo URL of the blocked visitor." }
+        },
+        "required": ["blockedAt", "blockedBy", "visitorName"]
+    },
+    "Settings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Settings",
+      "type": "object",
+      "description": "Global configuration settings for the application, managed by Admins.",
+      "properties": {
+        "starting_token_visitor": { "type": "number" },
+        "starting_token_owner": { "type": "number" },
+        "low_token_threshold": { "type": "number" },
+        "history_days_gatekeeper": { "type": "number" },
+        "history_days_owner": { "type": "number" },
+        "history_days_host": { "type": "number" },
+        "history_days_staff": { "type": "number" },
+        "history_days_visitor": { "type": "number" },
+        "export_history_days_owner": { "type": "number", "description": "Number of days of history an Owner can export." },
+        "export_history_days_host": { "type": "number", "description": "Number of days of history a Host can export." },
+        "export_history_days_visitor": { "type": "number", "description": "Number of days of history a Visitor can export." },
+        "pdf_export_cost_host": { "type": "number", "description": "Token cost for a Host to export history as a PDF." },
+        "csv_export_cost_host": { "type": "number", "description": "Token cost for a Host to export history as a CSV." },
+        "pdf_export_cost_visitor": { "type": "number", "description": "Token cost for a Visitor to export history as a PDF." },
+        "csv_export_cost_visitor": { "type": "number", "description": "Token cost for a Visitor to export history as a CSV." },
+        "mobile_verification_cost": { "type": "number" },
+        "star_rating_cost": { "type": "number", "description": "The number of tokens to deduct from a visitor when they receive a star rating." },
+        "block_visitor_cost": { "type": "number", "description": "The number of tokens to deduct from an owner when they block a visitor from their premise." },
+        "unblock_visitor_cost": { "type": "number", "description": "The number of tokens to deduct from an owner when they unblock a visitor from their premise." },
+        "block_visitor_cost_host": { "type": "number", "description": "The number of tokens to deduct from a host when they block a visitor." },
+        "unblock_visitor_cost_host": { "type": "number", "description": "The number of tokens to deduct from a host when they unblock a visitor." },
+        "show_token_card_visitor": { "type": "boolean" },
+        "log_ttl_days": { "type": "number", "description": "The Time-to-Live (TTL) for audit log documents, in days." },
+        "visit_ttl_days": { "type": "number", "description": "The Time-to-Live (TTL) for visit documents, in days." },
+        "currency": {
+          "type": "string",
+          "description": "The currency for token exchange rates.",
+          "enum": ["INR", "USD", "EUR", "GBP", "JPY", "AUD", "CAD"]
+        },
+        "token_exchange_rate": {
+          "type": "number",
+          "description": "How much 1 token is worth in the selected currency."
+        },
+        "gst_rate": {
+            "type": "number",
+            "description": "The Goods and Services Tax (GST) rate as a percentage (e.g., 18 for 18%)."
+        },
+        "agent_commission_rate": {
+            "type": "number",
+            "description": "The commission percentage for agents on premise token purchases."
+        },
+        "default_country_code": {
+          "type": "string",
+          "description": "The default country code for phone numbers (e.g., '+91')."
+        },
+        "phone_number_length": {
+            "type": "number",
+            "description": "The required length for phone numbers (e.g., 10 for India)."
+        },
+        "allow_unverified_checkin": {
+            "type": "boolean",
+            "description": "If true, allows visitors to generate a check-in QR code even if their phone number is not verified."
+        }
+      }
+    },
+    "Agent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Agent",
+      "type": "object",
+      "description": "Represents a field agent who helps onboard new premises.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Agent." },
+        "name": { "type": "string", "description": "Agent's full name." },
+        "phone": { "type": "string", "description": "Agent's phone number." },
+        "city": { "type": "string", "description": "City where the agent operates." },
+        "commission_balance": { "type": "number", "description": "The agent's current commission balance in the system currency." }
+      },
+      "required": ["id", "name", "phone", "city"]
+    },
+    "AgentLedgerEntry": {
+        "title": "Agent Ledger Entry",
+        "type": "object",
+        "description": "A record of a single credit or debit transaction in an agent's commission ledger.",
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "type": { "type": "string", "enum": ["credit", "debit"] },
+          "amount": { "type": "number", "description": "The amount credited or debited." },
+          "balance_after": { "type": "number", "description": "The agent's new total balance after this transaction." },
+          "description": { "type": "string", "description": "Human-readable description of the transaction." },
+          "context": {
+            "type": "object",
+            "properties": {
+              "premiseId": { "type": "string" },
+              "premiseName": { "type": "string" },
+              "purchaseAmount": { "type": "number" },
+              "relatedLogId": { "type": "string" }
+            }
+          }
+        },
+        "required": ["timestamp", "type", "amount", "balance_after", "description"]
+      },
+    "Announcement": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Announcement",
+      "type": "object",
+      "description": "Represents an announcement created by an admin for specific user roles and/or geographic locations.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Announcement." },
+        "title": { "type": "string", "description": "The title of the announcement." },
+        "message": { "type": "string", "description": "The content of the announcement." },
+        "targetRoles": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["owner", "visitor", "host", "gatekeeper", "staff", "admin"] },
+          "description": "Array of user roles to target."
+        },
+        "targetStates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of state IDs to target. An empty array or absence of this field means no states are explicitly targeted."
+        },
+        "targetDistricts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of district IDs to target. An empty array or absence of this field means no districts are explicitly targeted."
+        },
+        "targetCities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of city IDs to target. An empty array or absence of this field means no cities are explicitly targeted."
+        },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of when the announcement was created." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of when the announcement was last updated." }
+      },
+      "required": ["id", "title", "message", "targetRoles", "createdAt", "updatedAt"]
+    },
+     "Log": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Log",
+      "type": "object",
+      "description": "Represents an immutable audit log entry for a significant action performed in the system by any user.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the log entry." },
+        "actorId": { "type": "string", "description": "The UID of the user who performed the action." },
+        "actorName": { "type": "string", "description": "The denormalized name of the actor for display." },
+        "actorRole": { "type": "string", "description": "The denormalized role of the actor at the time of the action." },
+        "action": { "type": "string", "description": "A string code representing the action, e.g., 'CREATE_ANNOUNCEMENT'." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "The server timestamp of when the action occurred." },
+        "expiresAt": { "type": "string", "format": "date-time", "description": "The server timestamp when this log document should be automatically deleted by the Firestore TTL policy." },
+        "description": { "type": "string", "description": "A human-readable description of the event." },
+        "tokenChange": { "type": "number", "description": "The amount of tokens added or deducted in this action." },
+        "premiseId": { "type": "string", "description": "The premise ID associated with the log event, if any." },
+        "context": {
+          "type": "object",
+          "description": "Additional contextual IDs related to the log event."
+        }
+      },
+      "required": ["id", "actorId", "actorName", "actorRole", "action", "timestamp", "description"]
+    },
+    "State": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "State",
+      "type": "object",
+      "description": "Represents a state or province.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the State." },
+        "name": { "type": "string", "description": "The name of the state." }
+      },
+      "required": ["id", "name"]
+    },
+    "District": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "District",
+      "type": "object",
+      "description": "Represents a district within a state.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the District." },
+        "name": { "type": "string", "description": "The name of the district." },
+        "stateId": { "type": "string", "description": "The ID of the parent state." },
+        "stateName": { "type": "string", "description": "Denormalized name of the parent state." }
+      },
+      "required": ["id", "name", "stateId", "stateName"]
+    },
+    "City": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "City",
+      "type": "object",
+      "description": "Represents a city within a district.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the City." },
+        "name": { "type": "string", "description": "The name of the city." },
+        "districtId": { "type": "string", "description": "The ID of the parent district." },
+        "districtName": { "type": "string", "description": "Denormalized name of the parent district." },
+        "stateId": { "type": "string", "description": "Denormalized ID of the parent state." },
+        "stateName": { "type": "string", "description": "Denormalized name of the parent state." }
+      },
+      "required": ["id", "name", "districtId", "districtName", "stateId", "stateName"]
+    },
+    "CheckinToken": {
+      "title": "Check-in Token",
+      "type": "object",
+      "description": "A short-lived, single-use token for visitor check-ins.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique token value itself."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user this token belongs to."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "unused",
+            "used",
+            "expired"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "createdAt",
+        "expiresAt",
+        "status"
+      ]
+    },
+    "WhatsAppOtp": {
+      "title": "WhatsApp OTP",
+      "type": "object",
+      "description": "A temporary document to store a one-time password for WhatsApp verification.",
+      "properties": {
+        "otp": { "type": "string" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["otp", "expiresAt"]
+    },
+    "PremiseCategory": {
+      "title": "Premise Category",
+      "type": "object",
+      "description": "Defines a category for premises with specific token deduction rates.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "deduction_rate_visitor": { "type": "number" },
+        "deduction_rate_premise": { "type": "number" },
+        "pdf_export_cost": { "type": "number" },
+        "csv_export_cost": { "type": "number" }
+      },
+      "required": ["id", "name", "deduction_rate_visitor", "deduction_rate_premise", "pdf_export_cost", "csv_export_cost"]
+    },
+    "ContactSubmission": {
+      "title": "Contact Submission",
+      "type": "object",
+      "description": "Represents a single submission from the public contact form.",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": ["password", "anonymous", "google.com"]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": { "entityName": "User", "schema": { "$ref": "#/entities/User" } }
+      },
+      {
+        "path": "/users/{userId}/logs/{logId}",
+        "definition": { "entityName": "Log", "schema": { "$ref": "#/entities/Log" } }
+      },
+      {
+        "path": "/users/{userId}/blocked_visitors/{visitorId}",
+        "definition": { "entityName": "HostBlock", "schema": { "$ref": "#/entities/HostBlock" } }
+      },
+      {
+        "path": "/users/{userId}/visits/{visitId}",
+        "definition": { "entityName": "Visit", "schema": { "$ref": "#/entities/Visit" } }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": { "entityName": "AdminRole", "schema": { "$ref": "#/entities/AdminRole" } }
+      },
+      {
+        "path": "/premises/{premiseId}",
+        "definition": { "entityName": "Premise", "schema": { "$ref": "#/entities/Premise" } }
+      },
+      {
+        "path": "/premises/{premiseId}/logs/{logId}",
+        "definition": { "entityName": "Log", "schema": { "$ref": "#/entities/Log" } }
+      },
+      {
+        "path": "/premises/{premiseId}/visits/{visitId}",
+        "definition": { "entityName": "Visit", "schema": { "$ref": "#/entities/Visit" } }
+      },
+      {
+        "path": "/premises/{premiseId}/blocked_visitors/{visitorId}",
+        "definition": { "entityName": "PremiseBlock", "schema": { "$ref": "#/entities/PremiseBlock" } }
+      },
+      {
+        "path": "/ratings/{ratingId}",
+        "definition": { "entityName": "Rating", "schema": { "$ref": "#/entities/Rating" } }
+      },
+      {
+        "path": "/settings/{settingId}",
+        "definition": { "entityName": "Settings", "schema": { "$ref": "#/entities/Settings" } }
+      },
+      {
+        "path": "/agents/{agentId}",
+        "definition": { "entityName": "Agent", "schema": { "$ref": "#/entities/Agent" } }
+      },
+      {
+        "path": "/agents/{agentId}/ledger/{ledgerEntryId}",
+        "definition": { "entityName": "AgentLedgerEntry", "schema": { "$ref": "#/entities/AgentLedgerEntry" } }
+      },
+      {
+        "path": "/announcements/{announcementId}",
+        "definition": { "entityName": "Announcement", "schema": { "$ref": "#/entities/Announcement" } }
+      },
+       {
+        "path": "/states/{stateId}",
+        "definition": { "entityName": "State", "schema": { "$ref": "#/entities/State" } }
+      },
+      {
+        "path": "/districts/{districtId}",
+        "definition": { "entityName": "District", "schema": { "$ref": "#/entities/District" } }
+      },
+      {
+        "path": "/cities/{cityId}",
+        "definition": { "entityName": "City", "schema": { "$ref": "#/entities/City" } }
+      },
+      {
+        "path": "/checkin_tokens/{tokenId}",
+        "definition": { "entityName": "CheckinToken", "schema": { "$ref": "#/entities/CheckinToken" } }
+      },
+      {
+        "path": "/whatsapp_otps/{userId}",
+        "definition": { "entityName": "WhatsAppOtp", "schema": { "$ref": "#/entities/WhatsAppOtp" } }
+      },
+      {
+        "path": "/premise_categories/{categoryId}",
+        "definition": { "entityName": "PremiseCategory", "schema": { "$ref": "#/entities/PremiseCategory" } }
+      },
+      {
+        "path": "/contact_submissions/{submissionId}",
+        "definition": { "entityName": "ContactSubmission", "schema": { "$ref": "#/entities/ContactSubmission" } }
+      }
+    ]
+  }
+}
