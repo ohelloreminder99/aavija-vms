@@ -19,11 +19,13 @@ export function ShieldIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function AavijaLogo(props: SVGProps<SVGSVGElement>) {
+import { cn } from '@/lib/utils';
+
+export function AavijaLogo({ className, iconClassName, textClassName }: { className?: string, iconClassName?: string, textClassName?: string }) {
   return (
-    <div className="flex items-center justify-center gap-2" >
-        <ShieldIcon className="text-primary h-6 w-6" />
-        <span className="font-headline text-lg font-semibold text-primary">Aavija</span>
+    <div className={cn("flex items-center justify-center gap-2", className)} >
+      <ShieldIcon className={cn("h-6 w-6 text-primary", iconClassName)} />
+      <span className={cn("font-headline text-lg font-semibold text-primary", textClassName)}>Aavija</span>
     </div>
   );
 }

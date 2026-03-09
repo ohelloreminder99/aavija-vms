@@ -33,135 +33,180 @@ export interface Invoice {
 export async function generateInvoicePdf(invoice: Invoice) {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
 
-  // 1. Header (Logo Text on Right, Title in Center)
-  doc.setFontSize(24);
-  doc.setTextColor(44, 62, 80);
+  // --- 1. Obsidian Aesthetics & Background ---
+  // Subtle dark header bar
+  doc.setFillColor(10, 10, 10);
+  doc.rect(0, 0, pageWidth, 45, 'F');
+
+  // Subtle glow accent (simulated with light gray line)
+  doc.setDrawColor(40, 40, 40);
+  doc.setLineWidth(0.5);
+  doc.line(0, 45, pageWidth, 45);
+
+  // --- 2. Brand & Header ---
+  // Aavija Logo Text (White)
   doc.setFont('helvetica', 'bold');
-  doc.text('AAVIJA', pageWidth - 14, 20, { align: 'right' });
+  doc.setFontSize(26);
+  doc.setTextColor(255, 255, 255);
+  doc.text('AAVIJA', 14, 28);
 
-  doc.setFontSize(20);
-  doc.text('TAX INVOICE', pageWidth / 2, 35, { align: 'center' });
-
-  // 2. Company Details (Top Left)
   doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.setFont('helvetica', 'bold');
-  doc.text(invoice.companyName, 14, 50);
   doc.setFont('helvetica', 'normal');
-  const splitAddress = doc.splitTextToSize(invoice.companyAddress, 80);
-  doc.text(splitAddress, 14, 55);
-  const companyGstinY = 55 + (splitAddress.length * 5);
-  doc.text(`GSTIN: ${invoice.companyGstin}`, 14, companyGstinY);
+  doc.setTextColor(180, 180, 180);
+  doc.text('Visitor Management Ecosystem', 14, 34);
 
-  // 3. Invoice Metadata (Top Right)
+  // Invoice Title (Right aligned in header)
+  doc.setFontSize(22);
+  doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Invoice No: ${invoice.id}`, pageWidth - 14, 50, { align: 'right' });
+  doc.text('TAX INVOICE', pageWidth - 14, 30, { align: 'right' });
+
+  // --- 3. Key Metadata (Floating Bar below header) ---
+  doc.setFillColor(248, 249, 251);
+  doc.rect(14, 55, pageWidth - 28, 20, 'F');
+  doc.setDrawColor(230, 230, 230);
+  doc.rect(14, 55, pageWidth - 28, 20, 'S');
+
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
   doc.setFont('helvetica', 'normal');
-  
+  doc.text('INVOICE NUMBER', 20, 62);
+  doc.text('DATE OF ISSUE', pageWidth / 2 - 20, 62);
+  doc.text('STATUS', pageWidth - 20, 62, { align: 'right' });
+
+  doc.setFontSize(11);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('helvetica', 'bold');
+  doc.text(invoice.id, 20, 69);
+
   let dateText = 'N/A';
   if (invoice.timestamp) {
-      try {
-          const d = typeof invoice.timestamp === 'string' ? parseISO(invoice.timestamp) : (invoice.timestamp.toDate?.() || new Date(invoice.timestamp));
-          dateText = format(d, 'PPP p');
-      } catch (e) {
-          console.error("Date formatting error:", e);
-      }
+    try {
+      const d = typeof invoice.timestamp === 'string' ? parseISO(invoice.timestamp) : (invoice.timestamp.toDate?.() || new Date(invoice.timestamp));
+      dateText = format(d, 'dd MMM yyyy, p');
+    } catch (e) { console.error(e); }
   }
-  doc.text(`Date: ${dateText}`, pageWidth - 14, 55, { align: 'right' });
-  doc.text(`Status: ${invoice.status.toUpperCase()}`, pageWidth - 14, 60, { align: 'right' });
+  doc.text(dateText, pageWidth / 2 - 20, 69);
 
-  // 4. Billing Details
-  const dividerY = Math.max(companyGstinY + 10, 75);
-  doc.setDrawColor(200, 200, 200);
-  doc.line(14, dividerY, pageWidth - 14, dividerY);
-  
+  const statusColor = invoice.status.toLowerCase() === 'paid' ? [34, 197, 94] : [234, 179, 8];
+  doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+  doc.text(invoice.status.toUpperCase(), pageWidth - 20, 69, { align: 'right' });
+
+  // --- 4. Billing Sections ---
+  const sectionY = 90;
+
+  // Left: From (Aavija)
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
   doc.setFont('helvetica', 'bold');
-  doc.text('Bill To:', 14, dividerY + 10);
+  doc.text('FROM', 14, sectionY);
+
+  doc.setFontSize(11);
+  doc.setTextColor(20, 20, 20);
+  doc.text(invoice.companyName, 14, sectionY + 7);
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text(invoice.userName, 14, dividerY + 15);
-  
-  let currentY = dividerY + 20;
+  const splitCompanyAddr = doc.splitTextToSize(invoice.companyAddress, 80);
+  doc.text(splitCompanyAddr, 14, sectionY + 13);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`GSTIN: ${invoice.companyGstin}`, 14, sectionY + 13 + (splitCompanyAddr.length * 5));
+
+  // Right: To (Customer)
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.setFont('helvetica', 'bold');
+  doc.text('BILL TO', pageWidth / 2 + 10, sectionY);
+
+  doc.setFontSize(11);
+  doc.setTextColor(20, 20, 20);
+  doc.text(invoice.userName, pageWidth / 2 + 10, sectionY + 7);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(invoice.userEmail, pageWidth / 2 + 10, sectionY + 13);
+  doc.text(invoice.userPhone, pageWidth / 2 + 10, sectionY + 18);
+
+  const customerAddr = invoice.customerBillingAddress || invoice.userState;
+  const splitCustomerAddr = doc.splitTextToSize(customerAddr, 80);
+  doc.text(splitCustomerAddr, pageWidth / 2 + 10, sectionY + 23);
+
   if (invoice.customerGstin) {
     doc.setFont('helvetica', 'bold');
-    doc.text(`GSTIN: ${invoice.customerGstin}`, 14, currentY);
-    doc.setFont('helvetica', 'normal');
-    currentY += 5;
+    doc.text(`GSTIN: ${invoice.customerGstin}`, pageWidth / 2 + 10, sectionY + 23 + (splitCustomerAddr.length * 5) + 2);
   }
-  
-  doc.text(invoice.userEmail, 14, currentY);
-  currentY += 5;
-  doc.text(`Phone: ${invoice.userPhone}`, 14, currentY);
-  currentY += 5;
-  
-  const addressToPrint = invoice.customerBillingAddress || invoice.userState;
-  const splitCustomerAddress = doc.splitTextToSize(`Address: ${addressToPrint}`, 100);
-  doc.text(splitCustomerAddress, 14, currentY);
-  currentY += (splitCustomerAddress.length * 5);
 
-  // 5. Item Table
+  // --- 5. Table (Modern Simplified) ---
   autoTable(doc, {
-    startY: currentY + 10,
-    head: [['Description', 'HSN/SAC', 'Qty', 'Unit Price', 'Total']],
-    body: [
-      [
-        `Aavija Token Recharge (${invoice.tokenAmount} units)`,
-        invoice.hsnSacCode,
-        invoice.tokenAmount,
-        (invoice.subtotal / invoice.tokenAmount).toFixed(2),
-        invoice.subtotal.toFixed(2),
-      ]
-    ],
-    theme: 'striped',
-    headStyles: { fillColor: [44, 62, 80] },
+    startY: 135,
+    head: [['Description', 'HSN/SAC', 'Qty', 'Rate', 'Amount']],
+    body: [[
+      `Aavija Utility Tokens (${invoice.tokenAmount} units)`,
+      invoice.hsnSacCode,
+      invoice.tokenAmount,
+      (invoice.subtotal / invoice.tokenAmount).toFixed(2),
+      invoice.subtotal.toFixed(2),
+    ]],
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 6 },
+    headStyles: { fillColor: [15, 15, 15], textColor: [255, 255, 255], fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [250, 250, 250] },
+    margin: { left: 14, right: 14 },
   });
 
-  // 6. Totals Breakdown
-  const finalY = (doc as any).lastAutoTable.finalY + 15;
-  const labelX = pageWidth - 95; 
-  const valueX = pageWidth - 14;
+  // --- 6. Summary Block ---
+  const finalY = (doc as any).lastAutoTable.finalY + 10;
+  const summaryX = pageWidth - 60;
 
-  doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text('Subtotal:', labelX, finalY);
-  doc.text(`${invoice.subtotal.toFixed(2)}`, valueX, finalY, { align: 'right' });
+  doc.setTextColor(100, 100, 100);
+  doc.text('Subtotal', summaryX, finalY);
+  doc.setTextColor(30, 30, 30);
+  doc.text(`${invoice.subtotal.toFixed(2)}`, pageWidth - 14, finalY, { align: 'right' });
 
-  let totalsY = finalY + 8;
-  
+  let taxesY = finalY + 7;
   if (invoice.cgst > 0) {
-    const cgstLabel = invoice.cgstRate ? `CGST (${invoice.cgstRate.toFixed(1)}%):` : 'CGST:';
-    const sgstLabel = invoice.sgstRate ? `SGST (${invoice.sgstRate.toFixed(1)}%):` : 'SGST:';
-    
-    doc.text(cgstLabel, labelX, totalsY);
-    doc.text(`${invoice.cgst.toFixed(2)}`, valueX, totalsY, { align: 'right' });
-    totalsY += 8;
-    doc.text(sgstLabel, labelX, totalsY);
-    doc.text(`${invoice.sgst.toFixed(2)}`, valueX, totalsY, { align: 'right' });
-    totalsY += 10;
+    doc.setTextColor(100, 100, 100);
+    doc.text(`CGST (${invoice.cgstRate}%)`, summaryX, taxesY);
+    doc.setTextColor(30, 30, 30);
+    doc.text(`${invoice.cgst.toFixed(2)}`, pageWidth - 14, taxesY, { align: 'right' });
+    taxesY += 7;
+    doc.setTextColor(100, 100, 100);
+    doc.text(`SGST (${invoice.sgstRate}%)`, summaryX, taxesY);
+    doc.setTextColor(30, 30, 30);
+    doc.text(`${invoice.sgst.toFixed(2)}`, pageWidth - 14, taxesY, { align: 'right' });
+    taxesY += 7;
   } else if (invoice.igst > 0) {
-    const igstLabel = invoice.igstRate ? `IGST (${invoice.igstRate.toFixed(1)}%):` : 'IGST:';
-    doc.text(igstLabel, labelX, totalsY);
-    doc.text(`${invoice.igst.toFixed(2)}`, valueX, totalsY, { align: 'right' });
-    totalsY += 10;
+    doc.setTextColor(100, 100, 100);
+    doc.text(`IGST (${invoice.igstRate}%)`, summaryX, taxesY);
+    doc.setTextColor(30, 30, 30);
+    doc.text(`${invoice.igst.toFixed(2)}`, pageWidth - 14, taxesY, { align: 'right' });
+    taxesY += 7;
   }
 
+  // Total Line
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.5);
-  doc.line(labelX, totalsY - 4, valueX, totalsY - 4);
+  doc.line(summaryX, taxesY, pageWidth - 14, taxesY);
 
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text('Total Payable:', labelX, totalsY + 4);
-  doc.text(`${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, valueX, totalsY + 4, { align: 'right' });
+  doc.text('TOTAL', summaryX, taxesY + 10);
+  doc.text(`${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, pageWidth - 14, taxesY + 10, { align: 'right' });
 
-  // 7. Footer & Disclaimers
+  // --- 7. Footer & Security Watermark ---
   doc.setFontSize(8);
-  doc.setFont('helvetica', 'italic');
-  doc.setTextColor(100, 100, 100);
-  
-  const footerBaseY = doc.internal.pageSize.height - 20;
-  doc.text('Disclaimer: Any convenience fees for online payments are charged directly by the Razorpay Payment Gateway.', pageWidth / 2, footerBaseY, { align: 'center' });
-  doc.text('Thank you for choosing Aavija!', pageWidth / 2, footerBaseY + 5, { align: 'center' });
-  doc.text('This is a computer-generated invoice and does not require a signature.', pageWidth / 2, footerBaseY + 10, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(150, 150, 150);
+  const footerY = pageHeight - 30;
 
-  doc.save(`Invoice_${invoice.id}.pdf`);
+  doc.text('This is a digitally generated cryptographically signed invoice.', pageWidth / 2, footerY, { align: 'center' });
+  doc.text('Secured by Aavija Guardian Protocol.', pageWidth / 2, footerY + 5, { align: 'center' });
+
+  doc.setFillColor(15, 15, 15);
+  doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.text('Aavija Ecosystem | dbin.aavija.com | Confidential & Proprietary', pageWidth / 2, pageHeight - 6, { align: 'center' });
+
+  doc.save(`Aavija_Invoice_${invoice.id}.pdf`);
 }

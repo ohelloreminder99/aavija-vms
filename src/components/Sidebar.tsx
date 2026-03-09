@@ -74,16 +74,22 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
         return (
             <Button
                 key={key}
-                variant={isActive ? "secondary" : "ghost"}
+                variant="ghost"
                 className={cn(
-                    "w-full justify-start overflow-hidden",
-                    isActive ? "font-semibold bg-secondary/50" : "font-normal"
+                    "w-full justify-start overflow-hidden group relative transition-all duration-300",
+                    isActive
+                        ? "bg-primary/10 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-semibold"
+                        : "text-zinc-400 hover:text-white hover:bg-white/5 font-normal"
                 )}
                 asChild
                 onClick={onClose}
             >
                 <Link href={href} title={label}>
-                    <Icon className="mr-3 h-5 w-5 shrink-0" />
+                    {isActive && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
+                    <Icon className={cn(
+                        "mr-3 h-5 w-5 shrink-0 transition-all duration-300",
+                        isActive ? "text-primary scale-110" : "group-hover:text-white"
+                    )} />
                     <span className="truncate">{label}</span>
                 </Link>
             </Button>
@@ -93,39 +99,43 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
     if (!userProfile) return null;
 
     return (
-        <ScrollArea className="h-full py-4 pr-4">
-            <div className="space-y-6">
+        <ScrollArea className="h-full py-6">
+            <div className="space-y-8 px-4">
                 {/* Global Links */}
-                <div className="space-y-1">
-                    <h4 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                        Global
+                <div className="space-y-2">
+                    <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
+                        Core Systems
                     </h4>
-                    {renderLink('/dashboard/visitor', 'Visitor Dashboard', roleIcons.visitor, 'global-visitor')}
+                    {renderLink('/dashboard/visitor', 'Visitor Portal', roleIcons.visitor, 'global-visitor')}
                     {renderLink('/dashboard/visitor/refer', 'Refer & Earn', Gift, 'global-refer')}
-                    {userProfile.is_agent && renderLink('/dashboard/visitor/earnings', 'My Earnings', Wallet, 'global-earnings')}
-                    {renderLink('/dashboard/profile', 'My Profile', UserCircle, 'global-profile')}
+                    {userProfile.is_agent && renderLink('/dashboard/visitor/earnings', 'Agent Wallet', Wallet, 'global-earnings')}
+                    {renderLink('/dashboard/profile', 'Account Profile', UserCircle, 'global-profile')}
                     {userProfile.role === 'admin' && (
-                        <>
+                        <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
+                            <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60 mb-4">
+                                Governance
+                            </h4>
                             {renderLink('/dashboard/admin', 'Admin Console', roleIcons.admin, 'global-admin')}
-                            {renderLink('/dashboard/admin/referrals', 'Referral Log', Users, 'admin-referrals')}
-                        </>
+                            {renderLink('/dashboard/admin/referrals', 'Referral Network', Users, 'admin-referrals')}
+                        </div>
                     )}
                 </div>
 
                 {/* Premise Contexts */}
                 {userProfile.premise_roles && Object.keys(userProfile.premise_roles).length > 0 && (
-                    <div className="space-y-4">
-                        <h4 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            My Premises
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                        <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
+                            Operational Contexts
                         </h4>
                         {Object.entries(userProfile.premise_roles).map(([premiseId, roles]) => {
                             const name = premiseNames[premiseId] || 'Loading...';
                             return (
-                                <div key={premiseId} className="space-y-1">
-                                    <div className="px-4 py-2 text-sm font-medium text-foreground truncate" title={name}>
+                                <div key={premiseId} className="space-y-2">
+                                    <div className="px-4 py-2 text-xs font-semibold text-zinc-300 truncate opacity-80" title={name}>
                                         {name}
                                     </div>
-                                    <div className="pl-2 pr-2 space-y-1 border-l-2 border-muted ml-3">
+                                    <div className="pl-4 space-y-1 relative">
+                                        <div className="absolute left-0 top-0 bottom-0 w-px bg-white/5 ml-4" />
                                         {roles.map(role => {
                                             const href = `/dashboard/${role}?premiseId=${premiseId}`;
                                             const label = role.charAt(0).toUpperCase() + role.slice(1);
@@ -145,38 +155,38 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { userProfile: UserProfile | null, isCollapsed: boolean, toggleCollapse: () => void }) {
     return (
         <aside className={cn(
-            "hidden md:flex flex-col border-r bg-card transition-all duration-300 relative",
-            isCollapsed ? "w-16 items-center" : "w-64"
+            "hidden md:flex flex-col border-r border-white/5 bg-black/40 backdrop-blur-xl transition-all duration-500 relative",
+            isCollapsed ? "w-20 items-center" : "w-72"
         )}>
             {/* Collapse Toggle */}
             <Button
                 variant="ghost"
                 size="icon"
-                className="absolute -right-4 top-4 z-10 rounded-full border bg-background shadow-sm hover:bg-accent hover:text-accent-foreground"
+                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-zinc-900 text-zinc-400 shadow-xl hover:bg-zinc-800 hover:text-white transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
                 {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
             </Button>
 
             {!isCollapsed ? (
-                <div className="flex-1 w-full pl-6 overflow-hidden">
+                <div className="flex-1 w-full overflow-hidden">
                     <SidebarContent userProfile={userProfile} />
                 </div>
             ) : (
-                <div className="flex flex-col items-center py-8 space-y-4">
-                    <Button variant="ghost" size="icon" asChild title="Visitor Dashboard">
+                <div className="flex flex-col items-center py-10 space-y-6">
+                    <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="Visitor Dashboard">
                         <Link href="/dashboard/visitor"><Briefcase className="h-5 w-5" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" asChild title="My Profile">
+                    <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="My Profile">
                         <Link href="/dashboard/profile"><UserCircle className="h-5 w-5" /></Link>
                     </Button>
                     {userProfile?.is_agent && (
-                        <Button variant="ghost" size="icon" asChild title="My Earnings">
+                        <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="My Earnings">
                             <Link href="/dashboard/visitor/earnings"><Wallet className="h-5 w-5" /></Link>
                         </Button>
                     )}
                     {userProfile?.role === 'admin' && (
-                        <Button variant="ghost" size="icon" asChild title="Admin Console">
+                        <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="Admin Console">
                             <Link href="/dashboard/admin"><Settings className="h-5 w-5" /></Link>
                         </Button>
                     )}

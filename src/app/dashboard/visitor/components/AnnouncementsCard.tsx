@@ -44,48 +44,53 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
   const isActuallyLoading = isLoading || (!!premiseId && isPremiseLoading);
 
   return (
-    <Card className="lg:col-span-5">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Megaphone className="h-5 w-5" />
-          Announcements
+    <Card className="lg:col-span-5 glass-card border-white/5 overflow-hidden group">
+      <CardHeader className="relative z-10">
+        <CardTitle className="flex items-center gap-3 text-white">
+          <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Megaphone className="h-4 w-4 text-primary" />
+          </div>
+          System Announcements
         </CardTitle>
-        <CardDescription>
-          Updates and important messages from the admin team.
+        <CardDescription className="text-zinc-500 font-medium">
+          Official intelligence and security updates from Aavija Command.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10">
         {isActuallyLoading ? (
-          <div className="flex items-center justify-center h-48">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex flex-col items-center justify-center h-48 gap-4 bg-white/[0.02] rounded-2xl border border-white/5">
+            <Loader2 className="h-8 w-8 animate-spin text-white/20" />
+            <p className="text-zinc-500 text-xs animate-pulse">Retrieving encrypted data...</p>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-48 text-center text-destructive bg-destructive/10 rounded-lg p-4">
-            <AlertTriangle className="h-8 w-8 mb-2" />
-            <p className="font-semibold">Could not load announcements</p>
-            <p className="text-sm">{error.message}</p>
+          <div className="flex flex-col items-center justify-center h-48 text-center bg-red-500/5 border border-red-500/10 rounded-2xl p-6">
+            <AlertTriangle className="h-8 w-8 mb-4 text-red-500" />
+            <p className="font-bold text-red-500 uppercase tracking-tight">Signal Interrupted</p>
+            <p className="text-xs text-red-500/70 mt-1">{error.message}</p>
           </div>
         ) : announcements && announcements.length > 0 ? (
           <ScrollArea className="h-64 pr-4">
             <div className="space-y-4">
               {announcements.map((ann) => (
-                <div key={ann.id} className="p-4 border rounded-lg bg-background">
-                  <h3 className="font-semibold">{ann.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1 mb-2">
-                    {ann.message}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {ann.createdAt ? formatDistanceToNow(ann.createdAt.toDate(), { addSuffix: true }) : 'Recently'}
+                <div key={ann.id} className="p-5 border border-white/5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.05] transition-all group/item">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-white group-hover/item:text-primary transition-colors">{ann.title}</h3>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                      {ann.createdAt ? formatDistanceToNow(ann.createdAt.toDate(), { addSuffix: true }) : 'Live'}
+                    </p>
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed italic">
+                    "{ann.message}"
                   </p>
                 </div>
               ))}
             </div>
           </ScrollArea>
         ) : (
-          <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground bg-muted/50 rounded-lg">
-            <Info className="h-8 w-8 mb-2" />
-            <p className="font-semibold">No new announcements</p>
-            <p className="text-sm">You're all caught up!</p>
+          <div className="flex flex-col items-center justify-center h-48 text-center bg-white/[0.02] border border-white/5 rounded-2xl p-6">
+            <Info className="h-8 w-8 mb-4 text-zinc-700" />
+            <p className="font-bold text-zinc-500 uppercase tracking-tight">Zero Activity</p>
+            <p className="text-xs text-zinc-600 mt-1">No new transmissions detected in your sectors.</p>
           </div>
         )}
       </CardContent>

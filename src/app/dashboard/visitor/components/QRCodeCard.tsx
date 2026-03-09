@@ -209,8 +209,11 @@ export function QRCodeCard() {
 
   if (isLoading) {
     return (
-      <Card className="flex items-center justify-center p-6 min-h-[400px]">
-        <Skeleton className="h-full w-full" />
+      <Card className="flex items-center justify-center glass-card p-6 min-h-[400px] border-white/5">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-white/20" />
+          <p className="text-zinc-500 text-sm animate-pulse">Syncing security tokens...</p>
+        </div>
       </Card>
     );
   }
@@ -225,19 +228,19 @@ export function QRCodeCard() {
   // If they CAN check in, but somehow fail validation, show generic fallback if there's no UI
   if (!canCheckIn) {
     return (
-      <Card>
+      <Card className="glass-card border-white/5">
         <CardHeader>
-          <CardTitle>Check-in Unavailable</CardTitle>
-          <CardDescription>
-            You are currently unable to check in.
+          <CardTitle className="text-white">Check-in Locked</CardTitle>
+          <CardDescription className="text-zinc-400">
+            You are currently unable to initiate a new check-in.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert variant="destructive">
-            <ShieldAlert className="h-4 w-4" />
-            <AlertTitle>Action Required</AlertTitle>
-            <AlertDescription>
-              Please review your profile details or contact security.
+          <Alert className="bg-red-500/10 border-red-500/20 text-red-500">
+            <ShieldAlert className="h-4 w-4 text-red-500" />
+            <AlertTitle className="font-bold">Security Hold</AlertTitle>
+            <AlertDescription className="text-xs">
+              Please review your profile details or contact facility security.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -254,35 +257,35 @@ export function QRCodeCard() {
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Ready to Check-in?</CardTitle>
-          <CardDescription>
-            Click the button below to generate a secure, one-time QR code for
-            check-in.
+      <Card className="glass-card border-white/5 overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        <CardHeader className="relative z-10">
+          <CardTitle className="text-white">Ready to Check-in?</CardTitle>
+          <CardDescription className="text-zinc-400">
+            Generate a secure, single-use QR pass for instant access.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 relative z-10">
           <Button
             onClick={handleGenerateToken}
             disabled={isButtonDisabled}
-            className="w-full h-16 text-lg"
+            className="w-full h-20 text-xl font-bold bg-primary hover:bg-primary/90 text-white shadow-[0_0_30px_rgba(var(--primary),0.3)] transition-all transform active:scale-[0.98]"
           >
             {isGenerating ? (
-              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              <Loader2 className="mr-3 h-8 w-8 animate-spin" />
             ) : (
-              <QrCode className="mr-2 h-6 w-6" />
+              <QrCode className="mr-3 h-8 w-8" />
             )}
-            Show My QR Code
+            Initiate Secure Pass
           </Button>
           {validationIssues.map((issue) => (
-            <Alert key={issue.key} variant="destructive">
-              <ShieldAlert className="h-4 w-4" />
-              <AlertTitle>{issue.title}</AlertTitle>
-              <AlertDescription>
+            <Alert key={issue.key} className="bg-red-500/10 border-red-500/20 text-red-500">
+              <ShieldAlert className="h-4 w-4 text-red-500" />
+              <AlertTitle className="font-bold">{issue.title}</AlertTitle>
+              <AlertDescription className="text-xs">
                 {issue.description}
                 {issue.href && issue.buttonText && (
-                  <Button asChild size="sm" className="mt-2">
+                  <Button asChild size="sm" className="mt-3 bg-red-500 text-white hover:bg-red-600">
                     <Link href={issue.href}>{issue.buttonText}</Link>
                   </Button>
                 )}
@@ -293,47 +296,44 @@ export function QRCodeCard() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-black/90 border-white/10 backdrop-blur-2xl text-white">
           <DialogHeader>
-            <DialogTitle>Your Secure QR Code</DialogTitle>
-            <DialogDescription>
-              Present this code to the gatekeeper. It is valid for one use and
-              will expire shortly.
+            <DialogTitle className="text-2xl font-bold tracking-tight">Access Pass Authorized</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Present this encrypted code to the entry scanner. One-time use only.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center justify-center p-6 gap-4">
+          <div className="flex flex-col items-center justify-center p-8 gap-6 border border-white/5 rounded-2xl bg-white/5 mt-4">
             {tokenData ? (
               <div
-                style={{
-                  background: bgColor,
-                  padding: '16px',
-                  borderRadius: '8px',
-                }}
+                className="p-4 bg-white rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform animate-in fade-in zoom-in duration-500"
               >
                 <QRCode
                   value={tokenData.token}
-                  size={256}
-                  bgColor={bgColor}
-                  fgColor={fgColor}
-                  level="L"
+                  size={240}
+                  bgColor="white"
+                  fgColor="black"
+                  level="H"
                 />
               </div>
             ) : (
-              <div className="flex items-center justify-center h-[288px]">
-                <Loader2 className="h-8 w-8 animate-spin" />
+              <div className="flex flex-col items-center justify-center h-[240px] gap-4">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                <p className="text-zinc-500 text-sm">Encrypting secure pass...</p>
               </div>
             )}
             {tokenData && (
-              <div className="w-full max-w-xs space-y-1 pt-2">
+              <div className="w-full max-w-xs space-y-3 pt-4">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-500">
+                  <span>Security Lifeboat</span>
+                  <span className="text-primary">{Math.round(timeRemaining / 1000)}s</span>
+                </div>
                 <Progress
                   value={
                     (timeRemaining / (TOKEN_LIFESPAN_SECONDS * 1000)) * 100
                   }
-                  className="h-2"
+                  className="h-1.5 bg-white/10"
                 />
-                <p className="text-xs text-muted-foreground text-center">
-                  Code expires in {Math.round(timeRemaining / 1000)}s
-                </p>
               </div>
             )}
           </div>

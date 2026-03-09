@@ -45,10 +45,10 @@
     "genkit": "^1.20.0",
     "html5-qrcode": "^2.3.8",
     "idb-keyval": "^6.2.2",
-    "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.8.2",
+    "jspdf": "4.2.0",
+    "jspdf-autotable": "^4.0.0",
     "lucide-react": "^0.475.0",
-    "next": "15.5.9",
+    "next": "15.5.12",
     "papaparse": "^5.4.1",
     "patch-package": "^8.0.0",
     "razorpay": "^2.9.4",
@@ -60,6 +60,13 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
+  },
+  "overrides": {
+    "dompurify": "3.2.7",
+    "minimatch": "9.0.5",
+    "@tootallnate/once": "3.0.1",
+    "next": "15.5.12",
+    "jspdf": "4.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",

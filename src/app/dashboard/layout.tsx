@@ -85,16 +85,18 @@ function HeaderContent() {
         <div className="container flex min-h-16 max-w-7xl items-center justify-between gap-2 py-2">
             <div className="flex min-w-0 items-center gap-4">
                 <Link href="/dashboard" className='flex-shrink-0'>
-                    <AavijaLogo />
+                    <AavijaLogo iconClassName="text-white/80" textClassName="text-white" />
                 </Link>
                 {userProfile && (
                     <>
-                        <Separator orientation="vertical" className="h-6" />
+                        <Separator orientation="vertical" className="h-6 bg-white/10" />
                         <div className="flex min-w-0 flex-col">
-                            <span className="truncate font-medium text-foreground">
+                            <span className="truncate font-medium text-white/90">
                                 {userProfile.name}
                             </span>
-                            {getContextText()}
+                            <div className="text-white/50">
+                                {getContextText()}
+                            </div>
                         </div>
                     </>
                 )}
@@ -186,14 +188,18 @@ export default function DashboardLayout({
 
     if (user) {
         return (
-            <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
-                <div className="flex min-h-screen flex-col relative">
-                    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-obsidian"><Loader2 className="h-12 w-12 animate-spin text-white/20" /></div>}>
+                <div className="flex min-h-screen flex-col relative mesh-gradient selection:bg-white/10 selection:text-white">
+                    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/40 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
                         <HeaderContent />
                     </header>
                     <div className="flex flex-1 overflow-hidden">
                         <DesktopSidebar userProfile={userProfile} isCollapsed={isSidebarCollapsed} toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
-                        <main className="flex-1 overflow-y-auto w-full">{children}</main>
+                        <main className="flex-1 overflow-y-auto w-full bg-transparent">
+                            <div className="min-h-full">
+                                {children}
+                            </div>
+                        </main>
                     </div>
 
                     {/* Setup Gatekeeper */}

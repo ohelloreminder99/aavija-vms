@@ -49,31 +49,36 @@ export function VisitorTokenBalanceCard() {
 
   return (
     <>
-      <Card>
+      <Card className="glass-card overflow-hidden group border-white/5 hover:border-white/10 transition-all duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Your Visitor Token Balance
+          <CardTitle className="text-sm font-medium text-zinc-400">
+            Visitor Token Balance
           </CardTitle>
-          <Coins className="h-4 w-4 text-muted-foreground" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+            <Coins className="h-4 w-4 text-primary" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
+        <CardContent className="pt-4">
+          <div className="text-4xl font-bold tracking-tight text-white mb-1 group-hover:text-glow transition-all">
             {balance.toLocaleString()}
           </div>
-          <p className="text-xs text-muted-foreground">
-            Tokens available for check-ins
+          <p className="text-xs text-zinc-500 font-medium">
+            Tokens available for instant check-ins
           </p>
           {isLowBalance && (
-            <Alert variant="destructive" className="mt-2">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Low Balance</AlertTitle>
-              <AlertDescription className="text-xs">
-                Please recharge to avoid issues when checking in.
+            <Alert className="mt-4 bg-red-500/10 border-red-500/20 text-red-500">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <AlertTitle className="font-bold">Low Balance</AlertTitle>
+              <AlertDescription className="text-xs opacity-90">
+                Please recharge to avoid check-in disruption.
               </AlertDescription>
             </Alert>
           )}
-          <Button className="mt-4 w-full" onClick={() => setIsDialogOpen(true)}>
-            <Coins className="mr-2 h-4 w-4" /> Buy More Tokens
+          <Button
+            className="mt-6 w-full bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-all transform active:scale-[0.98]"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Coins className="mr-2 h-4 w-4" /> Recharge Wallet
           </Button>
         </CardContent>
       </Card>

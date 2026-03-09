@@ -75,11 +75,35 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer utilities {
+  .bg-obsidian {
+    background: radial-gradient(circle at center, #0a0a0a 0%, #050505 100%);
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  .glass-card {
+    @apply bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)];
+  }
+
+  .glass-morphism {
+    background: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+
+  .border-glow {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+  }
+  
+  .mesh-gradient {
+    background-color: #050505;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(225,39%,30%,0.1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(339,49%,30%,0.1) 0, transparent 50%);
   }
 }

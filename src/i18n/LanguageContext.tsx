@@ -58,7 +58,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         if (dictionaries[newLocale]) {
             setLocaleState(newLocale);
             setDict(dictionaries[newLocale]);
-            document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`; // Save for 1 year
+            document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000;SameSite=Lax;Secure`; // Save for 1 year
         }
     };
 
