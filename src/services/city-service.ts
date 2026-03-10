@@ -52,7 +52,7 @@ export function useCities(districtId?: string) {
  * @param data The city data.
  */
 export async function createCity(_db: any, data: Omit<City, 'id'>) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const newCityData = {
     name: data.name.toLowerCase(),
     districtId: data.districtId,
@@ -75,7 +75,7 @@ export async function updateCity(
   id: string,
   data: Partial<City>
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const dataToUpdate: Partial<City> = {};
   if (data.name) dataToUpdate.name = data.name.toLowerCase();
   if (data.districtId) dataToUpdate.districtId = data.districtId;
@@ -93,7 +93,7 @@ export async function updateCity(
  * @param id The ID of the city to delete.
  */
 export async function deleteCity(_db: any, id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('cities').delete().eq('id', id);
   if (error) throw error;
 }
@@ -109,7 +109,7 @@ export async function batchCreateCities(
   _db: any,
   cities: CsvCity[]
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   // 1. Fetch all states and districts to create a lookup map
   const { data: states } = await supabase.from('states').select('*');
   const { data: districts } = await supabase.from('districts').select('*');
@@ -146,4 +146,3 @@ export async function batchCreateCities(
   const { error } = await supabase.from('cities').insert(newCitiesToInsert);
   if (error) throw error;
 }
-

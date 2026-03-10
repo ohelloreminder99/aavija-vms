@@ -8,7 +8,7 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
  * corresponding document in the 'users' table.
  */
 export async function getOrphanedAuthUsers() {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
 
@@ -65,7 +65,7 @@ export async function deleteAuthUser(uid: string): Promise<{ success: boolean; e
     return { success: false, error: 'User ID is required.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
 

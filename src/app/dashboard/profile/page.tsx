@@ -16,9 +16,12 @@ import {
   X,
   Car,
   Coins,
+  Search,
+  Save,
 } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -70,23 +73,29 @@ import { LinkedAccounts } from './LinkedAccounts';
 import { updatePayoutDetails } from '@/services/agent-service';
 
 const SkeletonProfile = () => (
-  <>
-    <Skeleton className="mb-6 h-9 w-48" />
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-1/2" />
-        <Skeleton className="mt-2 h-4 w-3/4" />
+  <div className="space-y-6">
+    <Skeleton className="h-10 w-48 bg-white/5" />
+    <Card className="glass-card border-white/5 relative overflow-hidden">
+      <div className="absolute inset-0 bg-white/[0.01]" />
+      <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+        <Skeleton className="h-8 w-1/3 bg-white/5" />
+        <Skeleton className="mt-4 h-4 w-2/3 bg-white/5" />
       </CardHeader>
-      <CardContent className="space-y-6 pt-6">
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+      <CardContent className="space-y-8 pt-8 relative z-10">
+        <div className="flex items-center gap-6">
+          <Skeleton className="h-24 w-24 rounded-full bg-white/5" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24 bg-white/5" />
+            <Skeleton className="h-10 w-64 bg-white/5" />
+          </div>
         </div>
-        <Skeleton className="h-10 w-32" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="space-y-2"><Skeleton className="h-4 w-20 bg-white/5" /><Skeleton className="h-11 w-full bg-white/5" /></div>
+          <div className="space-y-2"><Skeleton className="h-4 w-20 bg-white/5" /><Skeleton className="h-11 w-full bg-white/5" /></div>
+        </div>
       </CardContent>
     </Card>
-  </>
+  </div>
 );
 
 const vehicleSchema = z.object({
@@ -391,202 +400,302 @@ export default function ProfilePage() {
               </Link>
             </Button>
           </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Profile</CardTitle>
-              <CardDescription>Update your personal information. This will be visible to hosts when you check in.</CardDescription>
+          <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
+            <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+              <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Identity <span className="text-primary/80">Profile</span></CardTitle>
+              <CardDescription className="text-zinc-400 max-w-xl leading-relaxed mt-2">Update your personal biometric and operational data. This will be verified by hosts during facility entry.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10 pt-8">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  <div className="mb-8 flex items-center gap-6">
-                    <Avatar className="h-24 w-24 border-2 border-primary/10">
-                      <AvatarImage src={userProfile?.photo_url} alt={userProfile?.name} />
-                      <AvatarFallback className="text-3xl">
-                        {isUploading ? <Loader2 className="h-8 w-8 animate-spin" /> : userProfile?.name ? userProfile.name.charAt(0) : <User className="h-8 w-8" />}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-2">
-                      <Label htmlFor="photo-upload">Profile Photo</Label>
-                      <Input id="photo-upload" type="file" accept="image/png, image/jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} className="max-w-xs" />
-                      <p className="text-xs text-muted-foreground">PNG, JPG or GIF. 5MB max.</p>
+                  <div className="mb-8 flex items-center gap-8 p-6 bg-white/[0.02] border border-white/5 rounded-3xl group/avatar">
+                    <div className="relative">
+                      <Avatar className="h-28 w-28 border-2 border-white/5 group-hover/avatar:border-primary/50 transition-all duration-500 shadow-2xl">
+                        <AvatarImage src={userProfile?.photo_url} alt={userProfile?.name} className="object-cover" />
+                        <AvatarFallback className="bg-white/5 text-4xl text-zinc-500 font-bold">
+                          {isUploading ? <Loader2 className="h-10 w-10 animate-spin text-primary/40" /> : userProfile?.name ? userProfile.name.charAt(0) : <User className="h-10 w-10" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      {isUploading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full backdrop-blur-sm"><Loader2 className="h-8 w-8 animate-spin text-white" /></div>}
+                    </div>
+                    <div className="space-y-3 flex-1">
+                      <Label htmlFor="photo-upload" className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Biometric Visual</Label>
+                      <div className="flex items-center gap-4">
+                        <Input id="photo-upload" type="file" accept="image/png, image,jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
+                        {isUploading && <span className="text-xs text-primary animate-pulse font-bold tracking-widest uppercase">Syncing...</span>}
+                      </div>
+                      <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">Support: WEBP, PNG, JPG (5MB Max)</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                     <FormField control={form.control} name="name" render={({ field }) => (
-                      <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Your Name" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem>
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Neural Designation</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your Full Name" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
+                        </FormControl>
+                        <FormMessage className="text-red-500 text-[10px]" />
+                      </FormItem>
                     )} />
                     <FormField control={form.control} name="companyName" render={({ field }) => (
-                      <FormItem><FormLabel>Company Name</FormLabel><FormControl><Input placeholder="Your Company" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem>
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Affiliated Org</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your Company" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
+                        </FormControl>
+                        <FormMessage className="text-red-500 text-[10px]" />
+                      </FormItem>
                     )} />
 
-                    <div className="md:col-span-2">
-                      <div className="flex items-start gap-2">
+                    <div className="md:col-span-2 p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-4">
+                      <div className="flex flex-wrap items-end gap-4">
                         <FormField control={form.control} name="countryCode" render={({ field }) => (
-                          <FormItem className="w-24"><FormLabel>Code</FormLabel><FormControl><Input {...field} disabled /></FormControl><FormMessage /></FormItem>
+                          <FormItem className="w-24">
+                            <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Node Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} disabled className="bg-white/5 border-white/10 text-zinc-500 h-11 text-center" />
+                            </FormControl>
+                          </FormItem>
                         )} />
                         <FormField control={form.control} name="phone" render={({ field }) => (
-                          <FormItem className="flex-1"><FormLabel>Mobile Number {!isPhoneLocked && <span className="text-xs font-normal text-muted-foreground ml-1">(Enter your {settings?.phone_number_length || '...'} digit phone number)</span>}</FormLabel><FormControl><Input type="tel" placeholder="9876543210" {...field} disabled={isPhoneLocked} /></FormControl><FormMessage /></FormItem>
+                          <FormItem className="flex-1 min-w-[200px]">
+                            <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">
+                              Signal Hash (Mobile)
+                              {!isPhoneLocked && <span className="text-[9px] font-normal text-zinc-500 ml-2">({settings?.phone_number_length || '10'} digits required)</span>}
+                            </FormLabel>
+                            <FormControl>
+                              <Input type="tel" placeholder="9876543210" {...field} disabled={isPhoneLocked} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11 font-mono tracking-wider" />
+                            </FormControl>
+                            <FormMessage className="text-red-500 text-[10px]" />
+                          </FormItem>
                         )} />
-                        <div className="pt-8">
+                        <div className="flex gap-2">
                           {isPhoneLocked ? (
-                            <div className="flex items-center gap-1 text-sm text-emerald-600 font-medium p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-md h-10"><ShieldCheck className="h-4 w-4" /><span>Verified</span></div>
+                            <div className="flex items-center gap-2 text-[10px] text-emerald-400 font-black uppercase tracking-widest px-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl h-11 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                              <ShieldCheck className="h-4 w-4" />
+                              <span>Verified</span>
+                            </div>
                           ) : (
-                            <Button type="button" onClick={handleSendVerificationCode} disabled={isVerifying || !hasSufficientTokens}>{isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Verify</Button>
+                            <Button type="button" onClick={handleSendVerificationCode} disabled={isVerifying || !hasSufficientTokens} className="h-11 px-6 bg-primary text-white font-bold uppercase tracking-widest text-[10px] hover:bg-primary/90">
+                              {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              Initialize Link
+                            </Button>
                           )}
+                          {isPhoneLocked && <Button type="button" variant="outline" onClick={() => setIsUpdateConfirmOpen(true)} className="h-11 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest">Reconfigure</Button>}
                         </div>
-                        {isPhoneLocked && <div className="pt-8"><Button type="button" onClick={() => setIsUpdateConfirmOpen(true)}>Update</Button></div>}
                       </div>
-                      <p className="text-xs text-muted-foreground pt-2">{isPhoneLocked ? 'Your number is verified. Click "Update" to change it.' : `Verification costs ${mobileVerificationCost} tokens. The verification code will be received on WhatsApp.`}</p>
-                      {(!hasSufficientTokens && !userProfile?.is_verified) && <p className="text-sm font-medium text-destructive">Insufficient tokens to verify.</p>}
-                      {verificationError && <p className="text-sm font-medium text-destructive">{verificationError}</p>}
+                      <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">
+                        {isPhoneLocked ? 'Communication link secured.' : `Verification protocol costs ${mobileVerificationCost} neural credits. Secure code transmitted via WhatsApp.`}
+                      </p>
+                      {(!hasSufficientTokens && !userProfile?.is_verified) && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Credit Depletion: Insufficient tokens for uplink.</p>}
+                      {verificationError && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">{verificationError}</p>}
                       {otpSent && !isPhoneLocked && (
-                        <div className="rounded-lg border bg-muted/50 p-4 mt-4">
-                          <FormItem><FormLabel>Enter Verification Code</FormLabel><div className="flex items-center gap-2"><FormControl><Input type="tel" maxLength={6} placeholder="6-digit code" value={otp} onChange={(e) => setOtp(e.target.value)} /></FormControl><Button type="button" onClick={handleConfirmCode} disabled={isVerifying || otp.length !== 6}>{isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Confirm</Button></div><FormDescription>A code has been sent to your WhatsApp.</FormDescription></FormItem>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4 animate-in fade-in slide-in-from-top-2">
+                          <FormItem>
+                            <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Verification Pulse</FormLabel>
+                            <div className="flex items-center gap-2">
+                              <FormControl>
+                                <Input type="tel" maxLength={6} placeholder="ENTER 6-DIGIT CODE" value={otp} onChange={(e) => setOtp(e.target.value)} className="bg-black/40 border-white/10 text-white text-center font-mono text-lg tracking-[0.5em] h-12" />
+                              </FormControl>
+                              <Button type="button" onClick={handleConfirmCode} disabled={isVerifying || otp.length !== 6} className="h-12 px-8 bg-emerald-600 text-white font-bold uppercase tracking-widest hover:bg-emerald-500">
+                                {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm'}
+                              </Button>
+                            </div>
+                            <FormDescription className="text-zinc-500 text-[10px]">Monitoring WhatsApp for incoming transmission...</FormDescription>
+                          </FormItem>
                         </div>
                       )}
                     </div>
 
                     <FormField control={form.control} name="cityId" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <Input placeholder="Search cities..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
-                        <ScrollArea className="h-32 w-full rounded-md border mt-2">
+                      <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">Operational Sector (City)</FormLabel>
+                        <div className="relative group/search mb-4">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within/search:text-primary transition-colors" />
+                          <Input placeholder="Filter sectors..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-700 h-10 text-sm" />
+                        </div>
+                        <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/20">
                           <FormControl>
-                            <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="p-4">
+                            <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="p-4 space-y-1">
                               {(filteredCities ?? []).map((city) => (
-                                <div key={city.id} className="mb-2 flex items-center space-x-3">
-                                  <RadioGroupItem value={city.id} id={`city-${city.id}`} />
-                                  <Label htmlFor={`city-${city.id}`} className="font-normal capitalize">{city.name}, <span className="text-muted-foreground text-xs">{city.stateName}</span></Label>
+                                <div key={city.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group/item">
+                                  <RadioGroupItem value={city.id} id={`city-${city.id}`} className="border-white/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
+                                  <Label htmlFor={`city-${city.id}`} className="font-medium text-zinc-400 group-hover/item:text-white transition-colors capitalize text-sm flex-1 cursor-pointer">
+                                    {city.name} <span className="text-[10px] text-zinc-600 uppercase tracking-tighter ml-2">{city.stateName}</span>
+                                  </Label>
                                 </div>
                               ))}
                             </RadioGroup>
                           </FormControl>
-                          {(filteredCities ?? []).length === 0 && <p className="p-4 text-center text-xs text-muted-foreground">No cities match your search.</p>}
+                          {(filteredCities ?? []).length === 0 && <p className="py-12 text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest">Sector Not Found</p>}
                         </ScrollArea>
-                        <FormMessage />
+                        <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
                     )}
                     />
                   </div>
 
-                  <Separator />
+                  <Separator className="bg-white/5 h-[1px]" />
 
                   <FormField control={form.control} name="products" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2"><Package className="h-5 w-5 text-primary" /><span>Products You Deal In</span></FormLabel>
-                      <FormDescription>Add up to 10 products or services you offer.</FormDescription>
+                    <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                      <FormLabel className="flex items-center gap-2 text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4">
+                        <Package className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+                        <span>Inventory Expertise</span>
+                      </FormLabel>
+                      <FormDescription className="text-zinc-500 text-[10px] mb-4">Add up to 10 products or services you offer for neural matching.</FormDescription>
                       <div className="flex items-center gap-2">
-                        <Input placeholder="e.g., Industrial Machinery" value={newProduct} onChange={(e) => setNewProduct(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddProduct(); } }} />
-                        <Button type="button" variant="outline" onClick={handleAddProduct} disabled={!newProduct.trim() || (field.value?.length ?? 0) >= 10}><Plus className="mr-2 h-4 w-4" />Add</Button>
+                        <Input placeholder="e.g., Industrial Machinery" value={newProduct} onChange={(e) => setNewProduct(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddProduct(); } }} className="bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10" />
+                        <Button type="button" variant="outline" onClick={handleAddProduct} disabled={!newProduct.trim() || (field.value?.length ?? 0) >= 10} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6">Add</Button>
                       </div>
-                      <div className="space-y-2 pt-2">
+                      <div className="space-y-4 pt-4">
                         {field.value && field.value.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
                             {field.value.map((product) => (
-                              <Badge key={product} variant="secondary" className="pl-3">{product}<button type="button" onClick={() => handleRemoveProduct(product)} className="ml-2 rounded-full p-0.5 text-secondary-foreground/50 hover:bg-destructive/20 hover:text-destructive"><X className="h-3 w-3" /><span className="sr-only">Remove {product}</span></button></Badge>
+                              <Badge key={product} variant="secondary" className="pl-3 py-1.5 bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 transition-colors">
+                                {product}
+                                <button type="button" onClick={() => handleRemoveProduct(product)} className="ml-2 rounded-full p-0.5 text-zinc-500 hover:text-red-500 transition-colors">
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
                             ))}
                           </div>
-                        ) : <p className="text-xs text-muted-foreground text-center py-2">No products added yet.</p>}
+                        ) : <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-[0.2em] text-center py-6 border border-dashed border-white/5 rounded-2xl">No expertise indexed.</p>}
                       </div>
-                      <FormMessage />
+                      <FormMessage className="text-red-500 text-[10px]" />
                     </FormItem>
                   )}
                   />
 
-                  <Separator />
+                  <Separator className="bg-white/5 h-[1px]" />
 
                   {userProfile?.is_agent && (
                     <>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <Coins className="h-5 w-5 text-primary" />
-                          <h3 className="text-lg font-medium">Agent Financial Details (KYC)</h3>
-                          {userProfile.kyc_verified ? (
-                            <Badge variant="default" className="bg-emerald-500 hover:bg-emerald-600">Verified</Badge>
-                          ) : (
-                            <Badge variant="secondary">Pending Verification</Badge>
-                          )}
+                      <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                            <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-headline font-bold text-white tracking-tight">Agent Payout Protocol</h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant={userProfile.kyc_verified ? "default" : "secondary"} className={cn("text-[8px] font-black uppercase tracking-widest", userProfile.kyc_verified ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
+                                {userProfile.kyc_verified ? "Verified" : "Pending Sync"}
+                              </Badge>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">These details are required for processing your commission payouts. Verification is done manually by admin.</p>
+                        <p className="text-[10px] text-zinc-500 font-medium uppercase leading-relaxed max-w-md">Financial credentials are required for commission distribution. Manual verification by sector admin is mandatory.</p>
 
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
                           <FormField control={form.control} name="agent_payout_upi" render={({ field }) => (
                             <FormItem>
-                              <FormLabel>UPI ID for Payouts</FormLabel>
-                              <FormControl><Input placeholder="yourname@upi" {...field} disabled={userProfile.kyc_verified} /></FormControl>
-                              <FormDescription>Commission will be sent to this UPI ID.</FormDescription>
-                              <FormMessage />
+                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">UPI Link</FormLabel>
+                              <FormControl><Input placeholder="yourname@upi" {...field} disabled={userProfile.kyc_verified} className="bg-black/20 border-white/5 text-white h-11" /></FormControl>
+                              <FormMessage className="text-red-500 text-[10px]" />
                             </FormItem>
                           )} />
                           <FormField control={form.control} name="pan_number" render={({ field }) => (
                             <FormItem>
-                              <FormLabel>PAN Number</FormLabel>
-                              <FormControl><Input placeholder="ABCDE1234F" {...field} className="uppercase" disabled={userProfile.kyc_verified} /></FormControl>
-                              <FormDescription>Required for TDS compliance (Income Tax).</FormDescription>
-                              <FormMessage />
+                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">PAN Hash</FormLabel>
+                              <FormControl><Input placeholder="ABCDE1234F" {...field} className="uppercase bg-black/20 border-white/5 text-white h-11" disabled={userProfile.kyc_verified} /></FormControl>
+                              <FormMessage className="text-red-500 text-[10px]" />
                             </FormItem>
                           )} />
                         </div>
                         {userProfile.kyc_verified && (
-                          <div className="rounded-md bg-emerald-50 p-4 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800">
-                            <p className="text-sm text-emerald-800 dark:text-emerald-400">
-                              Your financial details are verified and locked. Contact support if you need to change them.
+                          <div className="rounded-2xl bg-emerald-500/5 border border-emerald-500/10 p-4">
+                            <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-tighter text-center">
+                              Financial records locked and secured. Contact support for reconfiguration.
                             </p>
                           </div>
                         )}
                       </div>
-                      <Separator />
+                      <Separator className="bg-white/5 h-[1px]" />
                     </>
                   )}
 
-                  <div className="space-y-4">
+                  <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6">
                     <FormField control={form.control} name="vehicles" render={() => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2 text-lg"><Car className="h-5 w-5 text-primary" /><span>Manage Your Vehicles</span></FormLabel>
-                        <FormDescription>Select your primary vehicle for check-ins.</FormDescription>
-                        <div className="space-y-2 pt-2">
+                        <FormLabel className="flex items-center gap-3 text-zinc-300 font-headline font-bold uppercase tracking-widest text-[10px]">
+                          <Car className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+                          <span>Fleet Management</span>
+                        </FormLabel>
+                        <FormDescription className="text-zinc-500 text-[10px]">Synchronize your primary transport for rapid facility entry.</FormDescription>
+                        <div className="space-y-3 pt-4">
                           <FormField control={form.control} name="selected_vehicle_number" render={({ field }) => (
-                            <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="space-y-2">
+                            <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="space-y-3">
                               {vehicleFields.map((vehicle, index) => (
-                                <div key={vehicle.id} className="flex items-center justify-between rounded-md border p-3">
-                                  <div className="flex items-center gap-3">
-                                    <RadioGroupItem value={vehicle.number} id={`vehicle-${index}`} />
-                                    <Label htmlFor={`vehicle-${index}`} className="flex items-center gap-2 font-normal cursor-pointer"><Badge variant="outline" className="capitalize w-16 justify-center">{vehicle.type}</Badge><span className="font-mono text-base">{vehicle.number}</span></Label>
+                                <div key={vehicle.id} className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-white/10 transition-all group/vehicle">
+                                  <div className="flex items-center gap-4">
+                                    <RadioGroupItem value={vehicle.number} id={`vehicle-${index}`} className="border-white/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
+                                    <Label htmlFor={`vehicle-${index}`} className="flex items-center gap-3 font-normal cursor-pointer">
+                                      <Badge variant="outline" className="capitalize w-20 justify-center bg-white/5 border-white/10 text-zinc-400 group-hover/vehicle:text-white transition-colors">{vehicle.type}</Badge>
+                                      <span className="font-mono text-lg font-bold text-white tracking-widest group-hover/vehicle:text-primary transition-colors">{vehicle.number}</span>
+                                    </Label>
                                   </div>
-                                  <Button type="button" variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={() => handleRemoveVehicle(index)}><X className="h-4 w-4" /><span className="sr-only">Remove vehicle</span></Button>
+                                  <Button type="button" variant="ghost" size="icon" className="text-zinc-700 hover:text-red-500 hover:bg-red-500/5" onClick={() => handleRemoveVehicle(index)}>
+                                    <X className="h-4 w-4" />
+                                  </Button>
                                 </div>
                               ))}
                             </RadioGroup>
                           )}
                           />
-                          {vehicleFields.length === 0 && <p className="text-center text-sm text-muted-foreground py-4">No vehicles added yet.</p>}
+                          {vehicleFields.length === 0 && <p className="text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest py-8 border border-dashed border-white/5 rounded-2xl">No transport linked.</p>}
                         </div>
-                        <FormMessage />
+                        <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
                     )}
                     />
 
-                    <div className="space-y-2">
-                      <FormLabel>Add New Vehicle</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <Select value={newVehicleType} onValueChange={(value) => setNewVehicleType(value as any)}><SelectTrigger className="w-[120px]"><SelectValue placeholder="Type" /></SelectTrigger><SelectContent><SelectItem value="walking">Walking</SelectItem><SelectItem value="car">Car</SelectItem><SelectItem value="bike">Bike</SelectItem><SelectItem value="tempo">Tempo</SelectItem><SelectItem value="other">Other</SelectItem></SelectContent></Select>
-                        <Input placeholder="Vehicle Number" value={newVehicleNumber} onChange={(e) => setNewVehicleNumber(e.target.value.toUpperCase())} disabled={newVehicleType === 'walking'} />
-                        <Button type="button" variant="outline" onClick={handleAddVehicle}><Plus className="mr-2 h-4 w-4" /> Add</Button>
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                      <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Deploy New Asset</FormLabel>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Select value={newVehicleType} onValueChange={(value) => setNewVehicleType(value as any)}>
+                          <SelectTrigger className="w-[140px] bg-black/20 border-white/10 text-white h-10">
+                            <SelectValue placeholder="Type" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#020617] border-white/10 text-white">
+                            <SelectItem value="walking">Walking</SelectItem>
+                            <SelectItem value="car">Car</SelectItem>
+                            <SelectItem value="bike">Bike</SelectItem>
+                            <SelectItem value="tempo">Tempo</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input placeholder="Vehicle Number" value={newVehicleNumber} onChange={(e) => setNewVehicleNumber(e.target.value.toUpperCase())} disabled={newVehicleType === 'walking'} className="flex-1 min-w-[150px] bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10 font-mono" />
+                        <Button type="button" variant="outline" onClick={handleAddVehicle} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6 ml-auto">
+                          <Plus className="mr-2 h-4 w-4" /> Link
+                        </Button>
                       </div>
                     </div>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Save Changes</Button>
+                  <Button type="submit" disabled={isSubmitting} className="w-full h-14 bg-primary text-white font-black tracking-[0.2em] uppercase hover:bg-primary/90 shadow-[0_0_30px_rgba(59,130,246,0.3)] text-base">
+                    {isSubmitting ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Save className="mr-3 h-5 w-5" />}
+                    Synchronize Identity
+                  </Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
           <AlertDialog open={isUpdateConfirmOpen} onOpenChange={setIsUpdateConfirmOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader><AlertDialogTitle>Change Phone Number?</AlertDialogTitle><AlertDialogDescription>This will require you to re-verify your number via WhatsApp. This action will cost {mobileVerificationCost} tokens. Are you sure you want to proceed?</AlertDialogDescription></AlertDialogHeader>
-              <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }}>Yes, Continue</AlertDialogAction></AlertDialogFooter>
+            <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Reconfigure Link?</AlertDialogTitle>
+                <AlertDialogDescription className="text-zinc-400 leading-relaxed">
+                  Changing your signal hash (phone number) requires fresh biometric verification via WhatsApp.
+                  This operation consumes <span className="text-primary font-bold">{mobileVerificationCost} neural units</span>.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="pt-6">
+                <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+                <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-white font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Uplink</AlertDialogAction>
+              </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
 

@@ -14,7 +14,7 @@ export async function getBlockedVisitorsForHost(hostId: string): Promise<{
         return { success: false, error: 'Host ID is required.' };
     }
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) {
         return { success: false, error: 'Server database connection is not available.' };
     }
@@ -32,7 +32,7 @@ export async function getBlockedVisitorsForHost(hostId: string): Promise<{
             return { success: true, blocks: [] };
         }
 
-        const blocks = blocksSnapshot.map((data: any) => {
+        const blocks = (blocksSnapshot || []).map((data: any) => {
             return {
                 ...data,
                 id: data.id,

@@ -18,8 +18,8 @@ import { Premise } from '@/services/premise-service';
 const BuyTokensDialog = React.lazy(() => import('@/components/shared/BuyTokensDialog'));
 
 interface TokenBalanceCardProps {
-    premise: WithId<Premise> | null;
-    isLoading: boolean;
+  premise: WithId<Premise> | null;
+  isLoading: boolean;
 }
 
 export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: TokenBalanceCardProps) {
@@ -30,21 +30,22 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
 
   if (isLoading) {
     return (
-      <Card className="flex flex-col justify-center">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Premise Token Balance
+      <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative min-h-[160px] flex flex-col justify-center">
+        <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
+        <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+            Node Capital Balance
           </CardTitle>
-          <Coins className="h-4 w-4 text-muted-foreground" />
+          <Coins className="h-4 w-4 text-zinc-600 animate-pulse" />
         </CardHeader>
-        <CardContent>
-          <Skeleton className="mt-1 h-8 w-3/4" />
-          <Skeleton className="mt-4 h-10 w-3/4" />
+        <CardContent className="relative z-10">
+          <Skeleton className="h-8 w-24 bg-white/5" />
+          <Skeleton className="mt-4 h-10 w-full bg-white/5 rounded-xl" />
         </CardContent>
       </Card>
     );
   }
-  
+
   if (!premise) {
     return null;
   }
@@ -55,37 +56,43 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
 
   return (
     <>
-      <Card className="flex flex-col justify-center">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Premise Token Balance
+      <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative min-h-[160px] flex flex-col justify-center group/balance">
+        <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none group-hover/balance:opacity-20 transition-opacity" />
+        <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 group-hover/balance:text-primary transition-colors">
+            Node Capital <span className="text-zinc-700">/</span> {premise.name}
           </CardTitle>
-          <Coins className="h-4 w-4 text-muted-foreground" />
+          <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center">
+            <Coins className="h-4 w-4 text-zinc-500 group-hover/balance:text-primary transition-colors drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
+        <CardContent className="relative z-10">
+          <div className="text-4xl font-headline font-bold text-white tracking-tight transform group-hover/balance:translate-x-1 transition-transform">
             {balance.toLocaleString()}
           </div>
-          <p className="text-xs text-muted-foreground">
-            For {premise.name}
+          <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest mt-1">
+            Units Liquid
           </p>
           {isLowBalance && (
-            <Alert variant="destructive" className="mt-2">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Low Balance</AlertTitle>
-                <AlertDescription className="text-xs">
-                    Please recharge to avoid service interruptions.
-                </AlertDescription>
+            <Alert className="mt-4 bg-red-500/5 border-red-500/20 text-red-400 py-3 rounded-2xl">
+              <AlertCircle className="h-3.5 w-3.5" />
+              <AlertTitle className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">Critical Depletion</AlertTitle>
+              <AlertDescription className="text-[9px] font-medium leading-tight opacity-80">
+                Neural match protocol at risk. Replenish immediately.
+              </AlertDescription>
             </Alert>
           )}
-          <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
-            <Coins className="mr-2 h-4 w-4" /> Buy More Tokens
+          <Button
+            className="w-full mt-6 h-12 bg-primary text-white font-black uppercase tracking-widest text-[10px] hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-xl"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Coins className="mr-2 h-4 w-4" /> Expand Capacity
           </Button>
         </CardContent>
       </Card>
       {isDialogOpen && (
         <React.Suspense fallback={<div />}>
-            <BuyTokensDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} role="owner" premiseId={premise.id} />
+          <BuyTokensDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} role="owner" premiseId={premise.id} />
         </React.Suspense>
       )}
     </>

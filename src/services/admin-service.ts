@@ -31,7 +31,7 @@ export async function grantAdminRole(targetUserId: string): Promise<{ success: b
             throw new Error('Unauthorized: Only admins can grant admin roles.');
         }
 
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         const { error } = await adminDb
@@ -64,7 +64,7 @@ export async function revokeAdminRole(targetUserId: string): Promise<{ success: 
             throw new Error('Admins cannot revoke their own admin role.');
         }
 
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         const { error } = await adminDb
@@ -98,7 +98,7 @@ export async function adminUpdateUser(
             throw new Error('Unauthorized: Only admins can perform this operation.');
         }
 
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         const { error } = await adminDb

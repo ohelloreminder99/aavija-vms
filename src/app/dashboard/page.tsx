@@ -41,20 +41,20 @@ import { Label } from '@/components/ui/label';
 const RoleCard = React.memo(({ title, description, href, icon: Icon }: { title: string, description: string, href: string, icon: React.ElementType }) => (
   <Link href={href}>
     <Card className={cn(
-      "relative overflow-hidden group transition-all duration-300",
-      "glass-card hover:bg-white/5 hover:border-white/20 hover:scale-[1.02]",
-      title === "Change Your Password" && "bg-yellow-500/5 border-yellow-500/20 hover:bg-yellow-500/10"
+      "relative overflow-hidden group transition-all duration-500",
+      "glass-card hover:border-primary/50 hover:scale-[1.02] liquid-neon-border",
+      title === "Security Settings" && "opacity-80 hover:opacity-100"
     )}>
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <CardHeader className="flex flex-row items-center gap-5 p-6 relative z-10">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all duration-500 shadow-inner">
-          <Icon className="h-6 w-6 text-white group-hover:text-primary transition-colors duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <CardHeader className="flex flex-row items-center gap-6 p-6 relative z-10">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:border-primary group-hover:bg-primary/20 transition-all duration-500 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]">
+          <Icon className="h-7 w-7 text-white group-hover:text-primary group-hover:scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all duration-500" />
         </div>
-        <div>
-          <CardTitle className="text-xl font-headline tracking-tight text-white group-hover:text-glow transition-all">
+        <div className="flex-1 min-w-0">
+          <CardTitle className="text-xl font-headline tracking-wide text-white group-hover:text-glow transition-all duration-300">
             {title}
           </CardTitle>
-          <CardDescription className="text-zinc-400 group-hover:text-zinc-300">
+          <CardDescription className="text-zinc-400 group-hover:text-zinc-200 transition-colors duration-300">
             {description}
           </CardDescription>
         </div>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
             <RoleCard
               key={`${premiseId}-${role}`}
               title={`Act as ${details.name} of ${premiseName}`}
-              description={`Manage operations`}
+              description={`Manage operational flow for ${premiseName}`}
               href={`${details.href}?premiseId=${premiseId}`}
               icon={details.icon}
             />
@@ -105,45 +105,52 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-obsidian">
-        <div className="flex flex-col items-center gap-6">
-          <AavijaLogo iconClassName="text-white/80" textClassName="text-white scale-125" />
+      <div className="flex min-h-screen items-center justify-center bg-[#020617]">
+        <div className="flex flex-col items-center gap-8">
+          <AavijaLogo iconClassName="text-primary animate-pulse" textClassName="text-white scale-150" />
           <div className="relative">
-            <Loader2 className="h-10 w-10 animate-spin text-white/20" />
-            <div className="absolute inset-0 h-10 w-10 animate-pulse text-primary blur-sm">
-              <Loader2 className="h-10 w-10 animate-spin" />
+            <Loader2 className="h-12 w-12 animate-spin text-white/10" />
+            <div className="absolute inset-0 h-12 w-12 animate-pulse text-primary blur-md">
+              <Loader2 className="h-12 w-12 animate-spin" />
             </div>
           </div>
-          <p className="text-zinc-400 font-medium tracking-wide animate-pulse">Initializing Dashboard...</p>
+          <div className="space-y-2 text-center">
+            <p className="text-zinc-400 font-medium tracking-[0.2em] uppercase text-xs animate-pulse">Initializing Neural Link</p>
+            <div className="h-1 w-48 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-primary animate-[shimmer_2s_infinite] w-full" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full py-16 px-4">
-      <div className="container max-w-2xl">
+    <div className="min-h-full py-20 px-4">
+      <div className="container max-w-2xl px-0">
         <div className="mx-auto flex w-full flex-col justify-center space-y-12">
-          <div className="flex flex-col items-center space-y-4 text-center">
-            <div className="inline-flex items-center rounded-full border border-white/5 bg-white/5 px-3 py-1 text-xs font-medium text-primary backdrop-blur-sm">
-              <span className="relative flex h-2 w-2 mr-2">
+          <div className="flex flex-col items-center space-y-6 text-center">
+            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary backdrop-blur-md shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+              <span className="relative flex h-2 w-2 mr-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              System Authentication Active
+              ENCRYPTED BIOMETRIC LINK ACTIVE
             </div>
-            <h1 className="text-4xl font-headline font-bold tracking-tight text-white">Select Your Role</h1>
-            <p className="text-lg text-zinc-400 max-w-sm">Choose the security context you want to operate in today.</p>
+            <div className="space-y-2">
+              <h1 className="text-4xl font-headline font-bold tracking-tight text-white sm:text-5xl">Identify Your Context</h1>
+              <p className="text-lg text-zinc-400 max-w-sm mx-auto">Select a regional security identity to begin operation.</p>
+            </div>
           </div>
 
-          <div className="grid gap-4">
-            <RoleCard title="Act as Visitor" description="Check-in to a new premise" href="/dashboard/visitor" icon={User} />
-            {isAdmin && <RoleCard title="Act as Admin" description="Manage the entire system" href="/dashboard/admin" icon={UserCog} />}
-            {userProfile?.role === 'staff' && <RoleCard title="Act as Staff" description="View assigned duties" href="/dashboard/staff" icon={UserCog} />}
-            {userProfile?.is_agent && <RoleCard title="Act as Agent" description="View commissions & payouts" href="/dashboard/visitor/earnings" icon={Wallet} />}
+          <div className="grid gap-5">
+            <RoleCard title="Act as Visitor" description="Generate check-in tokens and manage your personal history" href="/dashboard/visitor" icon={User} />
+            {isAdmin && <RoleCard title="Act as Admin" description="Full governance control over all regional operations" href="/dashboard/admin" icon={UserCog} />}
+            {userProfile?.role === 'staff' && <RoleCard title="Act as Staff" description="Execute assigned security protocols" href="/dashboard/staff" icon={UserCog} />}
+            {userProfile?.is_agent && <RoleCard title="Act as Agent" description="Manage ecosystem expansion and commission ledger" href="/dashboard/visitor/earnings" icon={Wallet} />}
             {premiseRoleCards}
-            <div className="pt-4 mt-4 border-t border-white/5">
-              <RoleCard title="Security Settings" description="Update password & recovery" href="/dashboard/change-password" icon={LockKeyhole} />
+            <div className="pt-8 mt-4 border-t border-white/5 flex flex-col gap-5">
+              <RoleCard title="Security Settings" description="Update neural bypass pins and recovery protocols" href="/dashboard/change-password" icon={LockKeyhole} />
             </div>
           </div>
         </div>

@@ -85,16 +85,16 @@ function HeaderContent() {
         <div className="container flex min-h-16 max-w-7xl items-center justify-between gap-2 py-2">
             <div className="flex min-w-0 items-center gap-4">
                 <Link href="/dashboard" className='flex-shrink-0'>
-                    <AavijaLogo iconClassName="text-primary" textClassName="text-zinc-900" />
+                    <AavijaLogo iconClassName="text-primary" textClassName="text-white" />
                 </Link>
                 {userProfile && (
                     <>
                         <Separator orientation="vertical" className="h-6 bg-white/10" />
                         <div className="flex min-w-0 flex-col">
-                            <span className="truncate font-medium text-white/90">
+                            <span className="truncate font-medium text-white">
                                 {userProfile.name}
                             </span>
-                            <div className="text-white/50">
+                            <div className="text-zinc-400">
                                 {getContextText()}
                             </div>
                         </div>
@@ -103,13 +103,13 @@ function HeaderContent() {
             </div>
             <div className="flex shrink-0 items-center gap-1">
                 <LanguageSwitcher />
-                <Button variant="ghost" asChild size="sm" className="hidden sm:inline-flex">
+                <Button variant="ghost" asChild size="sm" className="hidden sm:inline-flex text-zinc-400 hover:text-white hover:bg-white/5">
                     <Link href="/dashboard/profile">
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                     </Link>
                 </Button>
-                <Button variant="ghost" onClick={handleSignOut} size="sm" className="hidden sm:inline-flex">
+                <Button variant="ghost" onClick={handleSignOut} size="sm" className="hidden sm:inline-flex text-zinc-400 hover:text-white hover:bg-white/5">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign Out</span>
                 </Button>
@@ -188,9 +188,9 @@ export default function DashboardLayout({
 
     if (user) {
         return (
-            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
-                <div className="flex min-h-screen flex-col relative mesh-light selection:bg-primary/20 selection:text-primary">
-                    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/20">
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#020617]"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
+                <div className="flex min-h-screen flex-col relative mesh-obsidian selection:bg-primary/30 selection:text-white">
+                    <header className="sticky top-0 z-50 w-full border-b border-white/5 glass-card">
                         <HeaderContent />
                     </header>
                     <div className="flex flex-1 overflow-hidden">

@@ -6,7 +6,7 @@ import { ContactSubmission } from '@/services/contact-service';
 export type SerializableContactSubmission = Omit<ContactSubmission, 'createdAt'> & { id: string; createdAt: string };
 
 export async function getContactSubmissions(): Promise<{ submissions?: SerializableContactSubmission[]; error?: string }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) {
@@ -35,7 +35,7 @@ export async function getContactSubmissions(): Promise<{ submissions?: Serializa
 }
 
 export async function deleteContactSubmission(submissionId: string): Promise<{ success: boolean; error?: string }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) {

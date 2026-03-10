@@ -8,6 +8,7 @@ import {
   Building,
   User as UserIcon,
   Download,
+  History,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +40,7 @@ import { useUser, WithId, useCollection } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import { format, subDays, parse } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/services/settings-service';
@@ -334,10 +336,13 @@ export default function VisitorHistoryPage() {
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-20 text-center text-muted-foreground border-2 border-dashed rounded-lg">
-          <p className="mb-2 font-semibold">No Visit History</p>
-          <p className="text-sm">
-            You haven&apos;t checked into any premises yet.
+        <div className="py-24 text-center border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.01]">
+          <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
+            <History className="h-8 w-8 text-zinc-700" />
+          </div>
+          <p className="mb-2 font-bold text-white uppercase tracking-widest text-sm">Archival Link Null</p>
+          <p className="text-xs text-zinc-500 max-w-[200px] mx-auto leading-relaxed">
+            You haven&apos;t initiated any neural check-ins in current sectors.
           </p>
         </div>
       );
@@ -369,11 +374,11 @@ export default function VisitorHistoryPage() {
             </div>
             {dateError && <p className="w-full text-xs text-destructive">{dateError}</p>}
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary transition-colors" />
             <Input
-              placeholder="Search by premise or host..."
-              className="pl-10"
+              placeholder="Filter by sector or validator identifier..."
+              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-primary/50 focus:ring-primary/20 h-12"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -381,7 +386,7 @@ export default function VisitorHistoryPage() {
         </div>
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="hover:bg-transparent border-white/10">
               <TableHead>Premise</TableHead>
               <TableHead>Host Met</TableHead>
               <TableHead>Check-in Time</TableHead>
@@ -391,39 +396,44 @@ export default function VisitorHistoryPage() {
           </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id}>
-                <TableCell className="font-medium capitalize">
+              <TableRow key={visit.id} className="group/row">
+                <TableCell className="font-medium capitalize text-white group-hover/row:text-primary transition-colors">
                   <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <Building className="h-4 w-4 text-zinc-500 group-hover/row:text-primary transition-colors" />
                     {premiseMap.get(visit.premise_id) || (
-                      <span className="text-muted-foreground">
-                        Unknown Premise
+                      <span className="text-zinc-600 italic">
+                        Unknown Sector
                       </span>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="capitalize">
+                <TableCell className="capitalize text-zinc-300">
                   <div className="flex items-center gap-2">
-                    <UserIcon className="h-4 w-4 text-muted-foreground" />
+                    <UserIcon className="h-4 w-4 text-zinc-500 group-hover/row:text-primary transition-colors" />
                     {visit.host_name || (
-                      <span className="text-muted-foreground">Unknown Host</span>
+                      <span className="text-zinc-600 italic">Redacted</span>
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-zinc-400 font-mono text-xs">
                   {visit.checkin_time
                     ? format(new Date(visit.checkin_time), 'PPp')
                     : 'N/A'}
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-zinc-400 font-mono text-xs">
                   {visit.checkout_time
                     ? format(new Date(visit.checkout_time), 'PPp')
                     : 'N/A'}
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={visit.status === 'active' ? 'default' : 'secondary'}
-                    className="capitalize"
+                    variant={visit.status === 'active' ? 'default' : 'outline'}
+                    className={cn(
+                      "capitalize border-white/10",
+                      visit.status === 'active'
+                        ? "bg-primary text-white shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                        : "text-zinc-500 bg-white/5"
+                    )}
                   >
                     {visit.status.replace('_', ' ')}
                   </Badge>
@@ -463,26 +473,27 @@ export default function VisitorHistoryPage() {
           </Link>
         </Button>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Visit History</CardTitle>
-          <CardDescription>{description}</CardDescription>
+      <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
+        <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
+        <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+          <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Intelligence Log: <span className="text-primary/80">Visits</span></CardTitle>
+          <CardDescription className="text-zinc-400 max-w-xl leading-relaxed mt-2">{description}</CardDescription>
         </CardHeader>
-        <CardContent>{renderContent()}</CardContent>
+        <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
       </Card>
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-[#020617] border-white/10 text-white backdrop-blur-3xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Export</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action will deduct <span className="font-bold">{exportCost ?? '...'}</span> tokens from your personal balance. Are you sure you want to proceed?
+            <AlertDialogTitle className="text-white text-xl">Deduct Neural Credits?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Generating an offline report costs <span className="font-bold text-primary">{exportCost ?? '...'} credits</span>. This will be permanently subtracted from your neural link balance.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null}>
+          <AlertDialogFooter className="border-t border-white/5 pt-6 mt-6">
+            <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white">Abort</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white hover:bg-primary/90">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm & Export
+              Authorize Deduction
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

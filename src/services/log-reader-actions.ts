@@ -13,7 +13,8 @@ export async function getLogsForActorAction(actorId: string, role?: string): Pro
   error: string | null;
 }> {
   try {
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
+    if (!adminDb) throw new Error('Admin database connection not available.');
 
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
@@ -57,7 +58,8 @@ export async function getLogsForPremiseAction(premiseId: string): Promise<{
   error: string | null;
 }> {
   try {
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
+    if (!adminDb) throw new Error('Admin database connection not available.');
 
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
@@ -80,7 +82,7 @@ export async function getLogsForPremiseAction(premiseId: string): Promise<{
 }
 
 export async function getInvoiceById(invoiceId: string) {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return null;
   try {
     const { data, error } = await adminDb.from('invoices').select('*').eq('id', invoiceId).single();

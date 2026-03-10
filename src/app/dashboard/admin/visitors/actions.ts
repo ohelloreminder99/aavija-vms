@@ -29,7 +29,7 @@ export async function getVisitsForVisitor(
     return { success: false, error: 'Visitor ID is required.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) {

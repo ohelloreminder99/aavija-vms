@@ -42,7 +42,7 @@ interface TokenHistoryCardProps {
 const LogItem = ({ log }: { log: SerializableLog }) => {
   const isCredit = (log.tokenChange ?? 0) > 0;
   const Icon = isCredit ? ArrowUpCircle : ArrowDownCircle;
-  const colorClass = isCredit ? 'text-emerald-600' : 'text-destructive';
+  const colorClass = isCredit ? 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]';
   const timestamp = new Date(log.timestamp);
   const { toast } = useToast();
   const [isDownloading, setIsDownloading] = React.useState(false);
@@ -67,19 +67,21 @@ const LogItem = ({ log }: { log: SerializableLog }) => {
   }
 
   return (
-    <div className="flex items-center gap-4 py-3 border-b last:border-0">
-      <Icon className={cn('h-5 w-5 flex-shrink-0', colorClass)} />
+    <div className="flex items-center gap-4 py-4 px-2 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors group/row">
+      <div className={cn('p-2 rounded-lg bg-white/5 border border-white/5 group-hover/row:border-white/10 transition-all', colorClass)}>
+        <Icon className="h-5 w-5 flex-shrink-0" />
+      </div>
       <div className="flex-1 space-y-1">
-        <p className="text-sm text-foreground leading-tight">{log.description}</p>
+        <p className="text-sm text-zinc-200 leading-tight font-medium group-hover/row:text-white transition-colors">{log.description}</p>
         <div className='flex items-center gap-4'>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <p className="text-xs text-muted-foreground cursor-default">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 cursor-default">
                   {formatDistanceToNow(timestamp, { addSuffix: true })}
                 </p>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent className="bg-black border-white/10 text-white">
                 <p>{timestamp.toLocaleString()}</p>
               </TooltipContent>
             </Tooltip>
@@ -89,19 +91,19 @@ const LogItem = ({ log }: { log: SerializableLog }) => {
             <Button
               variant="link"
               size="sm"
-              className="h-auto p-0 text-xs text-primary flex items-center gap-1"
+              className="h-auto p-0 text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 flex items-center gap-1"
               onClick={handleDownloadInvoice}
               disabled={isDownloading}
             >
               {isDownloading ? <Loader2 className='h-3 w-3 animate-spin' /> : <FileText className='h-3 w-3' />}
-              Download Invoice
+              Invoice
             </Button>
           )}
         </div>
       </div>
       <div
         className={cn(
-          'font-mono text-sm font-semibold whitespace-nowrap ml-2',
+          'font-mono text-base font-bold whitespace-nowrap ml-4 tabular-nums',
           colorClass
         )}
       >
@@ -117,7 +119,6 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Realtime Pulse: Dynamically refetch the ledger array whenever new tokens are bought or consumed
   const { data: realtimePulse } = useCollection({ table: 'logs', __memo: true });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;
 
@@ -129,7 +130,6 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
       try {
         let result;
         if (target.type === 'user') {
-          // Pass the role (visitor/host) to filter out premise transactions from personal history
           result = await getLogsForActorAction(target.id, target.role);
         } else {
           result = await getLogsForPremiseAction(target.id);
@@ -162,33 +162,35 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex h-48 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex h-64 flex-col items-center justify-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
+          <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Syncing Ledger...</p>
         </div>
       );
     }
 
     if (error && (!logs || logs.length === 0)) {
       return (
-        <div className="flex h-48 flex-col items-center justify-center p-4 text-center text-destructive">
-          <AlertTriangle className="h-8 w-8" />
-          <p className="mt-2 font-medium">Could not load token history.</p>
-          <p className="mt-1 text-xs">{error}</p>
+        <div className="flex h-64 flex-col items-center justify-center p-6 text-center text-red-500 bg-red-500/5 border border-red-500/10 rounded-2xl">
+          <AlertTriangle className="h-10 w-10 mb-4" />
+          <p className="font-bold uppercase tracking-tight">Ledger Sync Failure</p>
+          <p className="mt-1 text-[10px] text-red-500/70 max-w-[200px]">{error}</p>
         </div>
       );
     }
 
     if (!logs || logs.length === 0) {
       return (
-        <div className="flex h-48 flex-col items-center justify-center text-muted-foreground">
-          <Info className="h-8 w-8" />
-          <p className="mt-2 text-sm">No token transactions found.</p>
+        <div className="flex h-64 flex-col items-center justify-center text-zinc-600 bg-white/[0.01] border border-white/5 border-dashed rounded-2xl">
+          <Info className="h-10 w-10 mb-4 opacity-20" />
+          <p className="font-bold uppercase tracking-[0.2em] text-[10px]">Zero Transactions</p>
+          <p className="text-[10px] text-zinc-700 mt-1">No neural credit flux detected in current history.</p>
         </div>
       );
     }
 
     return (
-      <ScrollArea className="h-72 pr-4">
+      <ScrollArea className="h-[450px] pr-4">
         <div className="flex flex-col">
           {logs.map((log) => (
             <LogItem key={log.id} log={log} />
@@ -199,20 +201,23 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
   };
 
   return (
-    <Card className={cn(className)}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Coins className="h-5 w-5" />
-          Token History & Invoices
+    <Card className={cn("glass-card border-white/5 shadow-2xl overflow-hidden relative", className)}>
+      <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
+      <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+        <CardTitle className="flex items-center gap-3 text-white text-2xl font-headline font-bold tracking-tight">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
+            <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+          </div>
+          Token Ledger <span className="text-zinc-500 text-sm font-normal tracking-normal ml-auto">Sector: {target.type === 'user' ? (target.role || 'Personal') : 'Premise'}</span>
         </CardTitle>
-        <CardDescription>A log of your recent token transactions and invoices.</CardDescription>
+        <CardDescription className="text-zinc-400 mt-2">Verified records of neural credit acquisition and expenditure.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10 pt-6">
         {error && logs && logs.length > 0 && (
-          <Alert variant="destructive" className="mb-4">
+          <Alert variant="destructive" className="mb-6 bg-red-500/10 border-red-500/20 text-red-500">
             <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Incomplete History</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
+            <AlertTitle className="font-bold uppercase tracking-tight text-xs">Sync Integrity Compromised</AlertTitle>
+            <AlertDescription className="text-[10px] opacity-80">{error}</AlertDescription>
           </Alert>
         )}
         {renderContent()}

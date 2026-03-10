@@ -74,6 +74,10 @@ export function QRCodeCard() {
 
     if (foreground) setFgColor(`hsl(${foreground})`);
     if (background) setBgColor(`hsl(${background})`);
+
+    // Explicitly set for scanning reliability if theme variables feel too dark
+    setFgColor('#020617'); // Deep dark for QR bits
+    setBgColor('#FFFFFF'); // White for QR background
   }, []);
 
   const isLoading =
@@ -209,10 +213,11 @@ export function QRCodeCard() {
 
   if (isLoading) {
     return (
-      <Card className="flex items-center justify-center glass-card p-6 min-h-[400px] border-white/5">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-white/20" />
-          <p className="text-zinc-500 text-sm animate-pulse">Syncing security tokens...</p>
+      <Card className="flex items-center justify-center glass-card p-6 min-h-[400px] border-white/5 relative overflow-hidden">
+        <div className="absolute inset-0 mesh-obsidian opacity-20" />
+        <div className="flex flex-col items-center gap-4 relative z-10">
+          <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
+          <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">Syncing Neural Tokens...</p>
         </div>
       </Card>
     );
@@ -260,9 +265,9 @@ export function QRCodeCard() {
       <Card className="glass-card border-white/5 overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         <CardHeader className="relative z-10">
-          <CardTitle className="text-white">Ready to Check-in?</CardTitle>
+          <CardTitle className="text-white text-2xl tracking-tight">Generate Neural Pass</CardTitle>
           <CardDescription className="text-zinc-400">
-            Generate a secure, single-use QR pass for instant access.
+            Create a secure, single-use biometric code for facility entry.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 relative z-10">
@@ -296,11 +301,11 @@ export function QRCodeCard() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-md bg-black/90 border-white/10 backdrop-blur-2xl text-white">
+        <DialogContent className="sm:max-w-md bg-[#020617]/95 border-white/10 backdrop-blur-3xl text-white shadow-[0_0_50px_rgba(0,0,0,1)]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold tracking-tight">Access Pass Authorized</DialogTitle>
+            <DialogTitle className="text-2xl font-bold tracking-tight text-white">Access Pass Authorized</DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Present this encrypted code to the entry scanner. One-time use only.
+              Present this encrypted code to the biometric scanner. Pass expires in 60s.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-8 gap-6 border border-white/5 rounded-2xl bg-white/5 mt-4">

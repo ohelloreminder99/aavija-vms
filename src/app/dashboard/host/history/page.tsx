@@ -81,13 +81,15 @@ const StarRatingInput = ({
 }) => {
   const [hoverRating, setHoverRating] = React.useState(0);
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
           className={cn(
-            'h-8 w-8 cursor-pointer text-gray-300 transition-colors',
-            (hoverRating || rating) >= star && 'text-amber-400 fill-amber-400'
+            'h-10 w-10 cursor-pointer text-zinc-800 transition-all duration-300 transform hover:scale-110',
+            (hoverRating || rating) >= star
+              ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]'
+              : 'hover:text-zinc-600'
           )}
           onMouseEnter={() => setHoverRating(star)}
           onMouseLeave={() => setHoverRating(0)}
@@ -164,26 +166,30 @@ function RatingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Rate Your Visitor: {visit?.visitor_name}</DialogTitle>
-          <DialogDescription>
-            Your feedback helps maintain a safe and respectful community.
-          </DialogDescription>
+      <DialogContent className="bg-[#020617]/90 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        <DialogHeader className="space-y-4">
+          <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Star className="h-6 w-6 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+          </div>
+          <div>
+            <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Rate Your Visitor</DialogTitle>
+            <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
+              Analyzing encounter with <span className="text-primary">{visit?.visitor_name}</span>
+            </DialogDescription>
+          </div>
         </DialogHeader>
-        <div className="py-4 space-y-6">
-          <div className="flex flex-col items-center gap-2">
-            <p className="font-medium">Overall Experience</p>
+        <div className="py-8 space-y-8">
+          <div className="flex flex-col items-center gap-6">
+            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">Overall Experience</p>
             <StarRatingInput rating={rating} setRating={setRating} />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="gap-3">
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 border-white/5">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Submit Rating
+          <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Lock Rating'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -483,120 +489,134 @@ export default function HostHistoryPage() {
       );
     }
     return (
-      <>
-        <div className="space-y-4 mb-6">
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="flex items-end gap-2">
-              <div>
-                <Label htmlFor="start-date" className="text-xs text-muted-foreground">From</Label>
-                <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[150px]" maxLength={10} />
+      <div className="space-y-8">
+        <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+          <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+          <div className="relative z-10 flex flex-wrap items-end gap-6">
+            <div className="flex flex-wrap items-end gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Range Start</Label>
+                <div className="relative">
+                  <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="end-date" className="text-xs text-muted-foreground">To</Label>
-                <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[150px]" maxLength={10} />
+              <div className="space-y-2">
+                <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Terminal Date</Label>
+                <div className="relative">
+                  <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 ml-auto">
-              <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting}>
-                {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+
+            <div className="flex items-center gap-3 ml-auto">
+              <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6">
+                {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
                 Export CSV
               </Button>
-              <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting}>
-                {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+              <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6">
+                {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
                 Export PDF
               </Button>
             </div>
-            {dateError && <p className="w-full text-xs text-destructive">{dateError}</p>}
           </div>
+
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
             <Input
-              placeholder="Search by visitor name or status..."
-              className="pl-10"
+              placeholder="Filter by visitor identity or neural status..."
+              className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Snapshot</TableHead>
-              <TableHead>Visitor</TableHead>
-              <TableHead>Check-in Time</TableHead>
-              <TableHead>Check-out Time</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredVisits.map((visit) => {
-              const isRated = ratingsMap.has(visit.id);
-              const canRate = visit.status === 'completed' && !isRated;
 
-              return (
-                <TableRow key={visit.id}>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
-                      disabled={!visit.visitor_snapshot_url}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{visit.visitor_name}</div>
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(visit.checkin_time), 'PPp')}
-                  </TableCell>
-                  <TableCell>
-                    {visit.checkout_time ? (
-                      format(new Date(visit.checkout_time), 'PPp')
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
-                        N/A
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={visit.status === 'active' ? 'default' : 'secondary'} className="capitalize">
-                      {visit.status.replace('_', ' ')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {visit.status === 'completed' ? (
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" title="Rate Visitor" disabled={!canRate} onClick={() => setVisitToRate(visit)}>
-                          <Star className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Block Visitor" onClick={() => setVisitToBlock(visit)}>
-                          <UserX className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    ) : isRated ? (
-                      <div className="flex items-center justify-end gap-2 text-sm text-emerald-600">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Rated</span>
-                      </div>
-                    ) : null}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <div className="mt-6 flex justify-center">
+        <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+          <Table>
+            <TableHeader className="bg-white/[0.03]">
+              <TableRow className="border-white/5 hover:bg-transparent">
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Identity</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link UP</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link DOWN</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Protocol Status</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredVisits.map((visit) => {
+                const isRated = ratingsMap.has(visit.id);
+                const canRate = visit.status === 'completed' && !isRated;
+
+                return (
+                  <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                    <TableCell className="pl-8 py-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
+                        disabled={!visit.visitor_snapshot_url}
+                        className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{visit.visitor_name}</div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkin_time), 'PPp')}</span>
+                    </TableCell>
+                    <TableCell>
+                      {visit.checkout_time ? (
+                        <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                      ) : (
+                        <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={visit.status === 'active' ? 'default' : 'secondary'} className={cn("text-[8px] font-black uppercase tracking-widest",
+                        visit.status === 'active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
+                        {visit.status.replace('_', ' ')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right pr-8">
+                      {visit.status === 'completed' ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon" title="Rate Visitor" disabled={!canRate} onClick={() => setVisitToRate(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-amber-500 hover:bg-amber-500/10 disabled:opacity-20 transition-all">
+                            <Star className={cn("h-4 w-4", !canRate && "fill-zinc-800")} />
+                          </Button>
+                          <Button variant="ghost" size="icon" title="Block Visitor" onClick={() => setVisitToBlock(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                            <UserX className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : isRated ? (
+                        <div className="flex items-center justify-end gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                          <CheckCircle2 className="h-3.3 w-3.5" />
+                          <span>Rated</span>
+                        </div>
+                      ) : (
+                        <div className="h-9 w-9 ml-auto rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-center">
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="mt-8 flex justify-center pb-12">
           {hasMore && (
-            <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore}>
-              {isLoadingMore && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Load More
+            <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore} className="h-12 px-10 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all">
+              {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Sync More Artifacts"}
             </Button>
           )}
         </div>
-      </>
+      </div>
     );
   };
 
@@ -606,23 +626,35 @@ export default function HostHistoryPage() {
 
   return (
     <>
-      <div className="container py-10">
-        <div className="mb-4">
-          <Button asChild variant="outline">
-            <Link href={`/dashboard/host?premiseId=${premiseId}`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+      <div className="container py-10 max-w-7xl">
+        <div className="mb-8 flex items-center justify-between">
+          <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+            <Link href={`/dashboard/host?premiseId=${premiseId}`} className="flex items-center">
+              <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Back to Console</span>
             </Link>
           </Button>
+
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Host Intel Pulse Active</span>
+          </div>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Visitor History</CardTitle>
-            <CardDescription>
+
+        <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
+          <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+          <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <Search className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Intelligence <span className="text-primary/80">Archival</span></CardTitle>
+            </div>
+            <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
               {description}
             </CardDescription>
           </CardHeader>
-          <CardContent>{renderContent()}</CardContent>
+          <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
         </Card>
       </div>
 
@@ -638,54 +670,62 @@ export default function HostHistoryPage() {
       />
 
       <AlertDialog open={!!visitToBlock} onOpenChange={(open) => !open && setVisitToBlock(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will block <span className="font-bold">{visitToBlock?.visitor_name}</span> from being able to check-in to visit you in the future. They will still be able to visit other hosts at this premise.
+            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Impose Protocol Restriction?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+              You are about to block <span className="text-red-500 font-bold underline decoration-red-500/30 underline-offset-4">{visitToBlock?.visitor_name}</span>.
+              Future check-in requests for your node from this identity will be automatically terminated.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBlockConfirm} disabled={isBlocking}>
+          <AlertDialogFooter className="gap-3 pt-6">
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBlockConfirm} disabled={isBlocking} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
               {isBlocking && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Block Visitor
+              Commence Block
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Visitor Snapshot</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden">
+          <div className="absolute top-4 left-4 z-20">
+            <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Identity Snapshot</Badge>
+          </div>
           {imageUrlToView && (
             <div className="relative aspect-square w-full">
               <Image
                 src={imageUrlToView}
                 alt="Visitor snapshot"
                 fill
-                className="object-contain rounded-md"
+                className="object-contain"
+                unoptimized
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
             </div>
           )}
+          <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
+            <DialogClose asChild>
+              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6">Close Trace</Button>
+            </DialogClose>
+          </div>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Export</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action will deduct <span className="font-bold">{exportCost ?? '...'}</span> tokens from your personal balance. Are you sure you want to proceed?
+            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Confirm Data Extraction</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+              Extraction protocol requires a neural contribution of <span className="text-primary font-black">{exportCost ?? '...'} units</span> from your personal balance.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null}>
+          <AlertDialogFooter className="gap-3 pt-6">
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm & Export
+              Authorize Deduction
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -4,9 +4,9 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { Settings } from '@/services/settings-service';
 
 export async function updateSettingsAction(data: Partial<Settings>) {
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
     if (!adminDb) {
         return { success: false, error: 'Admin database not available.' };
     }

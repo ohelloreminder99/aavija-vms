@@ -7,9 +7,9 @@
  */
 
 import * as React from 'react';
-import { ArrowLeft, Loader2, Plus, Edit, Trash2, Search, Users, CheckCircle2, UserCircle2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Plus, Edit, Trash2, Search, Users, CheckCircle2, UserCircle2, Building, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -38,6 +38,7 @@ import { usePremiseCategories } from '@/services/premise-category-service';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createLogEntry } from '@/services/log-service';
 import { LogAction } from '@/services/log-actions';
+import { cn } from '@/lib/utils';
 
 const PremiseHistoryDialog = React.lazy(() => import('./components/PremiseHistoryDialog'));
 
@@ -49,7 +50,7 @@ function AgentEmailLookup({
   value,
   onChange,
 }: {
-  value: string; // the resolved agentId stored in the form
+  value: string;
   onChange: (agentId: string) => void;
 }) {
   const [email, setEmail] = React.useState('');
@@ -74,37 +75,46 @@ function AgentEmailLookup({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex gap-2">
         <Input
           type="email"
-          placeholder="agent@example.com"
+          placeholder="Scan via neural mail..."
+          className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800"
           value={email}
           onChange={e => { setEmail(e.target.value); setLookupResult(null); onChange(''); }}
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleVerify())}
         />
-        <Button type="button" variant="outline" onClick={handleVerify} disabled={isLooking || !email}>
-          {isLooking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify'}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleVerify}
+          disabled={isLooking || !email}
+          className="h-11 border-white/5 hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6"
+        >
+          {isLooking ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Ping'}
         </Button>
       </div>
-      {lookupError && <p className="text-xs text-destructive">{lookupError}</p>}
+      {lookupError && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{lookupError}</p>}
       {lookupResult && (
-        <div className="flex items-center gap-3 rounded-md border bg-muted/40 p-3">
-          <Avatar className="h-9 w-9">
+        <div className="flex items-center gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 animate-in fade-in slide-in-from-top-2">
+          <Avatar className="h-10 w-10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
             <AvatarImage src={lookupResult.photo_url} />
-            <AvatarFallback>{lookupResult.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="bg-emerald-500/10 text-emerald-400">{lookupResult.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <p className="text-sm font-medium">{lookupResult.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {lookupResult.is_agent ? '✓ Existing agent' : 'Will be designated as agent'}
+            <p className="text-sm font-bold text-emerald-400 leading-none mb-1">{lookupResult.name}</p>
+            <p className="text-[9px] text-emerald-500/60 font-black uppercase tracking-widest">
+              {lookupResult.is_agent ? 'Designated Operative' : 'Candidate Identified'}
             </p>
           </div>
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
+          <div className="h-8 w-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+          </div>
         </div>
       )}
       {!lookupResult && !lookupError && (
-        <p className="text-xs text-muted-foreground">Type agent's registered email and click Verify.</p>
+        <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-[0.2em] ml-1">Establish neural connection via registered mail.</p>
       )}
     </div>
   );
@@ -378,103 +388,419 @@ export default function PremisesPage() {
   };
 
   const renderContent = () => {
-    if (isLoading) return (<div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin" /></div>);
-    if (error) return (<div className="text-center text-red-500 py-10"><p>An error occurred.</p><p className="text-sm">{error}</p></div>);
-    if (!premises || premises.length === 0) return (<div className="py-10 text-center text-muted-foreground border-2 border-dashed rounded-lg"><p>No premise found.</p></div>);
+    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
+    if (error) return (
+      <div className="py-20 text-center text-red-500 border border-red-500/20 rounded-3xl bg-red-500/5">
+        <Shield className="mx-auto h-10 w-10 mb-4 opacity-50" />
+        <p className="font-bold uppercase tracking-widest text-[11px]">Nodal Link Failure</p>
+        <p className="text-[10px] opacity-60 mt-1">{error}</p>
+      </div>
+    );
+    if (!premises || premises.length === 0) return (
+      <div className="py-20 text-center text-zinc-600 border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.02]">
+        <Building className="mx-auto h-10 w-10 mb-4 opacity-20" />
+        <p className="font-bold uppercase tracking-widest text-[11px]">Infrastructure Negative</p>
+        <p className="text-[10px] opacity-60 mt-1">No active premises detected in the architectural grid.</p>
+      </div>
+    );
+
     return (
-      <>
-        <div className="relative mb-4"><Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" /><Input placeholder="Search..." className="pl-10" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
-        <Table>
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Category</TableHead><TableHead>City</TableHead><TableHead>Status</TableHead><TableHead>Owner</TableHead><TableHead>Agent</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {filteredPremises.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell className="font-medium"><Button variant="link" className="p-0 h-auto" onClick={() => openHistoryDialog(p)}>{p.name}</Button></TableCell>
-                <TableCell className="capitalize">{p.category?.name || 'N/A'}</TableCell>
-                <TableCell className="capitalize">{p.city}</TableCell>
-                <TableCell><Badge variant={p.is_active ? 'default' : 'destructive'}>{p.is_active ? 'Active' : 'Inactive'}</Badge></TableCell>
-                <TableCell>{p.owner ? <div className="flex items-center gap-2"><Avatar className='h-6 w-6'><AvatarImage src={p.owner.photo_url} /><AvatarFallback>{p.owner.name.charAt(0)}</AvatarFallback></Avatar><span className='text-xs'>{p.owner.name}</span></div> : 'N/A'}</TableCell>
-                <TableCell><span className='text-xs'>{p.agent?.name || 'N/A'}</span></TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => { setSelectedPremise(p); setIsEditOpen(true); }}><Edit className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => { setPremiseToChangeOwner(p); setIsChangeOwnerOpen(true); }}><Users className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => { setSelectedPremise(p); setIsDeleteAlertOpen(true); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                  </div>
-                </TableCell>
+      <div className="space-y-6">
+        <div className="relative group/search">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+          <Input
+            placeholder="Scan infrastructure by name, architectural unit, or city..."
+            className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all font-medium"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+          <Table>
+            <TableHeader className="bg-white/[0.03]">
+              <TableRow className="border-white/5 hover:bg-transparent">
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Infrastructural Node</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Unit Type</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">City Nodal</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Master Principal</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </>
+            </TableHeader>
+            <TableBody>
+              {filteredPremises.map((p) => (
+                <TableRow key={p.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                  <TableCell className="pl-8 py-5">
+                    <Button variant="link" className="p-0 h-auto font-bold text-white tracking-tight hover:text-primary transition-colors flex items-center gap-3 no-underline group-hover/row:text-primary" onClick={() => openHistoryDialog(p)}>
+                      <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover/row:border-primary/30 transition-all">
+                        <Building className="h-4 w-4" />
+                      </div>
+                      {p.name}
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-[8px] font-black uppercase tracking-[0.2em] bg-white/5 border-white/10 text-zinc-400">
+                      {p.category?.name || 'N/A'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-[11px] font-medium text-zinc-500 uppercase tracking-tighter">{p.city}</TableCell>
+                  <TableCell>
+                    <Badge className={cn(
+                      "text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 border-none",
+                      p.is_active
+                        ? "bg-emerald-500/10 text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+                        : "bg-red-500/10 text-red-500"
+                    )}>
+                      {p.is_active ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {p.owner ? (
+                      <div className="flex items-center gap-3">
+                        <Avatar className='h-7 w-7 border border-white/10'>
+                          <AvatarImage src={p.owner.photo_url} />
+                          <AvatarFallback className="text-[10px] bg-white/5">{p.owner.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className='text-[11px] font-bold text-zinc-300'>{p.owner.name}</span>
+                          <span className='text-[9px] font-black text-zinc-700 uppercase tracking-widest'>Nodal Principal</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className='text-[9px] font-black uppercase tracking-widest text-zinc-800'>Orphan Node</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right pr-8">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-primary hover:bg-primary/5 transition-all" onClick={() => { setSelectedPremise(p); setIsEditOpen(true); }}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-amber-500 hover:bg-amber-500/5 transition-all" title="Transfer Ownership" onClick={() => { setPremiseToChangeOwner(p); setIsChangeOwnerOpen(true); }}><Users className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/5 transition-all" onClick={() => { setSelectedPremise(p); setIsDeleteAlertOpen(true); }}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     );
   };
 
   const form: any = creationMode === 'new' ? newOwnerForm : existingUserForm;
 
   return (
-    <div className="container py-10">
-      <div className="flex justify-between items-center mb-6">
-        <Button asChild variant="outline"><Link href="/dashboard/admin"><ArrowLeft className="mr-2 h-4 w-4" />Back</Link></Button>
+    <div className="container py-10 max-w-7xl">
+      <div className="flex justify-between items-center mb-8">
+        <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+          <Link href="/dashboard/admin" className="flex items-center">
+            <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Back to Intelligence Hub</span>
+          </Link>
+        </Button>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />Create Premise</Button></DialogTrigger>
-          <DialogContent className="sm:max-w-md flex flex-col h-[90vh] max-h-[750px]">
-            <DialogHeader><DialogTitle>Create New Premise</DialogTitle></DialogHeader>
-            <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="flex items-center space-x-4"><div className="flex items-center space-x-2"><RadioGroupItem value="new" id="r1" /><Label htmlFor="r1">New Owner</Label></div><div className="flex items-center space-x-2"><RadioGroupItem value="existing" id="r2" /><Label htmlFor="r2">Existing User</Label></div></RadioGroup>
-            <Form key={creationMode} {...((creationMode === 'new' ? newOwnerForm : existingUserForm) as any)}><form onSubmit={form.handleSubmit(handleCreateSubmit as any)} className="flex-1 flex flex-col min-h-0"><ScrollArea className="flex-1 -mx-6"><div className="space-y-6 px-6 py-4">
-              <FormField control={form.control} name="premiseName" render={({ field }) => (<FormItem><FormLabel>Premise Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-              <FormField control={form.control} name="categoryId" render={({ field }) => (<FormItem><FormLabel>Category</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger></FormControl><SelectContent>{categories?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
-              <FormField control={form.control} name="premiseAddress" render={({ field }) => (<FormItem><FormLabel>Address</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-              <FormField control={form.control} name="cityId" render={({ field }) => (<FormItem><FormLabel>City</FormLabel><Input placeholder="Search..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} /><ScrollArea className="h-32 w-full rounded-md border mt-2"><FormControl><RadioGroup onValueChange={field.onChange} value={field.value} className="p-4">{filteredCities.map(c => <div key={c.id} className="flex items-center space-x-2 mb-2"><RadioGroupItem value={c.id} id={`c-${c.id}`} /><Label htmlFor={`c-${c.id}`} className="font-normal capitalize">{c.name}, {c.stateName}</Label></div>)}</RadioGroup></FormControl></ScrollArea><FormMessage /></FormItem>)} />
-              <Separator />
-              {creationMode === 'new' ? (
-                <>
-                  <FormField control={form.control} name="ownerName" render={({ field }) => (<FormItem><FormLabel>Owner Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="ownerEmail" render={({ field }) => (<FormItem><FormLabel>Owner Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="ownerPassword" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                </>
-              ) : (
-                <FormField control={form.control} name="ownerEmail" render={({ field }) => (<FormItem><FormLabel>Existing Owner Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-              )}
-              <Separator />
-              <FormField control={form.control} name="agentId" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Agent (Optional)</FormLabel>
-                  <FormDescription>Enter the registered email of the agent to assign to this premise.</FormDescription>
-                  <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div></ScrollArea><DialogFooter className="py-4 border-t"><DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose><Button type="submit" disabled={isSubmitting}>Create</Button></DialogFooter></form></Form>
+          <DialogTrigger asChild>
+            <Button className="bg-primary text-white font-black uppercase tracking-wider text-xs h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all">
+              <Plus className="mr-2 h-4 w-4" /> Establish New Node
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden flex flex-col h-[90vh] max-h-[800px]">
+            <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                    <Building className="h-5 w-5 text-primary" />
+                  </div>
+                  <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Node <span className="text-primary/80">Initialization</span></DialogTitle>
+                </div>
+                <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                  Establish a new infrastructural unit within the Aavija global mesh.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-8">
+                <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="grid grid-cols-2 gap-4">
+                  <div className={cn(
+                    "relative flex items-center justify-center h-12 rounded-xl border transition-all cursor-pointer group",
+                    creationMode === 'new' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                  )} onClick={() => setCreationMode('new')}>
+                    <RadioGroupItem value="new" id="r1" className="sr-only" />
+                    <Label htmlFor="r1" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">New Nodal Principal</Label>
+                    {creationMode === 'new' && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
+                  </div>
+                  <div className={cn(
+                    "relative flex items-center justify-center h-12 rounded-xl border transition-all cursor-pointer group",
+                    creationMode === 'existing' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                  )} onClick={() => setCreationMode('existing')}>
+                    <RadioGroupItem value="existing" id="r2" className="sr-only" />
+                    <Label htmlFor="r2" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">Linked Operative</Label>
+                    {creationMode === 'existing' && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+
+            <Form key={creationMode} {...((creationMode === 'new' ? newOwnerForm : existingUserForm) as any)}>
+              <form onSubmit={form.handleSubmit(handleCreateSubmit as any)} className="flex-1 flex flex-col min-h-0 bg-black/40">
+                <ScrollArea className="flex-1">
+                  <div className="space-y-8 p-8">
+                    <div className="grid grid-cols-2 gap-6">
+                      <FormField control={form.control} name="premiseName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Node Designation</FormLabel>
+                          <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" placeholder="e.g., Sector 7 Hub" /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="categoryId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Unit Classification</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/40 border-white/5 text-white h-11 rounded-xl">
+                                <SelectValue placeholder="Classification..." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                              {categories?.map(c => <SelectItem key={c.id} value={c.id} className="focus:bg-primary focus:text-white">{c.name}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    <FormField control={form.control} name="premiseAddress" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Geographic Coordinates</FormLabel>
+                        <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" placeholder="Analog Address..." /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <FormField control={form.control} name="cityId" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Nodal Hub (City)</FormLabel>
+                        <div className="space-y-4">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-700" />
+                            <Input placeholder="Scan urban grids..." className="pl-9 bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
+                          </div>
+                          <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/40 p-2">
+                            <FormControl>
+                              <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-1">
+                                {filteredCities.map(c => (
+                                  <div key={c.id} className={cn(
+                                    "flex items-center h-10 px-4 rounded-xl transition-all cursor-pointer group",
+                                    field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-500"
+                                  )} onClick={() => field.onChange(c.id)}>
+                                    <RadioGroupItem value={c.id} id={`c-${c.id}`} className="sr-only" />
+                                    <Label htmlFor={`c-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">{c.name}, <span className="opacity-50">{c.stateName}</span></Label>
+                                    {field.value === c.id && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                                  </div>
+                                ))}
+                              </RadioGroup>
+                            </FormControl>
+                          </ScrollArea>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <div className="h-px bg-white/5" />
+
+                    {creationMode === 'new' ? (
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                          <UserCircle2 className="h-4 w-4 text-zinc-500" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Principal Identity Protocol</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-6">
+                          <FormField control={form.control} name="ownerName" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Identity Name</FormLabel>
+                              <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <FormField control={form.control} name="ownerEmail" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Neural Mail</FormLabel>
+                              <FormControl><Input type="email" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        </div>
+                        <FormField control={form.control} name="ownerPassword" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Access Cipher</FormLabel>
+                            <FormControl><Input type="password" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                      </div>
+                    ) : (
+                      <FormField control={form.control} name="ownerEmail" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Linked Neural Mail</FormLabel>
+                          <FormControl><Input type="email" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" placeholder="operative@aavija.mesh" /></FormControl>
+                          <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Assign an existing operative to master this infrastructural node.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    )}
+
+                    <div className="h-px bg-white/5" />
+
+                    <FormField control={form.control} name="agentId" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Local Facilitator (Agent)</FormLabel>
+                        <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                </ScrollArea>
+                <div className="p-8 border-t border-white/5 bg-white/[0.02] flex justify-end gap-4">
+                  <DialogClose asChild>
+                    <Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Abort</Button>
+                  </DialogClose>
+                  <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Shield className="mr-2 h-4 w-4" />}
+                    Initialize Node
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
       </div>
-      <Card><CardHeader><CardTitle>Premises</CardTitle></CardHeader><CardContent>{renderContent()}</CardContent></Card>
+
+      <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
+        <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+        <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Building className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Premise <span className="text-primary/80">Oversight</span></CardTitle>
+          </div>
+          <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
+            Architectural directory of all active nodal points. Monitor unit health, principal assignments, and hub distribution across the global mesh.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
+      </Card>
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-md flex flex-col h-[90vh] max-h-[750px]">
-          <DialogHeader><DialogTitle>Edit Premise</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden flex flex-col h-[90vh] max-h-[800px]">
+          <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+            <DialogHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                  <Edit className="h-5 w-5 text-primary" />
+                </div>
+                <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Node <span className="text-primary/80">Modification</span></DialogTitle>
+              </div>
+              <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                Recalibrate structural parameters for node: <span className="text-white font-bold">{selectedPremise?.name}</span>
+              </DialogDescription>
+            </DialogHeader>
+          </div>
           <Form {...editForm}>
-            <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="flex-1 flex flex-col min-h-0">
-              <ScrollArea className="flex-1 -mx-6">
-                <div className="space-y-6 px-6 py-4">
-                  <FormField control={editForm.control} name="name" render={({ field }) => (<FormItem><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={editForm.control} name="categoryId" render={({ field }) => (<FormItem><FormLabel>Category</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select Category..." /></SelectTrigger></FormControl><SelectContent>{categories?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
-                  <FormField control={editForm.control} name="address" render={({ field }) => (<FormItem><FormLabel>Address</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={editForm.control} name="cityId" render={({ field }) => (<FormItem><FormLabel>City</FormLabel><Input placeholder="Search City..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} /><ScrollArea className="h-32 border rounded-md mt-2"><FormControl><RadioGroup onValueChange={field.onChange} value={field.value} className="p-2">{filteredCities.map(c => <div key={c.id} className='flex items-center space-x-2 mb-1'><RadioGroupItem value={c.id} id={`e-c-${c.id}`} /><Label htmlFor={`e-c-${c.id}`} className="font-normal capitalize">{c.name}</Label></div>)}</RadioGroup></FormControl></ScrollArea><FormMessage /></FormItem>)} />
+            <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="flex-1 flex flex-col min-h-0 bg-black/40">
+              <ScrollArea className="flex-1">
+                <div className="space-y-8 p-8">
+                  <div className="grid grid-cols-2 gap-6">
+                    <FormField control={editForm.control} name="name" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Node Designation</FormLabel>
+                        <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={editForm.control} name="categoryId" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Unit Classification</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-black/40 border-white/5 text-white h-11 rounded-xl">
+                              <SelectValue placeholder="Classification..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                            {categories?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+                  <FormField control={editForm.control} name="address" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Geographic Coordinates</FormLabel>
+                      <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={editForm.control} name="cityId" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Nodal Hub (City)</FormLabel>
+                      <div className="space-y-4">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
+                          <Input placeholder="Scan grids..." className="pl-10 bg-black/40 border-white/5 text-white h-11 rounded-xl" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
+                        </div>
+                        <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/40 p-2">
+                          <FormControl>
+                            <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-1">
+                              {filteredCities.map(c => (
+                                <div key={c.id} className={cn(
+                                  "flex items-center h-10 px-4 rounded-xl transition-all cursor-pointer",
+                                  field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-500"
+                                )} onClick={() => field.onChange(c.id)}>
+                                  <RadioGroupItem value={c.id} id={`e-c-${c.id}`} className="sr-only" />
+                                  <Label htmlFor={`e-c-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">{c.name}</Label>
+                                  {field.value === c.id && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                                </div>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                        </ScrollArea>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <div className="h-px bg-white/5" />
+
                   <FormField control={editForm.control} name="agentId" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Agent (Optional)</FormLabel>
-                      <FormDescription>Type the agent's email to reassign. Leave unchanged to keep current agent.</FormDescription>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Local Facilitator (Agent)</FormLabel>
                       <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
                       <FormMessage />
                     </FormItem>
                   )} />
-                  <FormField control={editForm.control} name="is_active" render={({ field }) => (<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4"><div className="space-y-0.5"><FormLabel className="text-base">Active Status</FormLabel><FormDescription>Turn off to temporarily suspend this Premise.</FormDescription></div><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>)} />
+
+                  <FormField control={editForm.control} name="is_active" render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-white/5 bg-black/40 p-6">
+                      <div className="space-y-1">
+                        <FormLabel className="text-sm font-bold text-white tracking-tight">Node Operational Status</FormLabel>
+                        <FormDescription className="text-[10px] text-zinc-600 font-medium uppercase tracking-tight">Toggle to temporarily decouple this node from the active mesh.</FormDescription>
+                      </div>
+                      <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-primary" /></FormControl>
+                    </FormItem>
+                  )} />
                 </div>
               </ScrollArea>
-              <DialogFooter className="py-4 border-t"><DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose><Button type="submit" disabled={isSubmitting}>Save</Button></DialogFooter>
+              <div className="p-8 border-t border-white/5 bg-white/[0.02] flex justify-end gap-4">
+                <DialogClose asChild>
+                  <Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Abort</Button>
+                </DialogClose>
+                <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                  Commit Changes
+                </Button>
+              </div>
             </form>
           </Form>
         </DialogContent>
@@ -482,18 +808,25 @@ export default function PremisesPage() {
 
       {/* Delete Dialog */}
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the premise and irreversibly revoke access for all associated users. Data like invoices and past active check-ins may be affected.
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Decommission <span className="text-red-500">Node?</span></AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+              This will permanently purge node <span className="text-white font-bold">{selectedPremise?.name}</span> from the global infrastructure directory.
+              Access for all associated principals and operatives will be irreversibly revoked.
+              Past active check-ins and ledger entries will be archived but decoupled from the live mesh.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} disabled={isSubmitting} className="bg-destructive hover:bg-destructive/90">
+          <AlertDialogFooter className="gap-3 pt-8">
+            <AlertDialogCancel disabled={isSubmitting} className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-              Force Delete
+              Purge Node
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -501,33 +834,50 @@ export default function PremisesPage() {
 
       {/* Duplicate User Collision Dialog */}
       <AlertDialog open={showDuplicateUserDialog} onOpenChange={setShowDuplicateUserDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Account Already Exists</AlertDialogTitle>
-            <AlertDialogDescription>
-              A user with that email address is already registered inside the network.
-              Please close this creation form and select <strong className="text-foreground border-b border-dashed border-primary">"Existing User"</strong> instead of "New Owner" to assign them to this premise safely!
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-amber-500" />
+              </div>
+              <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white font-headline">Identity <span className="text-amber-500">Collision</span></AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+              The neural mail provided is already associated with an identity inside the network registry.
+              Please recalibrate the request: select <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Linked Operative</span> instead of "New Nodal Principal" to securely bind the existing identity to this node.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)}>Got it</AlertDialogAction>
+          <AlertDialogFooter className="pt-6">
+            <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Recalibrate</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Change Owner Dialog */}
       <Dialog open={isChangeOwnerOpen} onOpenChange={setIsChangeOwnerOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Transfer Ownership</DialogTitle><DialogDescription>Enter the email address of the new owner to transfer control of this premise.</DialogDescription></DialogHeader>
-          <form onSubmit={handleChangeOwnerSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label>New Owner Email Address</Label>
-              <Input type="email" required value={newOwnerEmail || ''} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="newowner@example.com" />
+        <DialogContent className="sm:max-w-md bg-black/90 border-white/10 backdrop-blur-2xl p-8">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <DialogTitle className="text-2xl font-bold text-white tracking-tight">Ownership <span className="text-primary/80">Transfer</span></DialogTitle>
             </div>
-            <DialogFooter>
-              <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
-              <Button type="submit" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Transfer Ownership'}</Button>
-            </DialogFooter>
+            <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+              Reassign archival principal control for node: <span className="text-white">{premiseToChangeOwner?.name}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleChangeOwnerSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">New Principal Neural Mail</Label>
+              <Input type="email" required value={newOwnerEmail || ''} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="principal@aavija.mesh" className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" />
+            </div>
+            <div className="flex justify-end gap-4 pt-4">
+              <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Abort</Button></DialogClose>
+              <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Commit Transfer'}
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -538,4 +888,3 @@ export default function PremisesPage() {
     </div>
   );
 }
-

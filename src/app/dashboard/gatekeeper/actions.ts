@@ -59,7 +59,7 @@ export async function processScannedToken(
   hosts?: SerializableCheckinHost[];
   error?: string;
 }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server database is not available.' };
   }
@@ -200,7 +200,7 @@ interface FinalizeCheckinPayload {
  */
 export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<{ success: boolean, error?: string }> {
   const { token, visitorId, hostId, premiseId, gatekeeperId } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server database is not available.' };
   }
@@ -406,7 +406,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
 }
 
 export async function cancelCheckin(token: string): Promise<{ success: boolean }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false };
 
   try {
@@ -421,7 +421,7 @@ export async function cancelCheckin(token: string): Promise<{ success: boolean }
 }
 
 export async function getActiveVisitsForPremise(premiseId: string): Promise<{ success: boolean, visits?: SerializableVisit[], error?: string }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
   try {
@@ -441,7 +441,7 @@ export async function getActiveVisitsForPremise(premiseId: string): Promise<{ su
 
     if (error) throw error;
 
-    const visits = visitsSnapshot.map((doc: any) => ({
+    const visits = (visitsSnapshot || []).map((doc: any) => ({
       id: doc.id,
       ...doc,
       checkin_time: doc.checkin_time,
@@ -461,7 +461,7 @@ interface CheckoutPayload {
 
 export async function checkoutVisitor(payload: CheckoutPayload): Promise<{ success: boolean; error?: string }> {
   const { visitId, visitorId, premiseId } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
   try {
@@ -494,7 +494,7 @@ interface ForceCheckoutPayload extends CheckoutPayload {
 
 export async function forceCheckoutVisitor(payload: ForceCheckoutPayload): Promise<{ success: boolean; error?: string }> {
   const { visitId, visitorId, premiseId, actor } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
   try {
@@ -550,7 +550,7 @@ export async function getEmergencyContactInfo(payload: EmergencyContactPayload):
   error?: string;
 }> {
   const { visitId, premiseId } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
   try {

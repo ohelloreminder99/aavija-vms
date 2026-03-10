@@ -67,7 +67,7 @@ export async function designateAgentByEmail(
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized: Only admins can designate agents.');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     const { data, error } = await adminDb.rpc('rpc_designate_agent_by_email', {
@@ -124,7 +124,7 @@ export async function lookupUserByEmail(
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     const { data, error } = await adminDb
@@ -154,7 +154,7 @@ export async function removeAgentDesignation(
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     await adminDb.from('users').update({ is_agent: false }).eq('id', userId);
@@ -182,7 +182,7 @@ export async function submitPayoutRequest(payload: {
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const { user, profile } = await requireAuth();
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     // KYC gate for cash payouts
@@ -269,7 +269,7 @@ export async function adminProcessPayout(
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     // Fetch request info for WhatsApp notification BEFORE the RPC modifies it
@@ -337,7 +337,7 @@ export async function adminRejectPayout(
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     const { data, error } = await adminDb.rpc('rpc_reject_payout', {
@@ -393,7 +393,7 @@ export async function updatePayoutDetails(payload: {
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const { user } = await requireAuth();
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     const { error } = await adminDb
@@ -423,7 +423,7 @@ export async function getPayoutRequestsForAdmin(): Promise<{
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     const { data: requests, error } = await adminDb
@@ -466,7 +466,7 @@ export async function getAgentsOverview(): Promise<{
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     const { data, error } = await adminDb
@@ -492,7 +492,7 @@ export async function adminApproveKyc(
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
     await adminDb.from('users').update({ kyc_verified: true }).eq('id', userId);

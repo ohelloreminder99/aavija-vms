@@ -9,6 +9,7 @@ import {
   Download,
   Star,
   Eye,
+  History as HistoryIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,6 +42,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -58,6 +60,7 @@ import { Label } from '@/components/ui/label';
 import { format, subDays, parse } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/services/settings-service';
+import { cn } from '@/lib/utils';
 import { blockVisitorFromPremise } from '@/services/block-service';
 import { useToast } from '@/hooks/use-toast';
 import Papa from 'papaparse';
@@ -493,104 +496,76 @@ export default function HistoryPage() {
 
 
   const renderTable = () => {
-    if (isLoading) {
-      return (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="text-center text-red-500 py-10">
-          <p>An error occurred while fetching visit history.</p>
-          <p className="text-sm">{error}</p>
-        </div>
-      );
-    }
-
-    if (!visits || visits.length === 0) {
-      return (
-        <div className="py-10 text-center text-muted-foreground border-2 border-dashed rounded-lg">
-          <p>No visit history found for your premise.</p>
-        </div>
-      );
-    }
-
-    if (filteredVisits.length === 0) {
-      return (
-        <p className="py-10 text-center text-muted-foreground">
-          No visits match your criteria.
-        </p>
-      );
-    }
-
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Snapshot</TableHead>
-            <TableHead>Visitor Name</TableHead>
-            <TableHead>Host Name</TableHead>
-            <TableHead>Check-in Time</TableHead>
-            <TableHead>Check-out Time</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredVisits.map((visit) => {
-            return (
-              <TableRow key={visit.id}>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
-                    disabled={!visit.visitor_snapshot_url}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium">{visit.visitor_name}</div>
-                </TableCell>
-                <TableCell>{visit.host_name || 'N/A'}</TableCell>
-                <TableCell>
-                  {visit.checkin_time
-                    ? format(new Date(visit.checkin_time), 'PPp')
-                    : 'N/A'}
-                </TableCell>
-                <TableCell>
-                  {visit.checkout_time
-                    ? format(new Date(visit.checkout_time), 'PPp')
-                    : 'N/A'}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={visit.status === 'active' ? 'default' : 'secondary'}
-                    className="capitalize"
-                  >
-                    {visit.status.replace('_', ' ')}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-1">
-                    {visit.status === 'active' ? (
-                      <Button variant="outline" size="sm" onClick={() => setVisitToForceCheckout(visit)}>Force Checkout</Button>
+      <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+        <Table>
+          <TableHeader className="bg-white/[0.03]">
+            <TableRow className="border-white/5 hover:bg-transparent">
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Identity</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Linked Host</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link UP</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link DOWN</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Protocol Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredVisits.map((visit) => {
+              return (
+                <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                  <TableCell className="pl-8 py-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
+                      disabled={!visit.visitor_snapshot_url}
+                      className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{visit.visitor_name}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-[11px] font-medium text-zinc-400 group-hover/row:text-zinc-200 transition-colors">{visit.host_name || 'Autonomous'}</div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-mono text-[11px] text-zinc-500">{visit.checkin_time ? format(new Date(visit.checkin_time), 'PPp') : 'VOID'}</span>
+                  </TableCell>
+                  <TableCell>
+                    {visit.checkout_time ? (
+                      <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkout_time), 'PPp')}</span>
                     ) : (
-                      <Button variant="ghost" size="icon" title="Block from Premise" onClick={() => setVisitToBlock(visit)}>
-                        <UserX className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
                     )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={visit.status === 'active' ? 'default' : 'secondary'} className={cn("text-[8px] font-black uppercase tracking-widest",
+                      visit.status === 'active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
+                      {visit.status.replace('_', ' ')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right pr-8">
+                    <div className="flex justify-end gap-2">
+                      {visit.status === 'active' ? (
+                        <Button variant="outline" size="sm" onClick={() => setVisitToForceCheckout(visit)} className="h-8 bg-amber-500/5 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white text-[9px] font-black uppercase tracking-widest px-4 rounded-lg transition-all">
+                          Force Terminal
+                        </Button>
+                      ) : (
+                        <Button variant="ghost" size="icon" title="Impose Restriction" onClick={() => setVisitToBlock(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                          <UserX className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
     );
   };
 
@@ -599,137 +574,119 @@ export default function HistoryPage() {
   const description = `A paginated log of recent visits at your premise, showing the last ${visibleDays ?? '...'} days. You can export up to ${exportableDays ?? '...'} days of history via CSV/PDF.`;
 
   return (
-    <div className="container py-10">
-      <div className="mb-4">
-        <Button asChild variant="outline">
-          <Link href={`/dashboard/owner?premiseId=${premiseId}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+    <div className="container py-10 max-w-7xl">
+      <div className="mb-8 flex items-center justify-between">
+        <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+          <Link href={`/dashboard/owner?premiseId=${premiseId}`} className="flex items-center">
+            <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Back to Hub</span>
           </Link>
         </Button>
+        <div className="flex items-center gap-3">
+          <div className="h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Premise Nexus Link Active</span>
+        </div>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Visit History</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-end gap-4">
-              <div className="flex items-end gap-2">
-                <div>
-                  <Label
-                    htmlFor="start-date"
-                    className="text-xs text-muted-foreground"
-                  >
-                    From
-                  </Label>
-                  <Input
-                    id="start-date"
-                    type="text"
-                    placeholder="DD/MM/YYYY"
-                    value={startDate}
-                    onChange={(e) => handleDateInputChange(e.target.value, setStartDate)}
-                    className="w-[150px]"
-                    maxLength={10}
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="end-date"
-                    className="text-xs text-muted-foreground"
-                  >
-                    To
-                  </Label>
-                  <Input
-                    id="end-date"
-                    type="text"
-                    placeholder="DD/MM/YYYY"
-                    value={endDate}
-                    onChange={(e) => handleDateInputChange(e.target.value, setEndDate)}
-                    className="w-[150px]"
-                    maxLength={10}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-2 ml-auto">
-                <Button
-                  variant="outline"
-                  onClick={() => setExportToConfirm('csv')}
-                  disabled={
-                    filteredVisits.length === 0 ||
-                    isLoading ||
-                    !!dateError ||
-                    !!isExporting
-                  }
-                >
-                  {isExporting === 'csv' ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="mr-2 h-4 w-4" />
-                  )}
-                  Export CSV
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setExportToConfirm('pdf')}
-                  disabled={
-                    filteredVisits.length === 0 ||
-                    isLoading ||
-                    !!dateError ||
-                    !!isExporting
-                  }
-                >
-                  {isExporting === 'pdf' ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="mr-2 h-4 w-4" />
-                  )}
-                  Export PDF
-                </Button>
-              </div>
-              {dateError && (
-                <p className="w-full text-xs text-destructive">{dateError}</p>
-              )}
+
+      <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
+        <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+        <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <HistoryIcon className="h-5 w-5 text-primary" />
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <Input
-                placeholder="Search results by name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <div>
-                <Label htmlFor="visitor-filter" className="text-xs text-muted-foreground">Visitor</Label>
-                <Select value={visitorFilter} onValueChange={setVisitorFilter}>
-                  <SelectTrigger id="visitor-filter">
-                    <SelectValue placeholder="Filter by visitor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Visitors</SelectItem>
-                    {uniqueVisitors.map((v) => (
-                      <SelectItem key={v.id} value={v.id}>
-                        {v.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Facility <span className="text-primary/80">Intelligence</span></CardTitle>
+          </div>
+          <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
+            {description}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative z-10 pt-8">
+          <div className="space-y-8">
+            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
+              <div className="relative z-10 flex flex-wrap items-end gap-6">
+                <div className="flex flex-wrap items-end gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Range Start</Label>
+                    <div className="relative">
+                      <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Terminal Date</Label>
+                    <div className="relative">
+                      <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 ml-auto">
+                  <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6">
+                    {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6">
+                    {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
+                    Export PDF
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="host-filter" className="text-xs text-muted-foreground">Host</Label>
-                <Select value={hostFilter} onValueChange={setHostFilter}>
-                  <SelectTrigger id="host-filter">
-                    <SelectValue placeholder="Filter by host" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Hosts</SelectItem>
-                    {uniqueHosts.map((h) => (
-                      <SelectItem key={h.id} value={h.id}>
-                        {h.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
+                  <Input
+                    placeholder="Search identity logs..."
+                    className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Select value={visitorFilter} onValueChange={setVisitorFilter}>
+                    <SelectTrigger id="visitor-filter" className="h-12 bg-black/40 border-white/5 text-zinc-300 rounded-2xl font-bold uppercase tracking-widest text-[10px]">
+                      <SelectValue placeholder="All Visitor Artifacts" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#020617] border-white/10">
+                      <SelectItem value="all" className="text-zinc-400 uppercase tracking-widest font-black text-[9px]">Global Trace</SelectItem>
+                      {uniqueVisitors.map((v) => (
+                        <SelectItem key={v.id} value={v.id} className="text-white hover:bg-primary/20">
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Select value={hostFilter} onValueChange={setHostFilter}>
+                    <SelectTrigger id="host-filter" className="h-12 bg-black/40 border-white/5 text-zinc-300 rounded-2xl font-bold uppercase tracking-widest text-[10px]">
+                      <SelectValue placeholder="All Host Nodes" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#020617] border-white/10">
+                      <SelectItem value="all" className="text-zinc-400 uppercase tracking-widest font-black text-[9px]">Global Nodes</SelectItem>
+                      {uniqueHosts.map((h) => (
+                        <SelectItem key={h.id} value={h.id} className="text-white hover:bg-primary/20">
+                          {h.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+              {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
+            </div>
+
+            <div className='mt-8'>
+              {renderTable()}
+            </div>
+
+            <div className="mt-8 flex justify-center pb-12">
+              {hasMore && (
+                <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore} className="h-12 px-10 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all">
+                  {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Sync More Artifacts"}
+                </Button>
+              )}
             </div>
           </div>
 
@@ -748,36 +705,43 @@ export default function HistoryPage() {
       </Card>
 
       <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Visitor Snapshot</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden">
+          <div className="absolute top-4 left-4 z-20">
+            <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Identity Snapshot</Badge>
+          </div>
           {imageUrlToView && (
             <div className="relative aspect-square w-full">
               <Image
                 src={imageUrlToView}
                 alt="Visitor snapshot"
                 fill
-                className="object-contain rounded-md"
+                className="object-contain"
+                unoptimized
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
             </div>
           )}
+          <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
+            <DialogClose asChild>
+              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6 rounded-lg">Close Trace</Button>
+            </DialogClose>
+          </div>
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Export</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action will deduct <span className="font-bold">{exportCost ?? '...'}</span> tokens from the premise balance. Are you sure you want to proceed?
+            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Confirm Data Extraction</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+              Extraction protocol requires a neural contribution of <span className="text-primary font-black">{exportCost ?? '...'} units</span> from your premise balance.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null}>
+          <AlertDialogFooter className="gap-3 pt-6">
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm & Export
+              Authorize Deduction
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

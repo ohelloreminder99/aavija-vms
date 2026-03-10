@@ -25,7 +25,7 @@ type LogData = Omit<Log, 'id' | 'timestamp' | 'expiresAt'>;
  * Creates a new log entry in Supabase.
  */
 export async function createLogEntry(data: LogData) {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     console.error('Log creation skipped: Admin DB not available.');
     return;

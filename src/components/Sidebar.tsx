@@ -78,8 +78,8 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                 className={cn(
                     "w-full justify-start overflow-hidden group relative transition-all duration-300",
                     isActive
-                        ? "bg-primary/5 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-semibold"
-                        : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50 font-normal"
+                        ? "bg-primary/10 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-semibold shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                        : "text-zinc-400 hover:text-white hover:bg-white/5 font-normal"
                 )}
                 asChild
                 onClick={onClose}
@@ -88,7 +88,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     {isActive && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
                     <Icon className={cn(
                         "mr-3 h-5 w-5 shrink-0 transition-all duration-300",
-                        isActive ? "text-primary scale-110" : "group-hover:text-zinc-900"
+                        isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" : "group-hover:text-white"
                     )} />
                     <span className="truncate">{label}</span>
                 </Link>
@@ -103,7 +103,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
             <div className="space-y-8 px-4">
                 {/* Global Links */}
                 <div className="space-y-2">
-                    <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
+                    <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
                         Core Systems
                     </h4>
                     {renderLink('/dashboard/visitor', 'Visitor Portal', roleIcons.visitor, 'global-visitor')}
@@ -131,7 +131,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                             const name = premiseNames[premiseId] || 'Loading...';
                             return (
                                 <div key={premiseId} className="space-y-2">
-                                    <div className="px-4 py-2 text-xs font-semibold text-zinc-700 truncate opacity-80" title={name}>
+                                    <div className="px-4 py-2 text-xs font-semibold text-zinc-300 truncate opacity-80" title={name}>
                                         {name}
                                     </div>
                                     <div className="pl-4 space-y-1 relative">
@@ -155,14 +155,14 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { userProfile: UserProfile | null, isCollapsed: boolean, toggleCollapse: () => void }) {
     return (
         <aside className={cn(
-            "hidden md:flex flex-col border-r border-border/40 bg-white/60 backdrop-blur-xl transition-all duration-500 relative",
+            "hidden md:flex flex-col border-r border-white/5 glass-card transition-all duration-500 relative",
             isCollapsed ? "w-20 items-center" : "w-72"
         )}>
             {/* Collapse Toggle */}
             <Button
                 variant="ghost"
                 size="icon"
-                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-border/40 bg-white text-zinc-400 shadow-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all transform active:scale-95"
+                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-[#0F172A] text-zinc-400 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:bg-[#1E293B] hover:text-white transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
                 {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}

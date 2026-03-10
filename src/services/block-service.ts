@@ -57,7 +57,7 @@ interface HostBlockPayload extends BlockActionPayload {
  * Fetches settings and calculates the log expiry timestamp.
  * Returns null for expiresAt if TTL is not configured.
  */
-async function getLogExpiry(adminDb: NonNullable<ReturnType<typeof getAdminDb>>): Promise<{
+async function getLogExpiry(adminDb: NonNullable<Awaited<ReturnType<typeof getAdminDb>>>): Promise<{
   settings: Record<string, any> | null;
   expiresAt: string | null;
 }> {
@@ -90,7 +90,7 @@ export async function blockVisitorFromPremise(
 ): Promise<{ success: boolean; error?: string }> {
   const { premiseId, visitorId, actorId, actorName, actorRole, visitorName, visitorPhotoUrl } = payload;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
@@ -127,7 +127,7 @@ export async function unblockVisitorFromPremise(
 ): Promise<{ success: boolean; error?: string }> {
   const { premiseId, visitorId, actorId, actorName, actorRole } = payload;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
@@ -161,7 +161,7 @@ export async function blockVisitorFromHost(
 ): Promise<{ success: boolean; error?: string }> {
   const { hostId, visitorId, actorId, actorName, actorRole, visitorName, visitorPhotoUrl } = payload;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
@@ -197,7 +197,7 @@ export async function unblockVisitorFromHost(
 ): Promise<{ success: boolean; error?: string }> {
   const { hostId, visitorId, actorId, actorName, actorRole } = payload;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {

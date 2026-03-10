@@ -120,7 +120,7 @@ export function useSettings() {
     const fetchSettings = async () => {
       setIsLoading(true);
       try {
-        const supabase = createClient();
+        const supabase = await createClient();
         const { data: settingsData, error: err } = await supabase
           .from('settings')
           .select('*')
@@ -163,10 +163,9 @@ export function useSettings() {
  * @param data The partial settings data to update.
  */
 export async function updateSettings(_db: any, data: Partial<Settings>) {
-  const supabase = createClient();
+  const supabase = await createClient();
   clearSettingsCache();
 
   const { error } = await supabase.from('settings').update(data).eq('id', SETTINGS_DOC_ID);
   if (error) throw error;
 }
-

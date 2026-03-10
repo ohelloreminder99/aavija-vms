@@ -80,7 +80,7 @@ export type SerializablePremiseWithDetails = {
 };
 
 export async function getPremisesForAdmin(): Promise<{ success: boolean; data?: SerializablePremiseWithDetails[]; error?: string; }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) {
@@ -148,7 +148,7 @@ export async function createPremiseAndNewOwner(
     premiseName, premiseAddress, premiseCity, cityId, ownerName, ownerEmail, ownerPassword, agentId, categoryId, categoryName, city_state,
   } = data;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin service not available.' };
@@ -243,7 +243,7 @@ export async function createPremiseForExistingUser(
     premiseName, premiseAddress, premiseCity, cityId, ownerEmail, agentId, categoryId, categoryName, city_state,
   } = data;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
@@ -314,7 +314,7 @@ export async function deletePremise(
   premiseId: string,
   ownerId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
@@ -349,7 +349,7 @@ export async function getVisitsForPremise(
   payload: GetVisitsPayload
 ): Promise<{ success: boolean; visits?: SerializableVisit[], lastVisible?: string; error?: string }> {
   const { premiseId, limit, startAfter, startDate } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Server is not configured for admin access.' };
@@ -392,7 +392,7 @@ export async function changePremiseOwner(payload: {
   actor: { id: string; name: string; role: string; };
 }): Promise<{ success: boolean; error?: string }> {
   const { premiseId, oldOwnerId, newOwnerEmail, actor } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
@@ -451,7 +451,7 @@ export async function updatePremiseAdmin(
   premiseId: string,
   dataToUpdate: Partial<Premise>
 ): Promise<{ success: boolean; error?: string }> {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin database not available.' };

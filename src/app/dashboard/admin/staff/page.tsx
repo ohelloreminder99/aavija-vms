@@ -59,6 +59,7 @@ import { useToast } from '@/hooks/use-toast';
 import { createStaffUser, assignStaffRole, removeStaffRole } from './actions';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 const createSchema = z.object({
     name: z.string().min(2, 'Name is required.'),
@@ -162,93 +163,261 @@ export default function StaffManagementPage() {
     }, [staffMembers, searchTerm]);
 
     const renderContent = () => {
-        if (isLoading) return <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-        if (error) return <div className="text-center text-red-500 py-10"><p>An error occurred.</p><p className="text-sm">{error.message}</p></div>;
-        if (!staffMembers || staffMembers.length === 0) return <div className="py-10 text-center text-muted-foreground"><p>No staff members found.</p><p className='text-sm mt-1'>Click "Add Staff" to create one.</p></div>;
+        if (isLoading) {
+            return (
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                    <div className="relative">
+                        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                        <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Personnel Data...</p>
+                </div>
+            );
+        }
+
+        if (error) {
+            return (
+                <div className="text-center py-20 px-6 border border-red-500/20 bg-red-500/5 rounded-2xl">
+                    <p className="text-red-400 font-bold mb-2">Protocol Malfunction</p>
+                    <p className="text-xs text-red-500/60 font-medium uppercase tracking-wider">{error.message}</p>
+                </div>
+            );
+        }
+
+        if (!staffMembers || staffMembers.length === 0) {
+            return (
+                <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
+                    <UserCog className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
+                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">No Active Staff</p>
+                    <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">Establish a new operative to manage local mesh sectors.</p>
+                </div>
+            );
+        }
 
         return (
-            <>
-                <div className="relative mb-4">
-                    <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                    <Input placeholder="Search by name or email..." className="pl-10" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <div className="space-y-6">
+                <div className="relative group max-w-md">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
+                    <Input
+                        placeholder="Scan name or neural mail..."
+                        className="pl-11 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead className='text-right'>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredStaff.map((staff: WithId<UserProfile>) => (
-                            <TableRow key={staff.id}>
-                                <TableCell className="font-medium"><div className="flex items-center gap-3"><Avatar>{staff.photo_url && <AvatarImage src={staff.photo_url} alt={staff.name} />}<AvatarFallback>{staff.name.charAt(0)}</AvatarFallback></Avatar><span>{staff.name}</span></div></TableCell>
-                                <TableCell>{staff.email}</TableCell>
-                                <TableCell>{staff.phone || 'N/A'}</TableCell>
-                                <TableCell className='text-right'><Button variant="ghost" size="icon" onClick={() => setStaffToRemove(staff)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+
+                <div className="rounded-2xl border border-white/5 bg-black/20 overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-white/[0.02]">
+                            <TableRow className="border-white/5 hover:bg-transparent">
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Staff Identity</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Neural Mail</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Sever Peripheral</TableHead>
+                                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Terminal</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                {filteredStaff.length === 0 && <p className="py-10 text-center text-muted-foreground">No staff members match your search.</p>}
-            </>
+                        </TableHeader>
+                        <TableBody>
+                            {filteredStaff.map((staff: WithId<UserProfile>) => (
+                                <TableRow key={staff.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+                                    <TableCell className="px-6 py-4">
+                                        <div className="flex items-center gap-4">
+                                            <Avatar className="h-10 w-10 border border-white/5 group-hover:border-primary/30 transition-all">
+                                                {staff.photo_url && <AvatarImage src={staff.photo_url} alt={staff.name} />}
+                                                <AvatarFallback className="bg-zinc-900 text-zinc-500 font-bold">{staff.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">{staff.name}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-zinc-400 text-xs font-medium">{staff.email}</TableCell>
+                                    <TableCell className="text-zinc-400 text-xs font-mono">{staff.phone || '—'}</TableCell>
+                                    <TableCell className="px-6 py-4 text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => setStaffToRemove(staff)}
+                                            className="h-8 w-8 rounded-lg hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-all"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
         )
     }
 
     return (
-        <div className="container py-10">
-            <div className="mb-4 flex items-center justify-between">
-                <Button asChild variant="outline"><Link href="/dashboard/admin"><ArrowLeft className="mr-2 h-4 w-4" />Back to Dashboard</Link></Button>
+        <div className="max-w-7xl mx-auto px-6 py-12 space-y-10 min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div className="space-y-4">
+                    <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
+                        <Link href="/dashboard/admin">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Retreat to Command
+                        </Link>
+                    </Button>
+
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                                <UserCog className="h-6 w-6 text-primary" />
+                            </div>
+                            <h1 className="text-4xl font-headline font-bold text-white tracking-tighter">
+                                Staff <span className="text-primary/80">Command</span>
+                            </h1>
+                        </div>
+                        <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
+                            Operational directory of authenticated staff nodes. Manage personnel access and sector permissions.
+                        </p>
+                    </div>
+                </div>
+
                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                    <DialogTrigger asChild><Button disabled={isLoading}><Plus className="mr-2 h-4 w-4" />Add Staff</Button></DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Add Staff</DialogTitle>
-                            <DialogDescription>Create a new staff user or assign the role to an existing user.</DialogDescription>
-                        </DialogHeader>
-                        <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="flex items-center space-x-4"><div className="flex items-center space-x-2"><RadioGroupItem value="new" id="s-r1" /><Label htmlFor="s-r1">Create New User</Label></div><div className="flex items-center space-x-2"><RadioGroupItem value="existing" id="s-r2" /><Label htmlFor="s-r2">Assign Existing User</Label></div></RadioGroup>
+                    <DialogTrigger asChild>
+                        <Button disabled={isLoading} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all">
+                            <Plus className="mr-2 h-4 w-4" /> Establish Operative
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-lg bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden">
+                        <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+                            <DialogHeader>
+                                <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Access <span className="text-primary/80">Calibration</span></DialogTitle>
+                                <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                                    Initialize new staff node or link an existing operative to the protocol.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="mt-8">
+                                <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="grid grid-cols-2 gap-4">
+                                    <div className={cn(
+                                        "relative flex items-center justify-center h-12 rounded-xl border transition-all cursor-pointer group",
+                                        creationMode === 'new' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                                    )} onClick={() => setCreationMode('new')}>
+                                        <RadioGroupItem value="new" id="s-r1" className="sr-only" />
+                                        <Label htmlFor="s-r1" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">New Core User</Label>
+                                        {creationMode === 'new' && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
+                                    </div>
+                                    <div className={cn(
+                                        "relative flex items-center justify-center h-12 rounded-xl border transition-all cursor-pointer group",
+                                        creationMode === 'existing' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                                    )} onClick={() => setCreationMode('existing')}>
+                                        <RadioGroupItem value="existing" id="s-r2" className="sr-only" />
+                                        <Label htmlFor="s-r2" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">Linked Operative</Label>
+                                        {creationMode === 'existing' && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
+                                    </div>
+                                </RadioGroup>
+                            </div>
+                        </div>
 
-                        {creationMode === 'new' && (
-                            <Form {...createForm}>
-                                <form onSubmit={createForm.handleSubmit(handleCreateFormSubmit)} className="space-y-4 py-4">
-                                    <FormField control={createForm.control} name="name" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={createForm.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" placeholder="staff@example.com" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={createForm.control} name="password" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" placeholder="Must be at least 8 characters" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <DialogFooter><DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose><Button type="submit" disabled={isSubmitting}>{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create Account</Button></DialogFooter>
-                                </form>
-                            </Form>
-                        )}
-
-                        {creationMode === 'existing' && (
-                            <Form {...assignForm}>
-                                <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-4 py-4">
-                                    <FormField control={assignForm.control} name="email" render={({ field }) => (<FormItem><FormLabel>User Email</FormLabel><FormDescription>Enter the email of the existing user you want to make a staff member.</FormDescription><FormControl><Input type="email" placeholder="user@example.com" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <DialogFooter><DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose><Button type="submit" disabled={isSubmitting}>{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Assign Role</Button></DialogFooter>
-                                </form>
-                            </Form>
-                        )}
+                        <div className="bg-black/40 p-8">
+                            {creationMode === 'new' ? (
+                                <Form {...createForm}>
+                                    <form onSubmit={createForm.handleSubmit(handleCreateFormSubmit)} className="space-y-6">
+                                        <FormField control={createForm.control} name="name" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Identity Name</FormLabel>
+                                                <FormControl><Input placeholder="John Doe" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={createForm.control} name="email" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Neural Mail</FormLabel>
+                                                <FormControl><Input type="email" placeholder="staff@aavija.mesh" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={createForm.control} name="password" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Access Cipher</FormLabel>
+                                                <FormControl><Input type="password" placeholder="Min. 8 characters" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                        <div className="flex justify-end gap-4 pt-4">
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Abort</Button></DialogClose>
+                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Initialize Node
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </Form>
+                            ) : (
+                                <Form {...assignForm}>
+                                    <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-6">
+                                        <FormField control={assignForm.control} name="email" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Operative Neural Mail</FormLabel>
+                                                <FormControl><Input type="email" placeholder="user@aavija.mesh" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Inject staff permissions into an existing network identity.</FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                        <div className="flex justify-end gap-4 pt-4">
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Abort</Button></DialogClose>
+                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Inject Privileges
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </Form>
+                            )}
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
-            <Card>
-                <CardHeader><CardTitle>Manage Staff</CardTitle><CardDescription>A list of all users with the &apos;staff&apos; role.</CardDescription></CardHeader>
-                <CardContent>{renderContent()}</CardContent>
-            </Card>
-            <AlertDialog open={!!staffToRemove} onOpenChange={(open) => { if (!open) { setStaffToRemove(null); } }}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>{`This will remove the staff role from ${staffToRemove?.name}. They will be reverted to a standard visitor account.`}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel onClick={() => setStaffToRemove(null)}>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting}>{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Confirm</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
 
-            <AlertDialog open={showDuplicateUserDialog} onOpenChange={setShowDuplicateUserDialog}>
-                <AlertDialogContent>
+            <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden bg-black/40">
+                <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+                <CardContent className="relative z-10 p-6 sm:p-8">
+                    {renderContent()}
+                </CardContent>
+            </Card>
+
+            <AlertDialog open={!!staffToRemove} onOpenChange={(open) => { if (!open) { setStaffToRemove(null); } }}>
+                <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Account Already Exists</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            A user with that email address is already registered inside the network.
-                            Please close this creation form and select <strong className="text-foreground border-b border-dashed border-primary">"Assign Existing User"</strong> instead of "Create New User" to assign them safely!
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-10 w-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                                <Trash2 className="h-5 w-5 text-red-500" />
+                            </div>
+                            <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Sever <span className="text-red-500">Access?</span></AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+                            This will irreversibly purge the staff role from <span className="text-white font-bold">{staffToRemove?.name}</span>.
+                            The identity will be demoted to standard visitor status and detached from all admin terminal protocols.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)}>Understood</AlertDialogAction>
+                    <AlertDialogFooter className="gap-3 pt-8">
+                        <AlertDialogCancel onClick={() => setStaffToRemove(null)} className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Purge Access
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={showDuplicateUserDialog} onOpenChange={setShowDuplicateUserDialog}>
+                <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
+                    <AlertDialogHeader>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <UserCog className="h-5 w-5 text-amber-500" />
+                            </div>
+                            <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Identity <span className="text-amber-500">Collision</span></AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+                            The neural mail provided is already associated with an identity inside the network registry.
+                            Please recalibrate the request: select <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Linked Operative</span> instead of "New Core User" to safely assign staff privileges.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="pt-6">
+                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Recalibrate</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

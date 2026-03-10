@@ -12,9 +12,9 @@ export async function getMonthlyInvoices(month: number, year: number): Promise<{
     invoices?: SerializableInvoice[];
     error?: string;
 }> {
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
     if (!adminDb) return { error: "Admin database not available." };
 
     try {

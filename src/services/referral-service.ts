@@ -56,7 +56,7 @@ export async function ensureReferralCode(): Promise<{
 }> {
     try {
         const { user } = await requireAuth();
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         const { data, error } = await adminDb.rpc('rpc_generate_referral_code', {
@@ -100,7 +100,7 @@ export async function applyReferralCode(
             userId = user.id;
         }
 
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         // Get welcome token setting
@@ -151,7 +151,7 @@ export async function fireReferralCommission(
     purchaseAmountInr: number
 ): Promise<void> {
     try {
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) return;
 
         const { data: settings } = await adminDb
@@ -191,7 +191,7 @@ export async function getMyReferralStats(): Promise<{
 }> {
     try {
         const { user } = await requireAuth();
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         // Ensure user has a referral code
@@ -239,7 +239,7 @@ export async function getAllReferralEventsForAdmin(): Promise<{
         const { profile } = await requireAuth();
         if (profile.role !== 'admin') throw new Error('Unauthorized');
 
-        const adminDb = getAdminDb();
+        const adminDb = await getAdminDb();
         if (!adminDb) throw new Error('Admin database not available.');
 
         const { data: events, error } = await adminDb

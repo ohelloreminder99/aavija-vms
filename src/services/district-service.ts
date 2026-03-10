@@ -49,7 +49,7 @@ export function useDistricts(stateId?: string) {
  * @param data The district data.
  */
 export async function createDistrict(_db: any, data: Omit<District, 'id'>) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const newDistrictData = {
     name: data.name.toLowerCase(),
     stateId: data.stateId,
@@ -70,7 +70,7 @@ export async function updateDistrict(
   id: string,
   data: Partial<District>
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const dataToUpdate: Partial<District> = {};
   if (data.name) dataToUpdate.name = data.name.toLowerCase();
   if (data.stateId) dataToUpdate.stateId = data.stateId;
@@ -85,7 +85,7 @@ export async function updateDistrict(
  * @param id The ID of the district to delete.
  */
 export async function deleteDistrict(_db: any, id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('districts').delete().eq('id', id);
   if (error) throw error;
 }
@@ -102,7 +102,7 @@ export async function batchCreateDistricts(
   _db: any,
   districts: CsvDistrict[]
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   // 1. Fetch all states to create a lookup map of state name to state ID
   const { data: states } = await supabase.from('states').select('*');
   const stateMap = new Map((states || []).map(doc => [doc.name.toLowerCase(), doc.id]));
@@ -125,4 +125,3 @@ export async function batchCreateDistricts(
   const { error } = await supabase.from('districts').insert(newDistrictsToInsert);
   if (error) throw error;
 }
-

@@ -4,77 +4,102 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 40% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 40% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 40% 15%;
-    --primary: 220 70% 45%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 210 30% 96%;
-    --secondary-foreground: 220 70% 45%;
-    --muted: 210 30% 96%;
-    --muted-foreground: 220 20% 45%;
-    --accent: 220 70% 45%;
+    --background: 222 47% 4%;
+    --foreground: 210 20% 98%;
+    --card: 222 47% 6%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222 47% 5%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 222 47% 10%;
+    --muted-foreground: 217 19% 70%;
+    --accent: 217 91% 60%;
     --accent-foreground: 210 20% 98%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
-    --border: 210 30% 90%;
-    --input: 210 30% 90%;
-    --ring: 220 70% 45%;
-    --radius: 0.75rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 40% 25%;
-    --sidebar-primary: 220 70% 45%;
-    --sidebar-primary-foreground: 210 20% 98%;
-    --sidebar-accent: 210 30% 96%;
-    --sidebar-accent-foreground: 220 70% 45%;
-    --sidebar-border: 210 30% 94%;
-    --sidebar-ring: 220 70% 45%;
+    --border: 217 19% 15%;
+    --input: 217 19% 15%;
+    --ring: 217 91% 60%;
+    --radius: 0.85rem;
+    --sidebar-background: 222 47% 3%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 47% 10%;
+    --sidebar-accent-foreground: 217 91% 60%;
+    --sidebar-border: 217 19% 12%;
+    --sidebar-ring: 217 91% 60%;
   }
 
+  /* Force dark theme defaults for the premium experience */
   .dark {
-    --background: 220 40% 10%;
+    --background: 222 47% 3%;
     --foreground: 210 20% 98%;
-    --card: 220 40% 12%;
+    --card: 222 47% 5%;
     --card-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220 70% 45%;
-    --border: 220 40% 20%;
-    --input: 220 40% 20%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 4%;
+    --border: 217 19% 18%;
+    --input: 217 19% 18%;
   }
 }
 
 @layer utilities {
-  .bg-porcelain {
-    background: radial-gradient(circle at center, #ffffff 0%, #f7f9fc 100%);
+  .bg-liquid-obsidian {
+    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
   }
-  
+
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(200,210,230,0.15)];
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   }
 
   .glass-morphism {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .text-glow {
-    text-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    text-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
   }
 
   .border-glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
   }
-  
-  .mesh-light {
-    background-color: #f7f9fc;
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(210,40%,95%,1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(220,70%,90%,0.3) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(200,60%,90%,0.3) 0, transparent 50%);
+
+  .mesh-obsidian {
+    background-color: #020617;
+    background-image:
+      radial-gradient(at 0% 0%, hsla(217, 91%, 15%, 1) 0, transparent 40%),
+      radial-gradient(at 50% 0%, hsla(217, 91%, 20%, 0.2) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(217, 91%, 15%, 1) 0, transparent 40%);
+  }
+
+  .liquid-neon-border {
+    position: relative;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .liquid-neon-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -1px;
+    border-radius: inherit;
+    background: linear-gradient(to right, #3b82f6, #06b6d4, #3b82f6);
+    opacity: 0.3;
   }
 }

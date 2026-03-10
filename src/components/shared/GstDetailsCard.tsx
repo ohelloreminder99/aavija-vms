@@ -122,37 +122,42 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
 
   if (isLoadingStates) {
     return (
-      <div className="flex justify-center p-10">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <Card className="glass-card border-white/5 relative overflow-hidden h-96 flex flex-col items-center justify-center gap-4">
+        <div className="absolute inset-0 mesh-obsidian opacity-20" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary/40 relative z-10" />
+        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse relative z-10">Syncing Regions...</p>
+      </Card>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          GST & Billing Details
+    <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
+      <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
+      <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+        <CardTitle className="flex items-center gap-3 text-white text-2xl font-headline font-bold tracking-tight">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
+            <FileText className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+          </div>
+          Tax Intelligence
         </CardTitle>
-        <CardDescription>
-          Provide your legal business details for token purchase invoices.
+        <CardDescription className="text-zinc-400 mt-2">
+          Verify legal identities for neural credit fiscal compliance.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10 pt-8">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="legalName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Legal Name</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Legal Identity</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Farida Samnani" {...field} />
+                    <Input placeholder="e.g., Farida Samnani" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
                   </FormControl>
-                  <FormDescription>Official name to be printed on the Bill.</FormDescription>
-                  <FormMessage />
+                  <FormDescription className="text-zinc-500 text-[10px]">Official designation for biometric invoicing.</FormDescription>
+                  <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
             />
@@ -161,12 +166,12 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="gstNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>GSTIN (Optional)</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">GSTIN (Ops-Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 27AAAAA0000A1Z5" {...field} className="uppercase" />
+                    <Input placeholder="e.g., 27AAAAA0000A1Z5" {...field} className="uppercase bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
                   </FormControl>
-                  <FormDescription>Leave blank if you don't have a GST number.</FormDescription>
-                  <FormMessage />
+                  <FormDescription className="text-zinc-500 text-[10px]">Verification code for sector tax reclamation.</FormDescription>
+                  <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
             />
@@ -175,23 +180,23 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="billingState"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Billing State</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Sector State</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select registered state" />
+                      <SelectTrigger className="bg-white/5 border-white/10 text-white h-11">
+                        <SelectValue placeholder="Select registered sector" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-[#020617] border-white/10 text-white">
                       {states?.map((s) => (
-                        <SelectItem key={s.id} value={s.name} className="capitalize">
+                        <SelectItem key={s.id} value={s.name} className="capitalize hover:bg-white/5 focus:bg-white/5">
                           {s.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>Used to calculate Place of Supply for GST split.</FormDescription>
-                  <FormMessage />
+                  <FormDescription className="text-zinc-500 text-[10px]">Place of Supply for credit flux calculations.</FormDescription>
+                  <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
             />
@@ -200,21 +205,21 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="billingAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Registered Billing Address</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Neural Billing Node</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Full address including district and pincode..." {...field} />
+                    <Textarea placeholder="Full physical coordinates..." {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 min-h-[100px]" />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting} className="w-full">
+            <Button type="submit" disabled={isSubmitting} className="w-full h-12 bg-primary text-white font-bold tracking-widest uppercase hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Save className="mr-2 h-4 w-4" />
               )}
-              Save Details
+              Authorize Records
             </Button>
           </form>
         </Form>

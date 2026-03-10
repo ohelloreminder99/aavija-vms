@@ -27,13 +27,14 @@ export function VisitorTokenBalanceCard() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <Skeleton className="h-5 w-1/2" />
+      <Card className="glass-card border-white/5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-white/[0.01]" />
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+          <Skeleton className="h-5 w-1/2 bg-white/5" />
         </CardHeader>
-        <CardContent>
-          <Skeleton className="mt-1 h-8 w-3/4" />
-          <Skeleton className="mt-4 h-10 w-3/4" />
+        <CardContent className="relative z-10">
+          <Skeleton className="mt-1 h-10 w-3/4 bg-white/5" />
+          <Skeleton className="mt-6 h-12 w-full bg-white/5" />
         </CardContent>
       </Card>
     );
@@ -49,36 +50,39 @@ export function VisitorTokenBalanceCard() {
 
   return (
     <>
-      <Card className="glass-card overflow-hidden group border-border/40 hover:border-primary/20 transition-all duration-300">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-zinc-500 uppercase tracking-wider">
-            Visitor Token Balance
+      <Card className="glass-card overflow-hidden group border-white/5 hover:border-primary/30 transition-all duration-500 relative">
+        <div className="absolute inset-0 bg-primary/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+          <CardTitle className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] opacity-80">
+            Neural Energy Credits
           </CardTitle>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/5 border border-primary/10">
-            <Coins className="h-4 w-4 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10 shadow-inner group-hover:border-primary/50 group-hover:bg-primary/20 transition-all duration-500">
+            <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </div>
         </CardHeader>
-        <CardContent className="pt-4">
-          <div className="text-4xl font-bold tracking-tight text-zinc-900 mb-1 transition-all">
+        <CardContent className="pt-4 relative z-10">
+          <div className="text-5xl font-bold tracking-tight text-white mb-2 group-hover:text-glow transition-all duration-300 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
             {balance.toLocaleString()}
           </div>
-          <p className="text-xs text-zinc-500 font-medium">
-            Tokens available for instant check-ins
+          <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest opacity-70 mb-6">
+            Total active credits in your wallet
           </p>
+
           {isLowBalance && (
-            <Alert className="mt-4 bg-red-50 border-red-100 text-red-600">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertTitle className="font-bold">Low Balance</AlertTitle>
-              <AlertDescription className="text-xs opacity-90">
-                Please recharge to avoid check-in disruption.
+            <Alert className="mb-6 bg-red-500/10 border-red-500/20 text-red-500 backdrop-blur-sm animate-pulse">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <AlertTitle className="font-bold uppercase tracking-tight text-xs">Critical Depletion</AlertTitle>
+              <AlertDescription className="text-[10px] opacity-80 leading-relaxed font-medium">
+                Neural link at risk. Recharge immediately to prevent lockout.
               </AlertDescription>
             </Alert>
           )}
+
           <Button
-            className="mt-6 w-full bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all transform active:scale-[0.98]"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all transform active:scale-[0.98] font-bold tracking-wide rounded-xl"
             onClick={() => setIsDialogOpen(true)}
           >
-            <Coins className="mr-2 h-4 w-4" /> Recharge Wallet
+            <Coins className="mr-2 h-4 w-4" /> RECHARGE CREDITS
           </Button>
         </CardContent>
       </Card>

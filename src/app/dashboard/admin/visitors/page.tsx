@@ -64,119 +64,149 @@ export default function VisitorsPage() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="relative">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Neural Registry...</p>
         </div>
       );
     }
 
     if (error) {
       return (
-        <div className="text-center text-red-500 py-10">
-          <p>An error occurred while fetching visitors.</p>
-          <p className="text-sm">{error.message}</p>
+        <div className="text-center py-20 px-6 border border-red-500/20 bg-red-500/5 rounded-2xl">
+          <p className="text-red-400 font-bold mb-2">Registry Connection Failure</p>
+          <p className="text-xs text-red-500/60 font-medium uppercase tracking-wider">{error.message}</p>
         </div>
       );
     }
 
     if (!visitors || visitors.length === 0) {
       return (
-        <div className="py-10 text-center text-muted-foreground">
-          <p>No Visitor found.</p>
+        <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
+          <Search className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Zero Entity Matched</p>
+          <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">The global visitor mesh is currently clear of matching patterns.</p>
         </div>
       );
     }
 
     return (
-      <>
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+      <div className="space-y-6">
+        <div className="relative group max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
           <Input
-            placeholder="Search by name or email..."
-            className="pl-10"
+            placeholder="Scan name or neural mail..."
+            className="pl-11 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead className="text-right">Token Balance</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredVisitors.map((visitor: WithId<UserProfile>) => (
-              <TableRow key={visitor.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => setImageUrlToView(visitor.photo_url || null)} disabled={!visitor.photo_url} title="View photo">
-                      <Avatar>
+
+        <div className="rounded-2xl border border-white/5 bg-black/20 overflow-hidden">
+          <Table>
+            <TableHeader className="bg-white/[0.02]">
+              <TableRow className="border-white/5 hover:bg-transparent">
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Entity Profile</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Neural Mail</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Sever Peripheral (Phone)</TableHead>
+                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Credit Balance</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredVisitors.map((visitor: WithId<UserProfile>) => (
+                <TableRow key={visitor.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+                  <TableCell className="py-4">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setImageUrlToView(visitor.photo_url || null)}
+                        disabled={!visitor.photo_url}
+                        className="relative group/avatar"
+                      >
+                        <Avatar className="h-12 w-12 border border-white/5 group-hover/avatar:border-primary/50 transition-all">
+                          {visitor.photo_url && <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />}
+                          <AvatarFallback className="bg-zinc-900 text-zinc-500 font-bold">{visitor.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
                         {visitor.photo_url && (
-                          <AvatarImage
-                            src={visitor.photo_url}
-                            alt={visitor.name}
-                          />
+                          <div className="absolute inset-0 bg-primary/20 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
+                            <Eye className="h-4 w-4 text-white" />
+                          </div>
                         )}
-                        <AvatarFallback>
-                          {visitor.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </button>
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto"
-                      onClick={() => setSelectedVisitor(visitor)}
-                      title="View visit history"
-                    >
-                      <div className="flex flex-col items-start">
-                        <span>{visitor.name}</span>
-                        <span className="text-xs text-muted-foreground font-mono">
-                          {visitor.id}
+                      </button>
+                      <div className="flex flex-col">
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto text-sm font-bold text-white hover:text-primary hover:no-underline transition-colors justify-start"
+                          onClick={() => setSelectedVisitor(visitor)}
+                        >
+                          {visitor.name}
+                        </Button>
+                        <span className="text-[9px] text-zinc-600 font-mono tracking-tighter uppercase mt-0.5">
+                          ID: {visitor.id.split('-')[0]}...
                         </span>
                       </div>
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>{visitor.email}</TableCell>
-                <TableCell>{visitor.phone || 'N/A'}</TableCell>
-                <TableCell className="text-right font-mono">
-                  {(visitor.token_balance_visitor ?? 0).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {filteredVisitors.length === 0 && (
-          <p className="py-10 text-center text-muted-foreground">
-            No visitors match your search.
-          </p>
-        )}
-      </>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-zinc-400 text-xs font-medium">{visitor.email}</TableCell>
+                  <TableCell className="text-zinc-400 text-xs font-mono">{visitor.phone || '—'}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm font-bold text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] tabular-nums">
+                        {(visitor.token_balance_visitor ?? 0).toLocaleString()}
+                      </span>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-zinc-700">Credits</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {filteredVisitors.length === 0 && (
+            <div className="py-20 text-center bg-white/[0.01]">
+              <p className="text-zinc-700 text-[10px] font-black uppercase tracking-widest">Pattern Mismatch</p>
+            </div>
+          )}
+        </div>
+      </div>
     );
   };
 
   return (
-    <div className="container py-10">
-      <div className="mb-4">
-        <Button asChild variant="outline">
-          <Link href="/dashboard/admin">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </Button>
+    <div className="max-w-7xl mx-auto px-6 py-12 space-y-8 min-h-screen">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-4">
+          <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
+            <Link href="/dashboard/admin">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retreat to Command
+            </Link>
+          </Button>
+
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                <Search className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-4xl font-headline font-bold text-white tracking-tighter">
+                Entity <span className="text-primary/80">Registry</span>
+              </h1>
+            </div>
+            <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
+              Deep-scan of the global visitor mesh. Identify behavioral patterns and account health.
+            </p>
+          </div>
+        </div>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Total Visitors</CardTitle>
-          <CardDescription>
-            A list of all users with the 'visitor' role. Click a name to view their visit history or click their photo to enlarge it.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>{renderContent()}</CardContent>
+
+      <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden bg-black/40">
+        <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+        <CardContent className="relative z-10 p-6 sm:p-8">
+          {renderContent()}
+        </CardContent>
       </Card>
+
       {selectedVisitor && (
         <React.Suspense fallback={<div />}>
           <VisitorHistoryDialog
@@ -194,20 +224,28 @@ export default function VisitorsPage() {
       )}
 
       <Dialog open={!!imageUrlToView} onOpenChange={() => setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Visitor Photo</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden">
+          <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-white tracking-tight">Identity <span className="text-primary/80">Visualization</span></DialogTitle>
+            </DialogHeader>
+          </div>
           {imageUrlToView && (
-            <div className="relative aspect-square w-full">
-              <Image
-                src={imageUrlToView}
-                alt="Visitor photo"
-                fill
-                className="object-contain rounded-md"
-              />
+            <div className="relative aspect-square w-full bg-black/40 p-8 flex items-center justify-center">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
+                <Image
+                  src={imageUrlToView}
+                  alt="Visitor identity"
+                  fill
+                  className="object-contain"
+                />
+                <div className="absolute inset-0 pointer-events-none border border-white/10 rounded-2xl" />
+              </div>
             </div>
           )}
+          <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end">
+            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close Feed</Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

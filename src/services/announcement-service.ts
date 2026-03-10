@@ -120,7 +120,7 @@ export async function createAnnouncement(
   _db: any,
   data: Omit<Announcement, 'createdAt' | 'updatedAt' | 'id'>
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const newAnnouncement = {
     ...data,
     createdAt: new Date().toISOString(),
@@ -138,7 +138,7 @@ export async function updateAnnouncement(
   id: string,
   data: Partial<Omit<Announcement, 'createdAt'>>
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const dataToUpdate = {
     ...data,
     updatedAt: new Date().toISOString(),
@@ -151,8 +151,7 @@ export async function updateAnnouncement(
  * Deletes an announcement document.
  */
 export async function deleteAnnouncement(_db: any, id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('announcements').delete().eq('id', id);
   if (error) throw error;
 }
-

@@ -80,8 +80,7 @@ export function usePremiseById(premiseId: string | undefined) {
  * @param data The partial premise data to update.
  */
 export async function updatePremise(_db: any, id: string, data: Partial<Premise>) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('premises').update(data).eq('id', id);
   if (error) throw error;
 }
-

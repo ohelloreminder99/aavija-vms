@@ -31,7 +31,7 @@ export function useStates() {
  * @param data The state data.
  */
 export async function createState(_db: any, data: State) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('states').insert([{ name: data.name.toLowerCase() }]);
   if (error) throw error;
 }
@@ -47,7 +47,7 @@ export async function updateState(
   id: string,
   data: Partial<State>
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const dataToUpdate: Partial<State> = {};
   if (data.name) {
     dataToUpdate.name = data.name.toLowerCase();
@@ -62,7 +62,7 @@ export async function updateState(
  * @param id The ID of the state to delete.
  */
 export async function deleteState(_db: any, id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('states').delete().eq('id', id);
   if (error) throw error;
 }
@@ -76,9 +76,8 @@ export async function batchCreateStates(
   _db: any,
   states: State[]
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const newStates = states.map((state) => ({ name: state.name.toLowerCase() }));
   const { error } = await supabase.from('states').insert(newStates);
   if (error) throw error;
 }
-

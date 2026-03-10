@@ -22,7 +22,7 @@ export async function deductTokensForExport(
 ): Promise<{ success: boolean; error?: string; deductedCost?: number }> {
   const { target, actorId, actorName, actorRole, exportType, premiseIdForLog } = payload;
   let finalCost = 0;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return {
       success: false,
@@ -137,7 +137,7 @@ export async function getVisitsForExport({
   startDate?: string;
   endDate?: string;
 }) {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Database not available' };
 
   try {

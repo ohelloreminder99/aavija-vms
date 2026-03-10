@@ -6,9 +6,9 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
  * Finds and deletes all expired or used QR check-in tokens.
  */
 export async function cleanupQrTokens(): Promise<{ success: boolean; count?: number; error?: string }> {
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
     if (!adminDb) {
         return { success: false, error: "Server database connection not available." };
     }

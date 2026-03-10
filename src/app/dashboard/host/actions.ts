@@ -27,7 +27,7 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
     return { success: false, error: 'Rating must be between 1 and 5.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server is not configured for admin access.' };
   }
@@ -149,7 +149,7 @@ export async function getVisitsForHostInPremise(
     return { success: false, error: 'Host ID and Premise ID are required.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server is not configured for admin access.' };
   }
@@ -183,7 +183,7 @@ export async function getVisitsForHostInPremise(
       return { success: true, visits: [], lastVisible: undefined };
     }
 
-    const visits: SerializableVisit[] = visitsSnapshot.map((data: any) => {
+    const visits: SerializableVisit[] = (visitsSnapshot || []).map((data: any) => {
       return {
         id: data.id,
         visitor_id: data.visitor_id,
@@ -217,7 +217,7 @@ export async function getVisitsForHostInPremise(
 export async function setHostAvailability(payload: { hostId: string; premiseId: string; availability: string }): Promise<{ success: boolean; error?: string }> {
   const { hostId, premiseId, availability } = payload;
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server not configured for admin access.' };
   }

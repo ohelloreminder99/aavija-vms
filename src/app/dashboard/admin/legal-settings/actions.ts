@@ -4,7 +4,7 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { Settings } from '@/services/settings-service';
 
 export async function updateLegalSettingsAction(data: Partial<Settings>) {
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     const { profile } = await requireAuth();
     if (profile.role !== 'admin') throw new Error('Unauthorized');
 

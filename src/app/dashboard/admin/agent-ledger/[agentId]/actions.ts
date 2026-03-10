@@ -23,9 +23,9 @@ interface PayoutPayload {
 export async function recordAgentPayout(payload: PayoutPayload): Promise<{ success: boolean, error?: string }> {
     const { agentId, amount, description, actor } = payload;
 
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
     if (!adminDb) {
         return { success: false, error: "Server database connection not available." };
     }

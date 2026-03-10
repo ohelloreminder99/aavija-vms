@@ -24,7 +24,7 @@ export async function sendWhatsAppOtp(payload: {
     };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return {
       success: false,
@@ -182,7 +182,7 @@ export async function verifyWhatsAppOtp(payload: {
   countryCode: string;
 }): Promise<{ success: boolean; error?: string; message?: string }> {
   const { userId, otp, phone, countryCode } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return {
       success: false,

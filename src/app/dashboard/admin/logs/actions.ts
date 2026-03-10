@@ -16,9 +16,9 @@ interface GetLogsPayload {
  */
 export async function getAdminLogs(payload: GetLogsPayload): Promise<{ logs: SerializableLog[]; error?: string; }> {
     const { role, action } = payload;
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
     if (!adminDb) {
         return { logs: [], error: 'Server is not configured for admin access.' };
     }

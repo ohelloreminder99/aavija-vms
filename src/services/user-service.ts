@@ -89,7 +89,7 @@ export function useUserProfile(uid: string | undefined) {
  * @param data The user profile data.
  */
 export async function createUserProfile(_db: any, uid: string, data: Omit<UserProfile, 'id'>) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('users').insert({
     ...data,
     id: uid,
@@ -133,7 +133,7 @@ export type UpdateableUserProfile = Pick<
  */
 export async function updateUserProfile(uid: string, data: Partial<UpdateableUserProfile>) {
   if (!uid) return;
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.from('users').update(data).eq('id', uid);
   if (error) throw error;
 }
@@ -228,4 +228,3 @@ export function usePremiseBlocks(premiseId: string | undefined, userId: string |
 
   return useCollection<PremiseBlock>(query);
 }
-

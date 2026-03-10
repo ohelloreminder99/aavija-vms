@@ -32,7 +32,7 @@ export async function createHost(
     return { success: false, error: 'Password must be at least 8 characters long.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
 
   if (!adminDb) {
     return {
@@ -151,7 +151,7 @@ interface AssignHostByEmailPayload {
 
 export async function assignHostRoleByEmail(payload: AssignHostByEmailPayload): Promise<{ success: boolean; error?: string }> {
   const { email, identity, premiseId, actor } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Admin database not available.' };
   }
@@ -232,7 +232,7 @@ interface ToggleStatusPayload {
 
 export async function toggleHostStatus(payload: ToggleStatusPayload): Promise<{ success: boolean, error?: string }> {
   const { hostId, hostName, newStatus, premiseId, actor } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
 
   if (!adminDb) {
     return { success: false, error: 'Admin database service not available.' };
@@ -293,7 +293,7 @@ interface RemoveHostPayload {
 
 export async function removeHostFromPremise(payload: RemoveHostPayload): Promise<{ success: boolean; error?: string }> {
   const { hostId, hostName, premiseId, actor } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
 
   if (!adminDb) {
     return { success: false, error: 'Admin services not available.' };
@@ -353,7 +353,7 @@ export async function backfillHostAvailability(premiseId: string): Promise<{ suc
   if (!premiseId) {
     return { success: false, error: 'Premise ID is required.' };
   }
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Admin database not available.' };
   }

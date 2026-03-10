@@ -32,7 +32,7 @@ export async function getAgentLedgerAction(agentId: string): Promise<{
 }> {
   if (!agentId) return { success: false, error: 'Agent ID is required.' };
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server database connection not available.' };
   }

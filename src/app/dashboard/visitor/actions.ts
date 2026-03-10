@@ -40,7 +40,7 @@ export async function generateCheckinToken(userId: string): Promise<{
     return { success: false, error: 'Unauthorized: You can only generate tokens for your own account.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return {
       success: false,
@@ -116,7 +116,7 @@ export async function deleteCheckinToken(tokenId: string): Promise<{ success: bo
     return { success: false, error: 'Unauthorized.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return {
       success: false,

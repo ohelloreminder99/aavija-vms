@@ -1,12 +1,18 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
+import { getRegionConfig } from '@/lib/multi-tenant'
 
 export async function createClient() {
     const cookieStore = await cookies()
+    const headerStack = await headers()
+
+    // Read from cookies (most reliable for server components)
+    const url = cookieStore.get('x-region-url')?.value || process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const key = cookieStore.get('x-region-anon-key')?.value || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
     return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        url,
+        key,
         {
             cookies: {
                 getAll() {
@@ -30,10 +36,14 @@ export async function createClient() {
 
 // Function to get an admin client using the service role key.
 // This should only be used in secure server environments!
-export function getAdminDb() {
+// Updated to support regional routing while keeping service key security.
+export async function getAdminDb() {
+    const hostHeader = (await headers()).get('host') || 'localhost'
+    const config = await getRegionConfig(hostHeader)
+
     return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        config.supabase_url,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!, // Note: Service key must be global or managed per region
         {
             cookies: {
                 getAll() {
@@ -58,7 +68,7 @@ export async function requireAuth() {
         throw new Error('Unauthorized: You must be logged in.');
     }
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) {
         throw new Error('Server misconfiguration: Cannot verify role.');
     }

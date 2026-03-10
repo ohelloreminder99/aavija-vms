@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Loader2, Search, Plus, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Search, Plus, Edit, Trash2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -62,6 +62,7 @@ import { createGatekeeper, assignGatekeeperRoleByEmail } from './actions';
 import { useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 const createSchema = z.object({
     name: z.string().min(2, 'Name is required.'),
@@ -156,92 +157,226 @@ export default function GatekeepersPage() {
     }, [gatekeepers, searchTerm]);
 
     const renderContent = () => {
-        if (isLoading) return <div className="flex justify-center py-10"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-        if (error) return <div className="text-center text-red-500 py-10"><p>An error occurred.</p><p className="text-sm">{error.message}</p></div>;
-        if (!gatekeepers || gatekeepers.length === 0) return <div className="py-10 text-center text-muted-foreground"><p>No gatekeepers found.</p><p className='text-sm mt-1'>Click "Create Gatekeeper" to add one.</p></div>;
+        if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
+        if (error) return (
+            <div className="py-20 text-center text-red-500 border border-red-500/20 rounded-3xl bg-red-500/5">
+                <Shield className="mx-auto h-10 w-10 mb-4 opacity-50" />
+                <p className="font-bold uppercase tracking-widest text-[11px]">Sentinel Link Failure</p>
+                <p className="text-[10px] opacity-60 mt-1">{error.message}</p>
+            </div>
+        );
+        if (!gatekeepers || gatekeepers.length === 0) return (
+            <div className="py-20 text-center text-zinc-600 border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.02]">
+                <Plus className="mx-auto h-10 w-10 mb-4 opacity-20" />
+                <p className="font-bold uppercase tracking-widest text-[11px]">Sentinel Log Clear</p>
+                <p className="text-[10px] opacity-60 mt-1">Initialize gatekeeper records to secure the perimeter.</p>
+            </div>
+        );
 
         return (
-            <>
-                <div className="relative mb-4">
-                    <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                    <Input placeholder="Search by name or email..." className="pl-10" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <div className="space-y-6">
+                <div className="relative group/search">
+                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+                    <Input
+                        placeholder="Scan sentinel files by name or neural mail..."
+                        className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all font-medium"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead className='text-right'>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredGatekeepers.map((gatekeeper: any) => (
-                            <TableRow key={gatekeeper.id}>
-                                <TableCell className="font-medium"><div className="flex items-center gap-3"><Avatar>{gatekeeper.photo_url && <AvatarImage src={gatekeeper.photo_url} alt={gatekeeper.name} />}<AvatarFallback>{gatekeeper.name.charAt(0)}</AvatarFallback></Avatar><span>{gatekeeper.name}</span></div></TableCell>
-                                <TableCell>{gatekeeper.email}</TableCell>
-                                <TableCell>{gatekeeper.phone || 'N/A'}</TableCell>
-                                <TableCell className='text-right'><Button variant="ghost" size="icon" disabled><Edit className="h-4 w-4" /></Button><Button variant="ghost" size="icon" disabled><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+                    <Table>
+                        <TableHeader className="bg-white/[0.03]">
+                            <TableRow className="border-white/5 hover:bg-transparent">
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Sentinel Identity</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Comm Channel</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                {filteredGatekeepers.length === 0 && <p className="py-10 text-center text-muted-foreground">No gatekeepers match your search.</p>}
-            </>
+                        </TableHeader>
+                        <TableBody>
+                            {filteredGatekeepers.map((gatekeeper: any) => (
+                                <TableRow key={gatekeeper.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                                    <TableCell className="pl-8 py-5">
+                                        <div className="flex items-center gap-4">
+                                            <Avatar className="h-10 w-10 border border-white/10 group-hover/row:border-primary/30 transition-colors">
+                                                {gatekeeper.photo_url && <AvatarImage src={gatekeeper.photo_url} alt={gatekeeper.name} />}
+                                                <AvatarFallback className="bg-white/5 text-zinc-400 font-bold">{gatekeeper.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{gatekeeper.name}</span>
+                                                <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Sentinel Class V</span>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="text-[10px] font-medium text-zinc-400 group-hover/row:text-zinc-200 transition-colors">{gatekeeper.email}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="text-[11px] font-mono text-zinc-500 tracking-tight">{gatekeeper.phone || 'NO ANALOG'}</div>
+                                    </TableCell>
+                                    <TableCell className='text-right pr-8'>
+                                        <div className="flex justify-end gap-2">
+                                            <Button variant="ghost" size="icon" disabled className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-800 opacity-20">
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" disabled className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-800 opacity-20">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                {filteredGatekeepers.length === 0 && (
+                    <div className="py-20 text-center">
+                        <p className="text-[11px] font-black text-zinc-800 uppercase tracking-[0.3em]">No sentinel artifact detected</p>
+                    </div>
+                )}
+            </div>
         )
     }
 
     return (
-        <div className="container py-10">
-            <div className="mb-4 flex items-center justify-between">
-                <Button asChild variant="outline"><Link href={`/dashboard/owner?premiseId=${premiseId}`}><ArrowLeft className="mr-2 h-4 w-4" />Back to Dashboard</Link></Button>
+        <div className="container py-10 max-w-7xl">
+            <div className="mb-8 flex items-center justify-between">
+                <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+                    <Link href={`/dashboard/owner?premiseId=${premiseId}`} className="flex items-center">
+                        <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Back to Command Hub</span>
+                    </Link>
+                </Button>
+
                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                    <DialogTrigger asChild><Button disabled={isLoading}><Plus className="mr-2 h-4 w-4" />Create Gatekeeper</Button></DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Create Gatekeeper</DialogTitle>
-                            <DialogDescription>Create a user account for a gatekeeper at your premise.</DialogDescription>
+                    <DialogTrigger asChild>
+                        <Button disabled={isLoading} className="h-11 bg-primary text-white font-black uppercase tracking-widest text-[10px] px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-xl">
+                            <Plus className="mr-2 h-4 w-4" /> Recruit Sentinel
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-[#020617]/95 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+                        <DialogHeader className="space-y-4">
+                            <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                                <Shield className="h-6 w-6 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Sentinel Recruitment</DialogTitle>
+                                <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
+                                    Establish new perimeter link or authorize existing operative
+                                </DialogDescription>
+                            </div>
                         </DialogHeader>
-                        <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="flex items-center space-x-4"><div className="flex items-center space-x-2"><RadioGroupItem value="new" id="g-r1" /><Label htmlFor="g-r1">Create New User</Label></div><div className="flex items-center space-x-2"><RadioGroupItem value="existing" id="g-r2" /><Label htmlFor="g-r2">Assign Existing User</Label></div></RadioGroup>
 
-                        {creationMode === 'new' && (
-                            <Form {...createForm}>
-                                <form onSubmit={createForm.handleSubmit(handleCreateFormSubmit)} className="space-y-4 py-4">
-                                    <FormField control={createForm.control} name="name" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={createForm.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" placeholder="gatekeeper@example.com" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={createForm.control} name="password" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" placeholder="Must be at least 8 characters" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <DialogFooter><DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose><Button type="submit" disabled={isSubmitting}>{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create Account</Button></DialogFooter>
-                                </form>
-                            </Form>
-                        )}
+                        <div className="py-6 space-y-6">
+                            <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="grid grid-cols-2 gap-4">
+                                <div className={cn(
+                                    "flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer",
+                                    creationMode === 'new' ? "bg-primary/5 border-primary/30" : "bg-white/5 border-white/5 hover:bg-white/10"
+                                )} onClick={() => setCreationMode('new')}>
+                                    <RadioGroupItem value="new" id="g-r1" className="border-zinc-700 text-primary" />
+                                    <Label htmlFor="g-r1" className="text-[11px] font-black uppercase tracking-widest text-white cursor-pointer">Protocol: New</Label>
+                                </div>
+                                <div className={cn(
+                                    "flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer",
+                                    creationMode === 'existing' ? "bg-primary/5 border-primary/30" : "bg-white/5 border-white/5 hover:bg-white/10"
+                                )} onClick={() => setCreationMode('existing')}>
+                                    <RadioGroupItem value="existing" id="g-r2" className="border-zinc-700 text-primary" />
+                                    <Label htmlFor="g-r2" className="text-[11px] font-black uppercase tracking-widest text-white cursor-pointer">Protocol: Linked</Label>
+                                </div>
+                            </RadioGroup>
 
-                        {creationMode === 'existing' && (
-                            <Form {...assignForm}>
-                                <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-4 py-4">
-                                    <FormField control={assignForm.control} name="email" render={({ field }) => (<FormItem><FormLabel>User Email</FormLabel><FormDescription>Enter the email of the existing user you want to make a gatekeeper.</FormDescription><FormControl><Input type="email" placeholder="user@example.com" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <DialogFooter><DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose><Button type="submit" disabled={isSubmitting}>{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Assign Role</Button></DialogFooter>
-                                </form>
-                            </Form>
-                        )}
+                            {creationMode === 'new' && (
+                                <Form {...createForm}>
+                                    <form onSubmit={createForm.handleSubmit(handleCreateFormSubmit)} className="space-y-4">
+                                        <FormField control={createForm.control} name="name" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Identity Name</FormLabel>
+                                                <FormControl><Input placeholder="John Doe" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
+                                                <FormMessage className="text-[9px] uppercase font-bold" />
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={createForm.control} name="email" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Neural Mail</FormLabel>
+                                                <FormControl><Input type="email" placeholder="gatekeeper@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
+                                                <FormMessage className="text-[9px] uppercase font-bold" />
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={createForm.control} name="password" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Initial Cipher</FormLabel>
+                                                <FormControl><Input type="password" placeholder="8+ character secure string" {...field} className="bg-black/40 border-white/10 text-white h-11" /></FormControl>
+                                                <FormMessage className="text-[9px] uppercase font-bold" />
+                                            </FormItem>
+                                        )} />
+                                        <DialogFooter className="pt-4">
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Abort</Button></DialogClose>
+                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
+                                                {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Execute Sequence'}
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            )}
+
+                            {creationMode === 'existing' && (
+                                <Form {...assignForm}>
+                                    <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-4">
+                                        <FormField control={assignForm.control} name="email" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Operative Email</FormLabel>
+                                                <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
+                                                <FormDescription className="text-[9px] text-zinc-600 font-medium text-center">Email of an existing verified network identity</FormDescription>
+                                                <FormMessage className="text-[9px] uppercase font-bold" />
+                                            </FormItem>
+                                        )} />
+                                        <DialogFooter className="pt-4">
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Abort</Button></DialogClose>
+                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
+                                                {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Bind Sentinel'}
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            )}
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
-            <Card>
-                <CardHeader><CardTitle>Your Gatekeepers</CardTitle><CardDescription>A list of all users with the &apos;gatekeeper&apos; role at your premise.</CardDescription></CardHeader>
-                <CardContent>{renderContent()}</CardContent>
+
+            <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
+                <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+                <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                            <Shield className="h-5 w-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Sentinel <span className="text-primary/80">Command</span></CardTitle>
+                    </div>
+                    <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
+                        A centralized register of tactical personnel authorized for perimeter gate oversight.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="relative z-10 pt-8">
+                    {renderContent()}
+                </CardContent>
             </Card>
 
             <AlertDialog open={showDuplicateUserDialog} onOpenChange={setShowDuplicateUserDialog}>
-                <AlertDialogContent>
+                <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Account Already Exists</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            A user with that email address is already registered inside the network.
-                            Please close this creation form and select <strong className="text-foreground border-b border-dashed border-primary">"Assign Existing User"</strong> instead of "Create New User" to assign them safely to this premise!
+                        <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+                            <Shield className="h-6 w-6 text-amber-500" />
+                        </div>
+                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Signature Collision Detected</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-400 leading-relaxed text-[13px]">
+                            A verified identity with this neural mail is already registered in the Aavija mesh.
+                            Access the <strong className="text-primary uppercase tracking-widest text-[11px]">Bind Protocol</strong> (Assign Existing User) instead of the 'Protocol: New' sequence to link them to your node safely.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)}>Understood</AlertDialogAction>
+                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-white/5 text-white border border-white/10 hover:bg-white/10 px-8 h-12 uppercase font-black tracking-widest text-[10px]">Acknowledge</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

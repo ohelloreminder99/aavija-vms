@@ -27,7 +27,7 @@ interface Actor {
  * @param actor The user performing the action.
  */
 export async function createPremiseCategoryAction(data: PremiseCategory, actor: Actor) {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     throw new Error('Admin database is not available.');
   }
@@ -51,7 +51,7 @@ export async function createPremiseCategoryAction(data: PremiseCategory, actor: 
  * @param actor The user performing the action.
  */
 export async function updatePremiseCategoryAction(id: string, data: Partial<PremiseCategory>, actor: Actor) {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     throw new Error('Admin database is not available.');
   }
@@ -74,7 +74,7 @@ export async function updatePremiseCategoryAction(id: string, data: Partial<Prem
  * @param actor The user performing the action.
  */
 export async function deletePremiseCategoryAction(id: string, actor: Actor) {
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     throw new Error('Admin database is not available.');
   }

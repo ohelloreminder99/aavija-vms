@@ -8,9 +8,9 @@ export async function removeUserPhoneNumber(userId: string): Promise<{ success: 
         return { success: false, error: 'User ID is required.' };
     }
 
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
 
     if (!adminDb) {
         return {

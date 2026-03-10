@@ -31,7 +31,7 @@ export async function createGatekeeper(
     return { success: false, error: 'Password must be at least 8 characters long.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
 
   if (!adminDb) {
     return {
@@ -145,7 +145,7 @@ interface AssignGatekeeperByEmailPayload {
 
 export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperByEmailPayload): Promise<{ success: boolean; error?: string }> {
   const { email, premiseId, actor } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Admin database not available.' };
   }

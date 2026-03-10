@@ -9,9 +9,9 @@ interface ContactFormData {
 }
 
 export async function submitContactForm(data: ContactFormData): Promise<{ success: boolean; error?: string }> {
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) {
-        return { success: false, error: "Server database connection is not available." };
+        return { success: false, error: "Server database connection not available." };
     }
 
     try {

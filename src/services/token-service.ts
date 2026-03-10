@@ -50,7 +50,7 @@ export async function purchaseTokens(
       throw new Error('Unauthorized: You can only purchase tokens for your own account.');
     }
 
-    const adminDb = getAdminDb();
+    const adminDb = await getAdminDb();
     if (!adminDb) {
       throw new Error('Admin database not available.');
     }

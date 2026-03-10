@@ -31,7 +31,7 @@ export async function getVisitsForVisitorAction(
     return { success: false, error: 'Visitor ID is required.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server is not configured for admin access.' };
   }

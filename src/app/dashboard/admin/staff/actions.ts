@@ -28,7 +28,7 @@ export async function createStaffUser(
     return { success: false, error: 'Password must be at least 8 characters long.' };
   }
 
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
 
@@ -123,7 +123,7 @@ interface AssignStaffPayload {
 
 export async function assignStaffRole(payload: AssignStaffPayload): Promise<{ success: boolean; error?: string }> {
   const { email } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) {
@@ -157,7 +157,7 @@ interface RemoveStaffPayload {
 
 export async function removeStaffRole(payload: RemoveStaffPayload): Promise<{ success: boolean; error?: string }> {
   const { staffId } = payload;
-  const adminDb = getAdminDb();
+  const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) {
@@ -176,4 +176,3 @@ export async function removeStaffRole(payload: RemoveStaffPayload): Promise<{ su
     return { success: false, error: e.message || 'An unknown server error occurred.' };
   }
 }
-

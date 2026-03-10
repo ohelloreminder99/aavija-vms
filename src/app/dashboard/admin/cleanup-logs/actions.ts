@@ -7,9 +7,9 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
  * This is a destructive action and should be used with extreme caution.
  */
 export async function deleteAllLogs(): Promise<{ success: boolean; error?: string }> {
-    const adminDb = getAdminDb();
-  const { profile } = await requireAuth();
-  if (profile.role !== 'admin') throw new Error('Unauthorized');
+    const adminDb = await getAdminDb();
+    const { profile } = await requireAuth();
+    if (profile.role !== 'admin') throw new Error('Unauthorized');
     if (!adminDb) {
         return { success: false, error: "Admin database connection is not available." };
     }
