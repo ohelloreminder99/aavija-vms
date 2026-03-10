@@ -34,7 +34,7 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
         <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
         <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
-            Node Capital Balance
+            Premise Token Balance
           </CardTitle>
           <Coins className="h-4 w-4 text-zinc-600 animate-pulse" />
         </CardHeader>
@@ -60,7 +60,7 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
         <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none group-hover/balance:opacity-20 transition-opacity" />
         <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 group-hover/balance:text-primary transition-colors">
-            Node Capital <span className="text-zinc-700">/</span> {premise.name}
+            Premise Tokens <span className="text-zinc-700">/</span> {premise.name}
           </CardTitle>
           <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center">
             <Coins className="h-4 w-4 text-zinc-500 group-hover/balance:text-primary transition-colors drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
@@ -71,14 +71,14 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
             {balance.toLocaleString()}
           </div>
           <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest mt-1">
-            Units Liquid
+            Tokens Available
           </p>
           {isLowBalance && (
             <Alert className="mt-4 bg-red-500/5 border-red-500/20 text-red-400 py-3 rounded-2xl">
               <AlertCircle className="h-3.5 w-3.5" />
-              <AlertTitle className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">Critical Depletion</AlertTitle>
+              <AlertTitle className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">Low Token Balance</AlertTitle>
               <AlertDescription className="text-[9px] font-medium leading-tight opacity-80">
-                Neural match protocol at risk. Replenish immediately.
+                Your token balance is low. Please recharge soon.
               </AlertDescription>
             </Alert>
           )}
@@ -86,7 +86,7 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
             className="w-full mt-6 h-12 bg-primary text-white font-black uppercase tracking-widest text-[10px] hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-xl"
             onClick={() => setIsDialogOpen(true)}
           >
-            <Coins className="mr-2 h-4 w-4" /> Expand Capacity
+            <Coins className="mr-2 h-4 w-4" /> Recharge Tokens
           </Button>
         </CardContent>
       </Card>

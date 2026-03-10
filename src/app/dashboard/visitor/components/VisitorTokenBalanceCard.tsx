@@ -54,7 +54,7 @@ export function VisitorTokenBalanceCard() {
         <div className="absolute inset-0 bg-primary/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] opacity-80">
-            Neural Energy Credits
+            Token Balance
           </CardTitle>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10 shadow-inner group-hover:border-primary/50 group-hover:bg-primary/20 transition-all duration-500">
             <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
@@ -65,15 +65,15 @@ export function VisitorTokenBalanceCard() {
             {balance.toLocaleString()}
           </div>
           <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-widest opacity-70 mb-6">
-            Total active credits in your wallet
+            Available tokens in your wallet
           </p>
 
           {isLowBalance && (
             <Alert className="mb-6 bg-red-500/10 border-red-500/20 text-red-500 backdrop-blur-sm animate-pulse">
               <AlertCircle className="h-4 w-4 text-red-500" />
-              <AlertTitle className="font-bold uppercase tracking-tight text-xs">Critical Depletion</AlertTitle>
+              <AlertTitle className="font-bold uppercase tracking-tight text-xs">Low Balance</AlertTitle>
               <AlertDescription className="text-[10px] opacity-80 leading-relaxed font-medium">
-                Neural link at risk. Recharge immediately to prevent lockout.
+                Your balance is low. Please recharge to continue using the service.
               </AlertDescription>
             </Alert>
           )}
@@ -82,7 +82,7 @@ export function VisitorTokenBalanceCard() {
             className="w-full h-12 bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all transform active:scale-[0.98] font-bold tracking-wide rounded-xl"
             onClick={() => setIsDialogOpen(true)}
           >
-            <Coins className="mr-2 h-4 w-4" /> RECHARGE CREDITS
+            <Coins className="mr-2 h-4 w-4" /> RECHARGE TOKENS
           </Button>
         </CardContent>
       </Card>

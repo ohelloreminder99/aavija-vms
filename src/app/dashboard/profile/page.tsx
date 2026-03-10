@@ -403,8 +403,8 @@ export default function ProfilePage() {
           <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
             <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
             <CardHeader className="relative z-10 border-b border-white/5 pb-8">
-              <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Identity <span className="text-primary/80">Profile</span></CardTitle>
-              <CardDescription className="text-zinc-400 max-w-xl leading-relaxed mt-2">Update your personal biometric and operational data. This will be verified by hosts during facility entry.</CardDescription>
+              <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">My <span className="text-primary/80">Profile</span></CardTitle>
+              <CardDescription className="text-zinc-400 max-w-xl leading-relaxed mt-2">Update your personal and vehicle details for easier entry at any premise.</CardDescription>
             </CardHeader>
             <CardContent className="relative z-10 pt-8">
               <Form {...form}>
@@ -420,10 +420,10 @@ export default function ProfilePage() {
                       {isUploading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full backdrop-blur-sm"><Loader2 className="h-8 w-8 animate-spin text-white" /></div>}
                     </div>
                     <div className="space-y-3 flex-1">
-                      <Label htmlFor="photo-upload" className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Biometric Visual</Label>
+                      <Label htmlFor="photo-upload" className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Profile Photo</Label>
                       <div className="flex items-center gap-4">
                         <Input id="photo-upload" type="file" accept="image/png, image,jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
-                        {isUploading && <span className="text-xs text-primary animate-pulse font-bold tracking-widest uppercase">Syncing...</span>}
+                        {isUploading && <span className="text-xs text-primary animate-pulse font-bold tracking-widest uppercase">Uploading...</span>}
                       </div>
                       <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">Support: WEBP, PNG, JPG (5MB Max)</p>
                     </div>
@@ -432,7 +432,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                     <FormField control={form.control} name="name" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Neural Designation</FormLabel>
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Full Name</FormLabel>
                         <FormControl>
                           <Input placeholder="Your Full Name" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
                         </FormControl>
@@ -441,7 +441,7 @@ export default function ProfilePage() {
                     )} />
                     <FormField control={form.control} name="companyName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Affiliated Org</FormLabel>
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Company Name</FormLabel>
                         <FormControl>
                           <Input placeholder="Your Company" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
                         </FormControl>
@@ -453,7 +453,7 @@ export default function ProfilePage() {
                       <div className="flex flex-wrap items-end gap-4">
                         <FormField control={form.control} name="countryCode" render={({ field }) => (
                           <FormItem className="w-24">
-                            <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Node Code</FormLabel>
+                            <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Country</FormLabel>
                             <FormControl>
                               <Input {...field} disabled className="bg-white/5 border-white/10 text-zinc-500 h-11 text-center" />
                             </FormControl>
@@ -462,7 +462,7 @@ export default function ProfilePage() {
                         <FormField control={form.control} name="phone" render={({ field }) => (
                           <FormItem className="flex-1 min-w-[200px]">
                             <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">
-                              Signal Hash (Mobile)
+                              Mobile Number
                               {!isPhoneLocked && <span className="text-[9px] font-normal text-zinc-500 ml-2">({settings?.phone_number_length || '10'} digits required)</span>}
                             </FormLabel>
                             <FormControl>
@@ -480,21 +480,21 @@ export default function ProfilePage() {
                           ) : (
                             <Button type="button" onClick={handleSendVerificationCode} disabled={isVerifying || !hasSufficientTokens} className="h-11 px-6 bg-primary text-white font-bold uppercase tracking-widest text-[10px] hover:bg-primary/90">
                               {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                              Initialize Link
+                              Verify
                             </Button>
                           )}
-                          {isPhoneLocked && <Button type="button" variant="outline" onClick={() => setIsUpdateConfirmOpen(true)} className="h-11 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest">Reconfigure</Button>}
+                          {isPhoneLocked && <Button type="button" variant="outline" onClick={() => setIsUpdateConfirmOpen(true)} className="h-11 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest">Change</Button>}
                         </div>
                       </div>
                       <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">
-                        {isPhoneLocked ? 'Communication link secured.' : `Verification protocol costs ${mobileVerificationCost} neural credits. Secure code transmitted via WhatsApp.`}
+                        {isPhoneLocked ? 'Mobile number verified.' : `Verifying your mobile number costs ${mobileVerificationCost} tokens. OTP will be sent via WhatsApp.`}
                       </p>
-                      {(!hasSufficientTokens && !userProfile?.is_verified) && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Credit Depletion: Insufficient tokens for uplink.</p>}
+                      {(!hasSufficientTokens && !userProfile?.is_verified) && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Insufficient tokens to verify.</p>}
                       {verificationError && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">{verificationError}</p>}
                       {otpSent && !isPhoneLocked && (
                         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4 animate-in fade-in slide-in-from-top-2">
                           <FormItem>
-                            <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Verification Pulse</FormLabel>
+                            <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Enter OTP</FormLabel>
                             <div className="flex items-center gap-2">
                               <FormControl>
                                 <Input type="tel" maxLength={6} placeholder="ENTER 6-DIGIT CODE" value={otp} onChange={(e) => setOtp(e.target.value)} className="bg-black/40 border-white/10 text-white text-center font-mono text-lg tracking-[0.5em] h-12" />
@@ -503,7 +503,7 @@ export default function ProfilePage() {
                                 {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm'}
                               </Button>
                             </div>
-                            <FormDescription className="text-zinc-500 text-[10px]">Monitoring WhatsApp for incoming transmission...</FormDescription>
+                            <FormDescription className="text-zinc-500 text-[10px]">Checking WhatsApp for OTP...</FormDescription>
                           </FormItem>
                         </div>
                       )}
@@ -511,10 +511,10 @@ export default function ProfilePage() {
 
                     <FormField control={form.control} name="cityId" render={({ field }) => (
                       <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
-                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">Operational Sector (City)</FormLabel>
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">City</FormLabel>
                         <div className="relative group/search mb-4">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within/search:text-primary transition-colors" />
-                          <Input placeholder="Filter sectors..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-700 h-10 text-sm" />
+                          <Input placeholder="Search city..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-700 h-10 text-sm" />
                         </div>
                         <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/20">
                           <FormControl>
@@ -529,7 +529,7 @@ export default function ProfilePage() {
                               ))}
                             </RadioGroup>
                           </FormControl>
-                          {(filteredCities ?? []).length === 0 && <p className="py-12 text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest">Sector Not Found</p>}
+                          {(filteredCities ?? []).length === 0 && <p className="py-12 text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest">City Not Found</p>}
                         </ScrollArea>
                         <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
@@ -543,9 +543,9 @@ export default function ProfilePage() {
                     <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
                       <FormLabel className="flex items-center gap-2 text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4">
                         <Package className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-                        <span>Inventory Expertise</span>
+                        <span>Specialization</span>
                       </FormLabel>
-                      <FormDescription className="text-zinc-500 text-[10px] mb-4">Add up to 10 products or services you offer for neural matching.</FormDescription>
+                      <FormDescription className="text-zinc-500 text-[10px] mb-4">Add items or services you offer to help people find you.</FormDescription>
                       <div className="flex items-center gap-2">
                         <Input placeholder="e.g., Industrial Machinery" value={newProduct} onChange={(e) => setNewProduct(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddProduct(); } }} className="bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10" />
                         <Button type="button" variant="outline" onClick={handleAddProduct} disabled={!newProduct.trim() || (field.value?.length ?? 0) >= 10} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6">Add</Button>
@@ -562,7 +562,7 @@ export default function ProfilePage() {
                               </Badge>
                             ))}
                           </div>
-                        ) : <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-[0.2em] text-center py-6 border border-dashed border-white/5 rounded-2xl">No expertise indexed.</p>}
+                        ) : <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-[0.2em] text-center py-6 border border-dashed border-white/5 rounded-2xl">No items added.</p>}
                       </div>
                       <FormMessage className="text-red-500 text-[10px]" />
                     </FormItem>
@@ -579,7 +579,7 @@ export default function ProfilePage() {
                             <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-headline font-bold text-white tracking-tight">Agent Payout Protocol</h3>
+                            <h3 className="text-lg font-headline font-bold text-white tracking-tight">Payment Details</h3>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant={userProfile.kyc_verified ? "default" : "secondary"} className={cn("text-[8px] font-black uppercase tracking-widest", userProfile.kyc_verified ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
                                 {userProfile.kyc_verified ? "Verified" : "Pending Sync"}
@@ -587,19 +587,19 @@ export default function ProfilePage() {
                             </div>
                           </div>
                         </div>
-                        <p className="text-[10px] text-zinc-500 font-medium uppercase leading-relaxed max-w-md">Financial credentials are required for commission distribution. Manual verification by sector admin is mandatory.</p>
+                        <p className="text-[10px] text-zinc-500 font-medium uppercase leading-relaxed max-w-md">Add your UPI and PAN for commission payments. Manual verification by admin is required.</p>
 
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
                           <FormField control={form.control} name="agent_payout_upi" render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">UPI Link</FormLabel>
+                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">UPI ID</FormLabel>
                               <FormControl><Input placeholder="yourname@upi" {...field} disabled={userProfile.kyc_verified} className="bg-black/20 border-white/5 text-white h-11" /></FormControl>
                               <FormMessage className="text-red-500 text-[10px]" />
                             </FormItem>
                           )} />
                           <FormField control={form.control} name="pan_number" render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">PAN Hash</FormLabel>
+                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">PAN Number</FormLabel>
                               <FormControl><Input placeholder="ABCDE1234F" {...field} className="uppercase bg-black/20 border-white/5 text-white h-11" disabled={userProfile.kyc_verified} /></FormControl>
                               <FormMessage className="text-red-500 text-[10px]" />
                             </FormItem>
@@ -622,9 +622,9 @@ export default function ProfilePage() {
                       <FormItem>
                         <FormLabel className="flex items-center gap-3 text-zinc-300 font-headline font-bold uppercase tracking-widest text-[10px]">
                           <Car className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-                          <span>Fleet Management</span>
+                          <span>Vehicle Management</span>
                         </FormLabel>
-                        <FormDescription className="text-zinc-500 text-[10px]">Synchronize your primary transport for rapid facility entry.</FormDescription>
+                        <FormDescription className="text-zinc-500 text-[10px]">Add your vehicles for faster entry at gates.</FormDescription>
                         <div className="space-y-3 pt-4">
                           <FormField control={form.control} name="selected_vehicle_number" render={({ field }) => (
                             <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="space-y-3">
@@ -645,7 +645,7 @@ export default function ProfilePage() {
                             </RadioGroup>
                           )}
                           />
-                          {vehicleFields.length === 0 && <p className="text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest py-8 border border-dashed border-white/5 rounded-2xl">No transport linked.</p>}
+                          {vehicleFields.length === 0 && <p className="text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest py-8 border border-dashed border-white/5 rounded-2xl">No vehicles added.</p>}
                         </div>
                         <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
@@ -653,7 +653,7 @@ export default function ProfilePage() {
                     />
 
                     <div className="space-y-4 pt-4 border-t border-white/5">
-                      <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Deploy New Asset</FormLabel>
+                      <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Add New Vehicle</FormLabel>
                       <div className="flex flex-wrap items-center gap-3">
                         <Select value={newVehicleType} onValueChange={(value) => setNewVehicleType(value as any)}>
                           <SelectTrigger className="w-[140px] bg-black/20 border-white/10 text-white h-10">
@@ -669,7 +669,7 @@ export default function ProfilePage() {
                         </Select>
                         <Input placeholder="Vehicle Number" value={newVehicleNumber} onChange={(e) => setNewVehicleNumber(e.target.value.toUpperCase())} disabled={newVehicleType === 'walking'} className="flex-1 min-w-[150px] bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10 font-mono" />
                         <Button type="button" variant="outline" onClick={handleAddVehicle} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6 ml-auto">
-                          <Plus className="mr-2 h-4 w-4" /> Link
+                          <Plus className="mr-2 h-4 w-4" /> Add
                         </Button>
                       </div>
                     </div>
@@ -677,7 +677,7 @@ export default function ProfilePage() {
 
                   <Button type="submit" disabled={isSubmitting} className="w-full h-14 bg-primary text-white font-black tracking-[0.2em] uppercase hover:bg-primary/90 shadow-[0_0_30px_rgba(59,130,246,0.3)] text-base">
                     {isSubmitting ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Save className="mr-3 h-5 w-5" />}
-                    Synchronize Identity
+                    Save Profile
                   </Button>
                 </form>
               </Form>
@@ -686,15 +686,15 @@ export default function ProfilePage() {
           <AlertDialog open={isUpdateConfirmOpen} onOpenChange={setIsUpdateConfirmOpen}>
             <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-xl">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Reconfigure Link?</AlertDialogTitle>
+                <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Change Mobile Number?</AlertDialogTitle>
                 <AlertDialogDescription className="text-zinc-400 leading-relaxed">
-                  Changing your signal hash (phone number) requires fresh biometric verification via WhatsApp.
-                  This operation consumes <span className="text-primary font-bold">{mobileVerificationCost} neural units</span>.
+                  Changing your phone number requires new verification via WhatsApp.
+                  This costs <span className="text-primary font-bold">{mobileVerificationCost} tokens</span>.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="pt-6">
-                <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
-                <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-white font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Uplink</AlertDialogAction>
+                <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-white font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Change</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

@@ -45,7 +45,7 @@ const RatingCardComponent = () => {
         <Card className="glass-card border-white/5 group hover:border-primary/30 transition-all duration-500 relative overflow-hidden">
             <div className="absolute inset-0 bg-primary/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="relative z-10 pb-2">
-                <CardTitle className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">Global Trust Metric</CardTitle>
+                <CardTitle className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">Trust Score</CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
                 <div className="flex items-baseline gap-2 mb-4">
@@ -58,7 +58,7 @@ const RatingCardComponent = () => {
                     {renderStars(userProfile?.global_rating ?? 0)}
                 </div>
                 <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider mt-6 border-t border-white/5 pt-4">
-                    Aggregated reputation from <span className="text-primary/80">Sector Validators</span>.
+                    Total rating from <span className="text-primary/80">Admins</span>.
                 </p>
             </CardContent>
         </Card>

@@ -69,7 +69,7 @@ export default function VisitorsPage() {
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Neural Registry...</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Visitor Registry...</p>
         </div>
       );
     }
@@ -77,7 +77,7 @@ export default function VisitorsPage() {
     if (error) {
       return (
         <div className="text-center py-20 px-6 border border-red-500/20 bg-red-500/5 rounded-2xl">
-          <p className="text-red-400 font-bold mb-2">Registry Connection Failure</p>
+          <p className="text-red-400 font-bold mb-2">Connection Error</p>
           <p className="text-xs text-red-500/60 font-medium uppercase tracking-wider">{error.message}</p>
         </div>
       );
@@ -87,8 +87,8 @@ export default function VisitorsPage() {
       return (
         <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
           <Search className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
-          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Zero Entity Matched</p>
-          <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">The global visitor mesh is currently clear of matching patterns.</p>
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">No Visitors Found</p>
+          <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">No visitors matching your search were found.</p>
         </div>
       );
     }
@@ -98,7 +98,7 @@ export default function VisitorsPage() {
         <div className="relative group max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
           <Input
-            placeholder="Scan name or neural mail..."
+            placeholder="Search name or email..."
             className="pl-11 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -109,10 +109,10 @@ export default function VisitorsPage() {
           <Table>
             <TableHeader className="bg-white/[0.02]">
               <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Entity Profile</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Neural Mail</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Sever Peripheral (Phone)</TableHead>
-                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Credit Balance</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Visitor Profile</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Email Address</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Phone Number</TableHead>
+                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Token Balance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -156,7 +156,7 @@ export default function VisitorsPage() {
                       <span className="text-sm font-bold text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] tabular-nums">
                         {(visitor.token_balance_visitor ?? 0).toLocaleString()}
                       </span>
-                      <span className="text-[8px] font-black uppercase tracking-widest text-zinc-700">Credits</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-zinc-700">Tokens</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -165,7 +165,7 @@ export default function VisitorsPage() {
           </Table>
           {filteredVisitors.length === 0 && (
             <div className="py-20 text-center bg-white/[0.01]">
-              <p className="text-zinc-700 text-[10px] font-black uppercase tracking-widest">Pattern Mismatch</p>
+              <p className="text-zinc-700 text-[10px] font-black uppercase tracking-widest">No Match Found</p>
             </div>
           )}
         </div>
@@ -180,7 +180,7 @@ export default function VisitorsPage() {
           <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
             <Link href="/dashboard/admin">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Retreat to Command
+              Back to Dashboard
             </Link>
           </Button>
 
@@ -190,11 +190,11 @@ export default function VisitorsPage() {
                 <Search className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-4xl font-headline font-bold text-white tracking-tighter">
-                Entity <span className="text-primary/80">Registry</span>
+                Visitor <span className="text-primary/80">Registry</span>
               </h1>
             </div>
             <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
-              Deep-scan of the global visitor mesh. Identify behavioral patterns and account health.
+              View and manage all registered visitors and their account status.
             </p>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function VisitorsPage() {
         <DialogContent className="max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden">
           <div className="p-6 border-b border-white/5 bg-white/[0.02]">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white tracking-tight">Identity <span className="text-primary/80">Visualization</span></DialogTitle>
+              <DialogTitle className="text-2xl font-bold text-white tracking-tight">Visitor <span className="text-primary/80">Photo</span></DialogTitle>
             </DialogHeader>
           </div>
           {imageUrlToView && (
@@ -244,7 +244,7 @@ export default function VisitorsPage() {
             </div>
           )}
           <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end">
-            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close Feed</Button>
+            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -201,7 +201,7 @@ export async function generateInvoicePdf(invoice: Invoice) {
   const footerY = pageHeight - 30;
 
   doc.text('This is a digitally generated cryptographically signed invoice.', pageWidth / 2, footerY, { align: 'center' });
-  doc.text('Secured by Aavija Guardian Protocol.', pageWidth / 2, footerY + 5, { align: 'center' });
+  doc.text('Secured by Aavija Guardian.', pageWidth / 2, footerY + 5, { align: 'center' });
 
   doc.setFillColor(15, 15, 15);
   doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');

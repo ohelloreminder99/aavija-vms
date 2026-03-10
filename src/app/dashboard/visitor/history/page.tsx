@@ -340,9 +340,9 @@ export default function VisitorHistoryPage() {
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
             <History className="h-8 w-8 text-zinc-700" />
           </div>
-          <p className="mb-2 font-bold text-white uppercase tracking-widest text-sm">Archival Link Null</p>
+          <p className="mb-2 font-bold text-white uppercase tracking-widest text-sm">No History Found</p>
           <p className="text-xs text-zinc-500 max-w-[200px] mx-auto leading-relaxed">
-            You haven&apos;t initiated any neural check-ins in current sectors.
+            You haven&apos;t visited any locations yet.
           </p>
         </div>
       );
@@ -363,11 +363,11 @@ export default function VisitorHistoryPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 ml-auto">
-              <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting}>
+              <Button variant="default" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="bg-emerald-600 hover:bg-emerald-700 text-white border-0">
                 {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                 Export CSV
               </Button>
-              <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting}>
+              <Button variant="default" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="bg-red-600 hover:bg-red-700 text-white border-0">
                 {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                 Export PDF
               </Button>
@@ -377,7 +377,7 @@ export default function VisitorHistoryPage() {
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary transition-colors" />
             <Input
-              placeholder="Filter by sector or validator identifier..."
+              placeholder="Filter by location or host name..."
               className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-primary/50 focus:ring-primary/20 h-12"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -402,7 +402,7 @@ export default function VisitorHistoryPage() {
                     <Building className="h-4 w-4 text-zinc-500 group-hover/row:text-primary transition-colors" />
                     {premiseMap.get(visit.premise_id) || (
                       <span className="text-zinc-600 italic">
-                        Unknown Sector
+                        Unknown Location
                       </span>
                     )}
                   </div>
@@ -476,7 +476,7 @@ export default function VisitorHistoryPage() {
       <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
         <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
         <CardHeader className="relative z-10 border-b border-white/5 pb-8">
-          <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Intelligence Log: <span className="text-primary/80">Visits</span></CardTitle>
+          <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></CardTitle>
           <CardDescription className="text-zinc-400 max-w-xl leading-relaxed mt-2">{description}</CardDescription>
         </CardHeader>
         <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
@@ -484,16 +484,16 @@ export default function VisitorHistoryPage() {
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
         <AlertDialogContent className="bg-[#020617] border-white/10 text-white backdrop-blur-3xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white text-xl">Deduct Neural Credits?</AlertDialogTitle>
+            <AlertDialogTitle className="text-white text-xl">Download Report?</AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400">
-              Generating an offline report costs <span className="font-bold text-primary">{exportCost ?? '...'} credits</span>. This will be permanently subtracted from your neural link balance.
+              Generating an offline report costs <span className="font-bold text-primary">{exportCost ?? '...'} tokens</span>. This will be deducted from your token balance.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="border-t border-white/5 pt-6 mt-6">
-            <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white">Abort</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white hover:bg-primary/90">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Authorize Deduction
+              Confirm Download
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

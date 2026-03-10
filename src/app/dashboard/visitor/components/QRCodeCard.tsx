@@ -217,7 +217,7 @@ export function QRCodeCard() {
         <div className="absolute inset-0 mesh-obsidian opacity-20" />
         <div className="flex flex-col items-center gap-4 relative z-10">
           <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
-          <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">Syncing Neural Tokens...</p>
+          <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">Loading...</p>
         </div>
       </Card>
     );
@@ -265,9 +265,9 @@ export function QRCodeCard() {
       <Card className="glass-card border-white/5 overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         <CardHeader className="relative z-10">
-          <CardTitle className="text-white text-2xl tracking-tight">Generate Neural Pass</CardTitle>
+          <CardTitle className="text-white text-2xl tracking-tight">Generate Entry Pass</CardTitle>
           <CardDescription className="text-zinc-400">
-            Create a secure, single-use biometric code for facility entry.
+            Create a secure QR code to enter the premises.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 relative z-10">
@@ -281,7 +281,7 @@ export function QRCodeCard() {
             ) : (
               <QrCode className="mr-3 h-8 w-8" />
             )}
-            Initiate Secure Pass
+            Generate QR Code
           </Button>
           {validationIssues.map((issue) => (
             <Alert key={issue.key} className="bg-red-500/10 border-red-500/20 text-red-500">
@@ -303,9 +303,9 @@ export function QRCodeCard() {
       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
         <DialogContent className="sm:max-w-md bg-[#020617]/95 border-white/10 backdrop-blur-3xl text-white shadow-[0_0_50px_rgba(0,0,0,1)]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold tracking-tight text-white">Access Pass Authorized</DialogTitle>
+            <DialogTitle className="text-2xl font-bold tracking-tight text-white">Entry Pass Ready</DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Present this encrypted code to the biometric scanner. Pass expires in 60s.
+              Show this QR code at the entry gate. Pass expires in 60s.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-8 gap-6 border border-white/5 rounded-2xl bg-white/5 mt-4">
@@ -324,13 +324,13 @@ export function QRCodeCard() {
             ) : (
               <div className="flex flex-col items-center justify-center h-[240px] gap-4">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                <p className="text-zinc-500 text-sm">Encrypting secure pass...</p>
+                <p className="text-zinc-500 text-sm">Preparing QR code...</p>
               </div>
             )}
             {tokenData && (
               <div className="w-full max-w-xs space-y-3 pt-4">
                 <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-500">
-                  <span>Security Lifeboat</span>
+                  <span>Expires in</span>
                   <span className="text-primary">{Math.round(timeRemaining / 1000)}s</span>
                 </div>
                 <Progress

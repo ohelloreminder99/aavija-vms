@@ -115,7 +115,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="space-y-2 text-center">
-            <p className="text-zinc-400 font-medium tracking-[0.2em] uppercase text-xs animate-pulse">Initializing Neural Link</p>
+            <p className="text-zinc-400 font-medium tracking-[0.2em] uppercase text-xs animate-pulse">Initialising...</p>
             <div className="h-1 w-48 bg-white/5 rounded-full overflow-hidden">
               <div className="h-full bg-primary animate-[shimmer_2s_infinite] w-full" />
             </div>
@@ -135,11 +135,11 @@ export default function DashboardPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              ENCRYPTED BIOMETRIC LINK ACTIVE
+              SECURE SESSION ACTIVE
             </div>
             <div className="space-y-2">
-              <h1 className="text-4xl font-headline font-bold tracking-tight text-white sm:text-5xl">Identify Your Context</h1>
-              <p className="text-lg text-zinc-400 max-w-sm mx-auto">Select a regional security identity to begin operation.</p>
+              <h1 className="text-4xl font-headline font-bold tracking-tight text-white sm:text-5xl">Select Your Role</h1>
+              <p className="text-lg text-zinc-400 max-w-sm mx-auto">Choose how you want to continue.</p>
             </div>
           </div>
 
@@ -150,7 +150,7 @@ export default function DashboardPage() {
             {userProfile?.is_agent && <RoleCard title="Act as Agent" description="Manage ecosystem expansion and commission ledger" href="/dashboard/visitor/earnings" icon={Wallet} />}
             {premiseRoleCards}
             <div className="pt-8 mt-4 border-t border-white/5 flex flex-col gap-5">
-              <RoleCard title="Security Settings" description="Update neural bypass pins and recovery protocols" href="/dashboard/change-password" icon={LockKeyhole} />
+              <RoleCard title="Security Settings" description="Update your pin and session settings" href="/dashboard/change-password" icon={LockKeyhole} />
             </div>
           </div>
         </div>

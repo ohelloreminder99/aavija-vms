@@ -138,10 +138,10 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
           <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
             <FileText className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </div>
-          Tax Intelligence
+          GST & Billing Details
         </CardTitle>
         <CardDescription className="text-zinc-400 mt-2">
-          Verify legal identities for neural credit fiscal compliance.
+          Save your billing details for GST invoices.
         </CardDescription>
       </CardHeader>
       <CardContent className="relative z-10 pt-8">
@@ -152,11 +152,11 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="legalName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Legal Identity</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Name (as per GST)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Farida Samnani" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
+                    <Input placeholder="e.g., Sunil Kumar" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
                   </FormControl>
-                  <FormDescription className="text-zinc-500 text-[10px]">Official designation for biometric invoicing.</FormDescription>
+                  <FormDescription className="text-zinc-500 text-[10px]">Official name for your invoices.</FormDescription>
                   <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
@@ -166,11 +166,11 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="gstNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">GSTIN (Ops-Optional)</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">GST Number (Optional)</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., 27AAAAA0000A1Z5" {...field} className="uppercase bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
                   </FormControl>
-                  <FormDescription className="text-zinc-500 text-[10px]">Verification code for sector tax reclamation.</FormDescription>
+                  <FormDescription className="text-zinc-500 text-[10px]">Your GST identification number.</FormDescription>
                   <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
@@ -180,11 +180,11 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="billingState"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Sector State</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Registered State</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="bg-white/5 border-white/10 text-white h-11">
-                        <SelectValue placeholder="Select registered sector" />
+                        <SelectValue placeholder="Select your state" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="bg-[#020617] border-white/10 text-white">
@@ -195,7 +195,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription className="text-zinc-500 text-[10px]">Place of Supply for credit flux calculations.</FormDescription>
+                  <FormDescription className="text-zinc-500 text-[10px]">State for tax calculation.</FormDescription>
                   <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
@@ -205,21 +205,21 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
               name="billingAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Neural Billing Node</FormLabel>
+                  <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Billing Address</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Full physical coordinates..." {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 min-h-[100px]" />
+                    <Textarea placeholder="Enter your full address..." {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 min-h-[100px]" />
                   </FormControl>
                   <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting} className="w-full h-12 bg-primary text-white font-bold tracking-widest uppercase hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+            <Button type="submit" disabled={isSubmitting} className="w-full h-12 bg-primary text-white font-bold tracking-wide uppercase hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Save className="mr-2 h-4 w-4" />
               )}
-              Authorize Records
+              Save Details
             </Button>
           </form>
         </Form>

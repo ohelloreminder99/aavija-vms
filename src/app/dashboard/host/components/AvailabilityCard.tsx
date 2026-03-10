@@ -79,16 +79,16 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
     <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
       <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
       <CardHeader className="relative z-10 border-b border-white/5 pb-8">
-        <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Deployment <span className="text-primary/80">Status</span></CardTitle>
+        <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Availability <span className="text-primary/80">Status</span></CardTitle>
         <CardDescription className="text-zinc-400 mt-2">
-          Synchronize your availability with the facility gatekeepers.
+          Update your availability status for the entry gate.
         </CardDescription>
       </CardHeader>
       <CardContent className="relative z-10 pt-8">
         {isPremiseLoading ? (
           <div className="flex h-32 flex-col items-center justify-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">Syncing Grid...</p>
+            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">Loading...</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -132,7 +132,7 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
                 disabled={isSubmitting || selectedAvailability === currentDbAvailability}
                 className="h-12 px-8 bg-primary text-white font-black uppercase tracking-widest text-[10px] hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
               >
-                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Broadcast Status'}
+                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Update Status'}
               </Button>
             </div>
 
@@ -143,11 +143,11 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
               </div>
               <div className="p-4 rounded-2xl bg-amber-500/[0.03] border border-amber-500/10 group/status">
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(245,158,11,0.4)] transition-all">Busy</p>
-                <p className="text-[10px] text-zinc-500 leading-tight">Sector alert: You are occupied but still contactable.</p>
+                <p className="text-[10px] text-zinc-500 leading-tight">You are busy but can still be contacted.</p>
               </div>
               <div className="p-4 rounded-2xl bg-red-500/[0.03] border border-red-500/10 group/status">
                 <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(239,68,68,0.4)] transition-all">DND</p>
-                <p className="text-[10px] text-zinc-500 leading-tight">Full lockdown: Authorization for your node is disabled.</p>
+                <p className="text-[10px] text-zinc-500 leading-tight">Do not disturb. Gatekeeper will not send visitors.</p>
               </div>
             </div>
           </div>

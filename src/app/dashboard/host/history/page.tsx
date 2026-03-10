@@ -174,7 +174,7 @@ function RatingDialog({
           <div>
             <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Rate Your Visitor</DialogTitle>
             <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
-              Analyzing encounter with <span className="text-primary">{visit?.visitor_name}</span>
+              Rating visit for <span className="text-primary">{visit?.visitor_name}</span>
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -189,7 +189,7 @@ function RatingDialog({
             <Button variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 border-white/5">Cancel</Button>
           </DialogClose>
           <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
-            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Lock Rating'}
+            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Submit Rating'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -495,13 +495,13 @@ export default function HostHistoryPage() {
           <div className="relative z-10 flex flex-wrap items-end gap-6">
             <div className="flex flex-wrap items-end gap-4">
               <div className="space-y-2">
-                <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Range Start</Label>
+                <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Start Date</Label>
                 <div className="relative">
                   <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Terminal Date</Label>
+                <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">End Date</Label>
                 <div className="relative">
                   <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
                 </div>
@@ -523,7 +523,7 @@ export default function HostHistoryPage() {
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
             <Input
-              placeholder="Filter by visitor identity or neural status..."
+              placeholder="Search by visitor name or status..."
               className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -537,10 +537,10 @@ export default function HostHistoryPage() {
             <TableHeader className="bg-white/[0.03]">
               <TableRow className="border-white/5 hover:bg-transparent">
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Identity</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link UP</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link DOWN</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Protocol Status</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Name</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -612,7 +612,7 @@ export default function HostHistoryPage() {
         <div className="mt-8 flex justify-center pb-12">
           {hasMore && (
             <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore} className="h-12 px-10 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all">
-              {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Sync More Artifacts"}
+              {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Load More"}
             </Button>
           )}
         </div>
@@ -631,13 +631,13 @@ export default function HostHistoryPage() {
           <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
             <Link href={`/dashboard/host?premiseId=${premiseId}`} className="flex items-center">
               <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Back to Console</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
             </Link>
           </Button>
 
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Host Intel Pulse Active</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live Sync Active</span>
           </div>
         </div>
 
@@ -648,7 +648,7 @@ export default function HostHistoryPage() {
               <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
                 <Search className="h-5 w-5 text-primary" />
               </div>
-              <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Intelligence <span className="text-primary/80">Archival</span></CardTitle>
+              <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></CardTitle>
             </div>
             <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
               {description}
@@ -672,17 +672,17 @@ export default function HostHistoryPage() {
       <AlertDialog open={!!visitToBlock} onOpenChange={(open) => !open && setVisitToBlock(null)}>
         <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Impose Protocol Restriction?</AlertDialogTitle>
+            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Block Visitor?</AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
               You are about to block <span className="text-red-500 font-bold underline decoration-red-500/30 underline-offset-4">{visitToBlock?.visitor_name}</span>.
-              Future check-in requests for your node from this identity will be automatically terminated.
+              This visitor will no longer be able to request to visit you.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-6">
-            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleBlockConfirm} disabled={isBlocking} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
               {isBlocking && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Commence Block
+              Confirm Block
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -691,7 +691,7 @@ export default function HostHistoryPage() {
       <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
         <DialogContent className="max-w-xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden">
           <div className="absolute top-4 left-4 z-20">
-            <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Identity Snapshot</Badge>
+            <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Visitor Photo</Badge>
           </div>
           {imageUrlToView && (
             <div className="relative aspect-square w-full">
@@ -707,7 +707,7 @@ export default function HostHistoryPage() {
           )}
           <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
             <DialogClose asChild>
-              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6">Close Trace</Button>
+              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6">Close</Button>
             </DialogClose>
           </div>
         </DialogContent>
@@ -716,16 +716,16 @@ export default function HostHistoryPage() {
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
         <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Confirm Data Extraction</AlertDialogTitle>
+            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Download Report</AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-              Extraction protocol requires a neural contribution of <span className="text-primary font-black">{exportCost ?? '...'} units</span> from your personal balance.
+              Downloading this report costs <span className="text-primary font-black">{exportCost ?? '...'} tokens</span> from your personal balance.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-6">
-            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Authorize Deduction
+              Confirm Download
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

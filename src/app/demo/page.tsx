@@ -12,7 +12,7 @@ const features = [
     "Real-time WhatsApp Alerts",
     "Automated Token Economy",
     "Multi-Role Dashboards",
-    "Military-Grade Encryption",
+    "Bank-Level Security",
     "Digital Audit Trails"
 ];
 

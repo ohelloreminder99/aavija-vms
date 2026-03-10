@@ -243,8 +243,8 @@ export default function HostsPage() {
         if (!hosts || hosts.length === 0) return (
             <div className="py-20 text-center text-zinc-600 border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.02]">
                 <Plus className="mx-auto h-10 w-10 mb-4 opacity-20" />
-                <p className="font-bold uppercase tracking-widest text-[11px]">Directory Empty</p>
-                <p className="text-[10px] opacity-60 mt-1">Initialize person-of-interest logs to begin.</p>
+                <p className="font-bold uppercase tracking-widest text-[11px]">No Hosts Found</p>
+                <p className="text-[10px] opacity-60 mt-1">Add a host to get started.</p>
             </div>
         );
         return (
@@ -252,7 +252,7 @@ export default function HostsPage() {
                 <div className="relative group/search">
                     <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
                     <Input
-                        placeholder="Scan directory by name or encrypted email..."
+                        placeholder="Search by name or email..."
                         className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all font-medium"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -262,9 +262,9 @@ export default function HostsPage() {
                     <Table>
                         <TableHeader className="bg-white/[0.03]">
                             <TableRow className="border-white/5 hover:bg-transparent">
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Host Identity</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Linked Address</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-center">Neural Status</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Host Name</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Address</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-center">Status</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -303,10 +303,10 @@ export default function HostsPage() {
                                         </TableCell>
                                         <TableCell className='text-right pr-8'>
                                             <div className="flex items-center justify-end gap-2">
-                                                <Button variant="ghost" size="icon" title={isActive ? 'Sever Link' : 'Restore Link'} onClick={() => setHostToToggle(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 transition-all">
+                                                <Button variant="ghost" size="icon" title={isActive ? 'Deactivate' : 'Activate'} onClick={() => setHostToToggle(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 transition-all">
                                                     <Power className={cn("h-4 w-4", isActive ? "text-red-500/50 group-hover/row:text-red-500" : "text-emerald-500/50 group-hover/row:text-emerald-500")} />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" title="Purge Log" onClick={() => setHostToRemove(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                                                <Button variant="ghost" size="icon" title="Remove" onClick={() => setHostToRemove(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </div>
@@ -319,7 +319,7 @@ export default function HostsPage() {
                 </div>
                 {filteredHosts.length === 0 && (
                     <div className="py-20 text-center">
-                        <p className="text-[11px] font-black text-zinc-800 uppercase tracking-[0.3em]">No matching identity found in directory</p>
+                        <p className="text-[11px] font-black text-zinc-800 uppercase tracking-[0.3em]">No matching host found</p>
                     </div>
                 )}
             </div>
@@ -332,14 +332,14 @@ export default function HostsPage() {
                 <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
                     <Link href={`/dashboard/owner?premiseId=${premiseId}`} className="flex items-center">
                         <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Back to Command Hub</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
                     </Link>
                 </Button>
 
                 <Dialog open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
                     <DialogTrigger asChild>
                         <Button className="h-11 bg-primary text-white font-black uppercase tracking-widest text-[10px] px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-xl">
-                            <Plus className="mr-2 h-4 w-4" /> Recruit Host
+                            <Plus className="mr-2 h-4 w-4" /> Add Host
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-[#020617]/95 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
@@ -348,9 +348,9 @@ export default function HostsPage() {
                                 <Plus className="h-6 w-6 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                             </div>
                             <div>
-                                <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Host Recruitment</DialogTitle>
+                                <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Add New Host</DialogTitle>
                                 <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
-                                    Initialize new nodal link or assign existing operative
+                                    Add a new host or link an existing user to your premise
                                 </DialogDescription>
                             </div>
                         </DialogHeader>
@@ -362,14 +362,14 @@ export default function HostsPage() {
                                     creationMode === 'new' ? "bg-primary/5 border-primary/30" : "bg-white/5 border-white/5 hover:bg-white/10"
                                 )} onClick={() => setCreationMode('new')}>
                                     <RadioGroupItem value="new" id="h-r1" className="border-zinc-700 text-primary" />
-                                    <Label htmlFor="h-r1" className="text-[11px] font-black uppercase tracking-widest text-white cursor-pointer">Protocol: New</Label>
+                                    <Label htmlFor="h-r1" className="text-[11px] font-black uppercase tracking-widest text-white cursor-pointer">Create New</Label>
                                 </div>
                                 <div className={cn(
                                     "flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer",
                                     creationMode === 'existing' ? "bg-primary/5 border-primary/30" : "bg-white/5 border-white/5 hover:bg-white/10"
                                 )} onClick={() => setCreationMode('existing')}>
                                     <RadioGroupItem value="existing" id="h-r2" className="border-zinc-700 text-primary" />
-                                    <Label htmlFor="h-r2" className="text-[11px] font-black uppercase tracking-widest text-white cursor-pointer">Protocol: Linked</Label>
+                                    <Label htmlFor="h-r2" className="text-[11px] font-black uppercase tracking-widest text-white cursor-pointer">Link Existing</Label>
                                 </div>
                             </RadioGroup>
 
@@ -379,14 +379,14 @@ export default function HostsPage() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <FormField control={createForm.control} name="name" render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Identity Name</FormLabel>
+                                                    <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Full Name</FormLabel>
                                                     <FormControl><Input placeholder="John Doe" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                     <FormMessage className="text-[9px] uppercase font-bold" />
                                                 </FormItem>
                                             )} />
                                             <FormField control={createForm.control} name="email" render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Neural Mail</FormLabel>
+                                                    <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Email Address</FormLabel>
                                                     <FormControl><Input type="email" placeholder="host@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                     <FormMessage className="text-[9px] uppercase font-bold" />
                                                 </FormItem>
@@ -394,23 +394,23 @@ export default function HostsPage() {
                                         </div>
                                         <FormField control={createForm.control} name="identity" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Node Specification</FormLabel>
-                                                <FormControl><Input placeholder="e.g. Unit 402 - Sector B" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-600 font-medium">Physical coordinates for the host node</FormDescription>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Address / Unit No.</FormLabel>
+                                                <FormControl><Input placeholder="e.g. Unit 402, Block B" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
+                                                <FormDescription className="text-[9px] text-zinc-600 font-medium">Specific address for the host (e.g. Flat 102)</FormDescription>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="password" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Initial Cipher</FormLabel>
-                                                <FormControl><Input type="password" placeholder="8+ character secure string" {...field} className="bg-black/40 border-white/10 text-white h-11" /></FormControl>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Password</FormLabel>
+                                                <FormControl><Input type="password" placeholder="Minimum 8 characters" {...field} className="bg-black/40 border-white/10 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
                                             <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Abort</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
-                                                {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Execute Sequence'}
+                                                {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Create Host'}
                                             </Button>
                                         </DialogFooter>
                                     </form>
@@ -422,23 +422,23 @@ export default function HostsPage() {
                                     <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-4">
                                         <FormField control={assignForm.control} name="email" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Operative Email</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Email Address</FormLabel>
                                                 <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-600 font-medium">Email of an existing verified network identity</FormDescription>
+                                                <FormDescription className="text-[9px] text-zinc-600 font-medium">The email address of the existing user you want to add</FormDescription>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <FormField control={assignForm.control} name="identity" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Node Specification</FormLabel>
-                                                <FormControl><Input placeholder="e.g. Unit 402 - Sector B" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
+                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Address / Unit No.</FormLabel>
+                                                <FormControl><Input placeholder="e.g. Unit 402, Block B" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Abort</Button></DialogClose>
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
-                                                {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Bind Operative'}
+                                                {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Link User'}
                                             </Button>
                                         </DialogFooter>
                                     </form>
@@ -456,10 +456,10 @@ export default function HostsPage() {
                         <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
                             <Users className="h-5 w-5 text-primary" />
                         </div>
-                        <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Host <span className="text-primary/80">Directory</span></CardTitle>
+                        <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Host <span className="text-primary/80">List</span></CardTitle>
                     </div>
                     <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
-                        A centralized log of all verified entities with 'host' classification assigned to your premise node.
+                        A list of all users assigned as hosts for your premise.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="relative z-10 pt-8">
@@ -471,14 +471,14 @@ export default function HostsPage() {
                                     <AlertTriangle className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <AlertTitle className="text-[12px] font-black uppercase tracking-widest mb-1">Legacy Log Detected</AlertTitle>
+                                    <AlertTitle className="text-[12px] font-black uppercase tracking-widest mb-1">Update Required</AlertTitle>
                                     <AlertDescription className="text-[10px] font-medium text-zinc-400 max-w-lg leading-relaxed">
-                                        Operative records require synchronization with the neural availability protocol. System default will be set to 'Available' for all logs.
+                                        Some host records need to be updated. They will be set to 'Available' by default.
                                     </AlertDescription>
                                 </div>
                             </div>
                             <Button onClick={handleBackfill} disabled={isMigrating} size="sm" className="relative z-10 bg-amber-500 text-black font-black uppercase tracking-widest text-[9px] h-10 px-6 rounded-lg hover:bg-amber-400">
-                                {isMigrating ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : "Sync Records"}
+                                {isMigrating ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : "Update Now"}
                             </Button>
                         </Alert>
                     )}
@@ -489,17 +489,17 @@ export default function HostsPage() {
             <AlertDialog open={!!hostToToggle} onOpenChange={(open) => { if (!open) { setHostToToggle(null); } }}>
                 <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Modify Operative Access?</AlertDialogTitle>
+                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Change Host Status?</AlertDialogTitle>
                         <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-                            You are about to <span className="text-primary font-bold">{hostToToggle?.is_active ?? true ? 'sever' : 'restore'}</span> the neural link for {hostToToggle?.name}.
-                            {hostToToggle?.is_active ?? true ? ' They will no longer be visible in the visitor selection mesh.' : ' Their signature will reappear in the visitor selection mesh.'}
+                            You are about to <span className="text-primary font-bold">{hostToToggle?.is_active ?? true ? 'deactivate' : 'activate'}</span> {hostToToggle?.name}.
+                            {hostToToggle?.is_active ?? true ? ' They will no longer be visible to visitors at the gate.' : ' They will reappear in the visitor selection list.'}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-6">
-                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleToggleStatusConfirm} disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Execute Protocol
+                            Confirm
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -508,17 +508,17 @@ export default function HostsPage() {
             <AlertDialog open={!!hostToRemove} onOpenChange={(open) => { if (!open) { setHostToRemove(null); } }}>
                 <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight text-red-500">Purge Host Log?</AlertDialogTitle>
+                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight text-red-500">Remove Host?</AlertDialogTitle>
                         <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-                            This will permanently remove <span className="text-white font-bold">{hostToRemove?.name}</span> from your premise directory.
-                            Their account will be downgraded to 'Visitor' classification. They will retain network access but lose nodal association.
+                            This will remove <span className="text-white font-bold">{hostToRemove?.name}</span> from your premise.
+                            They will lose access to this premise but will still be able to use the app as a visitor.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-6">
-                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Purge Records
+                            Remove
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -530,14 +530,14 @@ export default function HostsPage() {
                         <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
                             <AlertTriangle className="h-6 w-6 text-amber-500" />
                         </div>
-                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Signature Collision Detected</AlertDialogTitle>
+                        <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">User Already Exists</AlertDialogTitle>
                         <AlertDialogDescription className="text-zinc-400 leading-relaxed text-[13px]">
-                            A verified identity with this neural mail is already registered in the Aavija mesh.
-                            Access the <strong className="text-primary uppercase tracking-widest text-[11px]">Bind Protocol</strong> (Assign Existing User) instead of the 'Protocol: New' sequence to link them to your node safely.
+                            A user with this email address already exists in our system.
+                            Please use the <strong className="text-primary uppercase tracking-widest text-[11px]">Link Existing</strong> option to add them to your premise.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-white/5 text-white border border-white/10 hover:bg-white/10 px-8 h-12 uppercase font-black tracking-widest text-[10px]">Acknowledge</AlertDialogAction>
+                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-white/5 text-white border border-white/10 hover:bg-white/10 px-8 h-12 uppercase font-black tracking-widest text-[10px]">Close</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

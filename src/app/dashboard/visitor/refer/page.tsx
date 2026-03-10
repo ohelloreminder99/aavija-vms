@@ -67,7 +67,7 @@ export default function ReferPage() {
             <div>
                 <h1 className="text-2xl font-bold">Refer & Earn</h1>
                 <p className="text-muted-foreground text-sm">
-                    Share your code. Every time someone you referred buys tokens, you earn real money.
+                    Share your link. Every time someone you referred buys tokens, you earn real money.
                 </p>
             </div>
 
@@ -86,30 +86,22 @@ export default function ReferPage() {
                 ))}
             </div>
 
-            {/* Your referral code */}
+            {/* Your referral link */}
             <Card className="border-2 border-primary/20">
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Your Referral Code</CardTitle>
-                    <CardDescription>Share this link or code with friends.</CardDescription>
+                <CardHeader className="pb-3 text-center">
+                    <CardTitle className="text-xl">Share Your Link</CardTitle>
+                    <CardDescription>Friends who sign up via your link get a welcome gift automatically.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {/* Code badge */}
-                    <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3">
-                        <span className="font-mono text-xl font-bold tracking-widest">{stats?.referral_code || '...'}</span>
-                        <Button size="sm" variant="ghost" onClick={handleCopy}>
-                            {copied ? <CheckCheck className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                        </Button>
-                    </div>
-
+                <CardContent className="space-y-6">
                     {/* Share buttons */}
-                    <div className="flex gap-3">
-                        <Button className="flex-1" onClick={handleCopy} variant="outline">
-                            {copied ? <CheckCheck className="h-4 w-4 mr-2 text-green-500" /> : <Copy className="h-4 w-4 mr-2" />}
-                            Copy Link
-                        </Button>
-                        <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={handleWhatsApp}>
-                            <Share2 className="h-4 w-4 mr-2" />
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Button className="flex-1 h-12 text-lg" onClick={handleWhatsApp} variant="default" style={{ backgroundColor: '#25D366' }}>
+                            <Share2 className="h-5 w-5 mr-3" />
                             Share on WhatsApp
+                        </Button>
+                        <Button className="flex-1 h-12 text-lg" onClick={handleCopy} variant="outline">
+                            {copied ? <CheckCheck className="h-5 w-5 mr-3 text-green-500" /> : <Copy className="h-5 w-5 mr-3" />}
+                            Copy Invite Link
                         </Button>
                     </div>
 

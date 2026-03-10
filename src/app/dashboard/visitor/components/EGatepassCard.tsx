@@ -115,10 +115,10 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
             <Alert className="bg-red-500/10 border-red-500/20 text-red-500 rounded-2xl p-6">
                 <LogOut className="h-6 w-6 text-red-500 mr-4" />
                 <div className="space-y-1">
-                    <AlertTitle className="text-lg font-black uppercase tracking-tight">Checkout Protocol Required</AlertTitle>
+                    <AlertTitle className="text-lg font-black uppercase tracking-tight">Checkout Required</AlertTitle>
                     <AlertDescription className="text-sm font-medium opacity-80 leading-relaxed">
                         Security tracking is active for <strong>{visit.premise_name}</strong>.
-                        You must physically manifest a checkout with the Gatekeeper to terminate this session before initiating a new sequence.
+                        You must checkout with the Gatekeeper to end this visit before starting a new one.
                     </AlertDescription>
                 </div>
             </Alert>

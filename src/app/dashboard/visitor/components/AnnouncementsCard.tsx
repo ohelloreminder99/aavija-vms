@@ -51,22 +51,22 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
           <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:border-primary/50 group-hover:bg-primary/10 transition-all duration-500">
             <Megaphone className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </div>
-          <span className="text-xl font-headline tracking-tight">System Intelligence</span>
+          <span className="text-xl font-headline tracking-tight">Announcements</span>
         </CardTitle>
         <CardDescription className="text-zinc-400 font-medium ml-13">
-          Verified tactical and operational updates from Sector HQ.
+          Important updates and announcements for you.
         </CardDescription>
       </CardHeader>
       <CardContent className="relative z-10">
         {isActuallyLoading ? (
           <div className="flex flex-col items-center justify-center h-48 gap-4 bg-white/[0.01] rounded-2xl border border-white/5">
             <Loader2 className="h-8 w-8 animate-spin text-primary/30" />
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Decrypting Feed...</p>
+            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Loading...</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-48 text-center bg-red-500/5 border border-red-500/10 rounded-2xl p-6">
             <AlertTriangle className="h-8 w-8 mb-4 text-red-500" />
-            <p className="font-bold text-red-500 uppercase tracking-tighter">Secure Link Severed</p>
+            <p className="font-bold text-red-500 uppercase tracking-tighter">Connection Error</p>
             <p className="text-xs text-red-500/70 mt-1">{error.message}</p>
           </div>
         ) : announcements && announcements.length > 0 ? (
@@ -90,8 +90,8 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
         ) : (
           <div className="flex flex-col items-center justify-center h-48 text-center bg-white/[0.01] border border-white/5 rounded-2xl p-6">
             <Info className="h-8 w-8 mb-4 text-zinc-800" />
-            <p className="font-bold text-zinc-500 uppercase tracking-widest text-xs">Sector Silent</p>
-            <p className="text-[10px] text-zinc-600 mt-1">No active transmissions in current operational window.</p>
+            <p className="font-bold text-zinc-500 uppercase tracking-widest text-xs">No Announcements</p>
+            <p className="text-[10px] text-zinc-600 mt-1">There are no new updates at this time.</p>
           </div>
         )}
       </CardContent>

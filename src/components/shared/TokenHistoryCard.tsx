@@ -164,7 +164,7 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
       return (
         <div className="flex h-64 flex-col items-center justify-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
-          <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Syncing Ledger...</p>
+          <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Loading...</p>
         </div>
       );
     }
@@ -173,7 +173,7 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
       return (
         <div className="flex h-64 flex-col items-center justify-center p-6 text-center text-red-500 bg-red-500/5 border border-red-500/10 rounded-2xl">
           <AlertTriangle className="h-10 w-10 mb-4" />
-          <p className="font-bold uppercase tracking-tight">Ledger Sync Failure</p>
+          <p className="font-bold uppercase tracking-tight">History Sync Failure</p>
           <p className="mt-1 text-[10px] text-red-500/70 max-w-[200px]">{error}</p>
         </div>
       );
@@ -183,8 +183,8 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
       return (
         <div className="flex h-64 flex-col items-center justify-center text-zinc-600 bg-white/[0.01] border border-white/5 border-dashed rounded-2xl">
           <Info className="h-10 w-10 mb-4 opacity-20" />
-          <p className="font-bold uppercase tracking-[0.2em] text-[10px]">Zero Transactions</p>
-          <p className="text-[10px] text-zinc-700 mt-1">No neural credit flux detected in current history.</p>
+          <p className="font-bold uppercase tracking-[0.2em] text-[10px]">No Transactions</p>
+          <p className="text-[10px] text-zinc-700 mt-1">No token transactions found in your history.</p>
         </div>
       );
     }
@@ -208,9 +208,9 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
           <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
             <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </div>
-          Token Ledger <span className="text-zinc-500 text-sm font-normal tracking-normal ml-auto">Sector: {target.type === 'user' ? (target.role || 'Personal') : 'Premise'}</span>
+          Token History <span className="text-zinc-500 text-sm font-normal tracking-normal ml-auto">Source: {target.type === 'user' ? (target.role || 'Personal') : 'Premise'}</span>
         </CardTitle>
-        <CardDescription className="text-zinc-400 mt-2">Verified records of neural credit acquisition and expenditure.</CardDescription>
+        <CardDescription className="text-zinc-400 mt-2">Verified records of token additions and usage.</CardDescription>
       </CardHeader>
       <CardContent className="relative z-10 pt-6">
         {error && logs && logs.length > 0 && (
