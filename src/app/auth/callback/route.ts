@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { LogAction } from '@/services/log-actions';
+import { getRegionConfig } from '@/lib/multi-tenant';
 
 // Helper: apply referral code server-side using admin client (no session needed)
 async function maybeApplyReferral(
@@ -48,9 +49,12 @@ export async function GET(request: Request) {
 
     if (code) {
         const cookieStore = await cookies();
+        const host = (await headers()).get('host') || '';
+        const config = await getRegionConfig(host);
+
         const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            config.supabase_url,
+            config.supabase_anon_key,
             {
                 cookies: {
                     get(name: string) {
@@ -78,7 +82,7 @@ export async function GET(request: Request) {
         if (!error && user) {
             // To bypass RLS and create the initial profile or write logs, use the Service Role Key
             const adminSupabase = createServerClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                config.supabase_url,
                 process.env.SUPABASE_SERVICE_ROLE_KEY!,
                 {
                     cookies: {
