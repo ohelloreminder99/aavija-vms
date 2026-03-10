@@ -16,11 +16,11 @@ let regionsCache: RegionConfig[] | null = null;
  * Falls back to environment variables if no match is found.
  */
 export async function getRegionConfig(hostname: string): Promise<RegionConfig> {
-    // Clean hostname for comparison (handles localhost:3000, etc.)
-    const cleanHost = hostname.split(':')[0].toLowerCase();
+    // Clean hostname for comparison (handles localhost:3000, [::1]:3000, etc.)
+    const cleanHost = hostname.split(':')[0].toLowerCase().replace(/[\[\]]/g, '');
 
     // 1. Check for hardcoded development overrides
-    if (cleanHost === 'localhost' || cleanHost === '127.0.0.1' || hostname.includes('preview')) {
+    if (cleanHost === 'localhost' || cleanHost === '127.0.0.1' || cleanHost === '::1' || hostname.includes('preview')) {
         return {
             code: 'DEV',
             domain: hostname,
