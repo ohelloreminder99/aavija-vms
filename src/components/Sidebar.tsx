@@ -78,8 +78,8 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                 className={cn(
                     "w-full justify-start overflow-hidden group relative transition-all duration-300",
                     isActive
-                        ? "bg-primary/10 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-semibold"
-                        : "text-zinc-400 hover:text-white hover:bg-white/5 font-normal"
+                        ? "bg-primary/5 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-semibold"
+                        : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50 font-normal"
                 )}
                 asChild
                 onClick={onClose}
@@ -88,7 +88,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     {isActive && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
                     <Icon className={cn(
                         "mr-3 h-5 w-5 shrink-0 transition-all duration-300",
-                        isActive ? "text-primary scale-110" : "group-hover:text-white"
+                        isActive ? "text-primary scale-110" : "group-hover:text-zinc-900"
                     )} />
                     <span className="truncate">{label}</span>
                 </Link>
@@ -103,7 +103,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
             <div className="space-y-8 px-4">
                 {/* Global Links */}
                 <div className="space-y-2">
-                    <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
+                    <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
                         Core Systems
                     </h4>
                     {renderLink('/dashboard/visitor', 'Visitor Portal', roleIcons.visitor, 'global-visitor')}
@@ -111,7 +111,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     {userProfile.is_agent && renderLink('/dashboard/visitor/earnings', 'Agent Wallet', Wallet, 'global-earnings')}
                     {renderLink('/dashboard/profile', 'Account Profile', UserCircle, 'global-profile')}
                     {userProfile.role === 'admin' && (
-                        <div className="pt-4 mt-4 border-t border-white/5 space-y-2">
+                        <div className="pt-4 mt-4 border-t border-border/40 space-y-2">
                             <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60 mb-4">
                                 Governance
                             </h4>
@@ -123,19 +123,19 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 
                 {/* Premise Contexts */}
                 {userProfile.premise_roles && Object.keys(userProfile.premise_roles).length > 0 && (
-                    <div className="space-y-4 pt-4 border-t border-white/5">
-                        <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
+                    <div className="space-y-4 pt-4 border-t border-border/40">
+                        <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
                             Operational Contexts
                         </h4>
                         {Object.entries(userProfile.premise_roles).map(([premiseId, roles]) => {
                             const name = premiseNames[premiseId] || 'Loading...';
                             return (
                                 <div key={premiseId} className="space-y-2">
-                                    <div className="px-4 py-2 text-xs font-semibold text-zinc-300 truncate opacity-80" title={name}>
+                                    <div className="px-4 py-2 text-xs font-semibold text-zinc-700 truncate opacity-80" title={name}>
                                         {name}
                                     </div>
                                     <div className="pl-4 space-y-1 relative">
-                                        <div className="absolute left-0 top-0 bottom-0 w-px bg-white/5 ml-4" />
+                                        <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40 ml-4" />
                                         {roles.map(role => {
                                             const href = `/dashboard/${role}?premiseId=${premiseId}`;
                                             const label = role.charAt(0).toUpperCase() + role.slice(1);
@@ -155,14 +155,14 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { userProfile: UserProfile | null, isCollapsed: boolean, toggleCollapse: () => void }) {
     return (
         <aside className={cn(
-            "hidden md:flex flex-col border-r border-white/5 bg-black/40 backdrop-blur-xl transition-all duration-500 relative",
+            "hidden md:flex flex-col border-r border-border/40 bg-white/60 backdrop-blur-xl transition-all duration-500 relative",
             isCollapsed ? "w-20 items-center" : "w-72"
         )}>
             {/* Collapse Toggle */}
             <Button
                 variant="ghost"
                 size="icon"
-                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-zinc-900 text-zinc-400 shadow-xl hover:bg-zinc-800 hover:text-white transition-all transform active:scale-95"
+                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-border/40 bg-white text-zinc-400 shadow-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
                 {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
@@ -174,19 +174,19 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                 </div>
             ) : (
                 <div className="flex flex-col items-center py-10 space-y-6">
-                    <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="Visitor Dashboard">
+                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="Visitor Dashboard">
                         <Link href="/dashboard/visitor"><Briefcase className="h-5 w-5" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="My Profile">
+                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="My Profile">
                         <Link href="/dashboard/profile"><UserCircle className="h-5 w-5" /></Link>
                     </Button>
                     {userProfile?.is_agent && (
-                        <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="My Earnings">
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="My Earnings">
                             <Link href="/dashboard/visitor/earnings"><Wallet className="h-5 w-5" /></Link>
                         </Button>
                     )}
                     {userProfile?.role === 'admin' && (
-                        <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white" asChild title="Admin Console">
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="Admin Console">
                             <Link href="/dashboard/admin"><Settings className="h-5 w-5" /></Link>
                         </Button>
                     )}

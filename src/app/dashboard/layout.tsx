@@ -53,29 +53,29 @@ function HeaderContent() {
 
         if (premiseId && premise && dashboardRole) {
             if (['owner', 'host', 'gatekeeper'].includes(dashboardRole)) {
-                return <span className="truncate text-sm text-muted-foreground capitalize">{premise.name} (as {dashboardRole})</span>;
+                return <span className="truncate text-sm text-zinc-500 font-medium capitalize">{premise.name} (as {dashboardRole})</span>;
             }
         }
 
         if (dashboardRole === 'admin') {
-            return <span className="capitalize font-medium">Admin Dashboard</span>
+            return <span className="capitalize font-semibold text-primary">Admin Dashboard</span>
         }
 
         if (dashboardRole === 'visitor') {
-            return <span className="capitalize font-medium">Visitor Dashboard</span>
+            return <span className="capitalize font-semibold text-primary">Visitor Dashboard</span>
         }
 
         if (dashboardRole === 'staff') {
-            return <span className="capitalize font-medium">Staff Dashboard</span>
+            return <span className="capitalize font-semibold text-primary">Staff Dashboard</span>
         }
 
         if (pathname === '/dashboard') {
-            return <span className="text-sm text-muted-foreground">Select a Role</span>;
+            return <span className="text-sm text-zinc-500 font-medium">Select a Role</span>;
         }
 
         // A sensible fallback if none of the above match
         if (userProfile?.role) {
-            return <span className="capitalize font-medium">{userProfile.role}</span>;
+            return <span className="capitalize font-semibold text-primary">{userProfile.role}</span>;
         }
 
         return null;
@@ -85,7 +85,7 @@ function HeaderContent() {
         <div className="container flex min-h-16 max-w-7xl items-center justify-between gap-2 py-2">
             <div className="flex min-w-0 items-center gap-4">
                 <Link href="/dashboard" className='flex-shrink-0'>
-                    <AavijaLogo iconClassName="text-white/80" textClassName="text-white" />
+                    <AavijaLogo iconClassName="text-primary" textClassName="text-zinc-900" />
                 </Link>
                 {userProfile && (
                     <>
@@ -188,9 +188,9 @@ export default function DashboardLayout({
 
     if (user) {
         return (
-            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-obsidian"><Loader2 className="h-12 w-12 animate-spin text-white/20" /></div>}>
-                <div className="flex min-h-screen flex-col relative mesh-gradient selection:bg-white/10 selection:text-white">
-                    <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/40 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
+                <div className="flex min-h-screen flex-col relative mesh-light selection:bg-primary/20 selection:text-primary">
+                    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/20">
                         <HeaderContent />
                     </header>
                     <div className="flex flex-1 overflow-hidden">

@@ -49,25 +49,25 @@ export function VisitorTokenBalanceCard() {
 
   return (
     <>
-      <Card className="glass-card overflow-hidden group border-white/5 hover:border-white/10 transition-all duration-300">
+      <Card className="glass-card overflow-hidden group border-border/40 hover:border-primary/20 transition-all duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-zinc-400">
+          <CardTitle className="text-sm font-medium text-zinc-500 uppercase tracking-wider">
             Visitor Token Balance
           </CardTitle>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/5 border border-primary/10">
             <Coins className="h-4 w-4 text-primary" />
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="text-4xl font-bold tracking-tight text-white mb-1 group-hover:text-glow transition-all">
+          <div className="text-4xl font-bold tracking-tight text-zinc-900 mb-1 transition-all">
             {balance.toLocaleString()}
           </div>
           <p className="text-xs text-zinc-500 font-medium">
             Tokens available for instant check-ins
           </p>
           {isLowBalance && (
-            <Alert className="mt-4 bg-red-500/10 border-red-500/20 text-red-500">
-              <AlertCircle className="h-4 w-4 text-red-500" />
+            <Alert className="mt-4 bg-red-50 border-red-100 text-red-600">
+              <AlertCircle className="h-4 w-4 text-red-600" />
               <AlertTitle className="font-bold">Low Balance</AlertTitle>
               <AlertDescription className="text-xs opacity-90">
                 Please recharge to avoid check-in disruption.
@@ -75,7 +75,7 @@ export function VisitorTokenBalanceCard() {
             </Alert>
           )}
           <Button
-            className="mt-6 w-full bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-all transform active:scale-[0.98]"
+            className="mt-6 w-full bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all transform active:scale-[0.98]"
             onClick={() => setIsDialogOpen(true)}
           >
             <Coins className="mr-2 h-4 w-4" /> Recharge Wallet
