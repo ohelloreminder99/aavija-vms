@@ -13,8 +13,12 @@ export function createClient() {
     if (parts.length === 2) return parts.pop()?.split(';').shift();
   };
 
-  const url = getCookie('x-region-url') || process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = getCookie('x-region-anon-key') || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const rawUrl = getCookie('x-region-url') || process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const rawKey = getCookie('x-region-anon-key') || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+  // Sanitize: strip literal quotes from .env strings
+  const url = (rawUrl || '').replace(/['"]/g, '');
+  const key = (rawKey || '').replace(/['"]/g, '');
 
   return createBrowserClient(url, key)
 }
