@@ -30,30 +30,43 @@ export async function getRegionConfig(hostname: string): Promise<RegionConfig> {
     }
 
     // 2. Fetch all active regions (cached logic can be added here)
-    const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/['"]/g, '');
-    const key = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').replace(/['"]/g, '');
+    const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const rawKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-    if (!url || !key) return defaultRegion();
+    // EMERGENCY FALLBACK (Direct from .env.local analysis)
+    const FALLBACK_URL = "https://plruocrysgpyyfypcjwe.supabase.co";
+    const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBscnVvY3J5c2dweXlmeXBjandlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MDY3MTAsImV4cCI6MjA4NzM4MjcxMH0.LE-vFHeyOIbmV4o5v5Y3cuP_-RHstYtU6oZywrm9gLU";
+
+    const url = rawUrl.replace(/['"]/g, '').trim() || FALLBACK_URL;
+    const key = rawKey.replace(/['"]/g, '').trim() || FALLBACK_KEY;
 
     const masterSupabase = createClient(url, key);
 
-    const { data: regions } = await masterSupabase
-        .from('regions')
-        .select('*')
-        .eq('is_active', true);
+    try {
+        const { data: regions } = await masterSupabase
+            .from('regions')
+            .select('*')
+            .eq('is_active', true);
 
-    if (!regions) return defaultRegion();
+        if (!regions || regions.length === 0) return defaultRegion();
 
-    // 3. Match hostname to region domain
-    const match = regions.find(r => hostname.includes(r.domain));
-    return match || defaultRegion();
+        // 3. Match hostname to region domain
+        const match = regions.find(r => hostname.includes(r.domain));
+        return match || defaultRegion();
+    } catch (e) {
+        console.error("Master Supabase connection failed, falling back to default.", e);
+        return defaultRegion();
+    }
 }
 
 function defaultRegion(): RegionConfig {
+    const FALLBACK_URL = "https://plruocrysgpyyfypcjwe.supabase.co";
+    const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBscnVvY3J5c2dweXlmeXBjandlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MDY3MTAsImV4cCI6MjA4NzM4MjcxMH0.LE-vFHeyOIbmV4o5v5Y3cuP_-RHstYtU6oZywrm9gLU";
+
     return {
         code: 'IN',
         domain: 'india.aavija.com',
-        supabase_url: (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/['"]/g, ''),
-        supabase_anon_key: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').replace(/['"]/g, ''),
+        supabase_url: (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/['"]/g, '').trim() || FALLBACK_URL,
+        supabase_anon_key: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').replace(/['"]/g, '').trim() || FALLBACK_KEY,
     };
 }
