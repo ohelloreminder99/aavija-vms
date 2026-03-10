@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/dialog';
 import { EGatepassCard } from './EGatepassCard';
 
-const TOKEN_LIFESPAN_SECONDS = 60;
+const TOKEN_LIFESPAN_SECONDS_DEFAULT = 60;
 
 export function QRCodeCard() {
   const { user, isUserLoading } = useUser();
@@ -51,6 +51,7 @@ export function QRCodeCard() {
   const [isClient, setIsClient] = useState(false);
 
   // State for the QR code dialog
+  const expirySeconds = settings?.qr_code_expiry_seconds || TOKEN_LIFESPAN_SECONDS_DEFAULT;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGenerating, startGeneratingTransition] = useTransition();
 
@@ -305,7 +306,7 @@ export function QRCodeCard() {
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold tracking-tight text-white">Entry Pass Ready</DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Show this QR code at the entry gate. Pass expires in 60s.
+              Show this QR code at the entry gate. Pass expires in {expirySeconds}s.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-8 gap-6 border border-white/5 rounded-2xl bg-white/5 mt-4">
@@ -335,7 +336,7 @@ export function QRCodeCard() {
                 </div>
                 <Progress
                   value={
-                    (timeRemaining / (TOKEN_LIFESPAN_SECONDS * 1000)) * 100
+                    (timeRemaining / (expirySeconds * 1000)) * 100
                   }
                   className="h-1.5 bg-white/10"
                 />

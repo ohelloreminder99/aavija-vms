@@ -85,7 +85,7 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
     });
     if (insertError) throw insertError;
 
-    // 6. Deduct tokens from Host Atomically (RPC)
+    // 6. Deduct tokens from Host Atomically (RPC) - Host pays to rate a visitor
     if (starRatingCost > 0) {
       const { error: rpcError } = await adminDb.rpc('deduct_user_tokens', { p_user_id: hostId, p_amount: starRatingCost });
       if (rpcError) throw new Error('Insufficient tokens to submit a star rating.');
@@ -97,16 +97,18 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
     }).eq('id', visitorId);
     if (updateVisitorError) throw updateVisitorError;
 
-    // 8. Create log entry (against the HOST)
+    // 8. Create log entry for the HOST (Token deduction)
     await createLogEntry({
-      actorId: hostId, // Log against the host whose tokens are deducted
+      actorId: hostId,
       actorName: actor.name,
       actorRole: 'host',
       action: LogAction.VISITOR_RATED,
-      description: `Rated visitor an average of ${rating} stars. Cost: ${starRatingCost} tokens.`,
-      tokenChange: -starRatingCost
+      description: `Rated visitor ${visitorId} (${rating} stars). Cost: ${starRatingCost} tokens.`,
+      tokenChange: -starRatingCost,
+      context: { visitId }
     });
 
+    // 9. Revalidate path
     revalidatePath('/dashboard/host/history');
     return { success: true };
   } catch (error: any) {

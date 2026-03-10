@@ -314,7 +314,7 @@ export default function TokenSettingsPage() {
                     <FormItem><FormLabel>Low Token Warning Threshold</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormDescription>Threshold to trigger a low token balance warning.</FormDescription></FormItem>
                   )} />
                   <FormField control={form.control} name="star_rating_cost" render={({ field }) => (
-                    <FormItem><FormLabel>Star Rating Cost</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormDescription>Tokens deducted from a visitor when they receive a star rating.</FormDescription></FormItem>
+                    <FormItem><FormLabel>Star Rating Cost</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormDescription>Tokens deducted from a host when they submit a star rating.</FormDescription></FormItem>
                   )} />
                   <FormField control={form.control} name="block_visitor_cost" render={({ field }) => (
                     <FormItem><FormLabel>Premise: Block Visitor Cost</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormDescription>Tokens deducted from a premise's balance when an owner blocks a visitor.</FormDescription></FormItem>

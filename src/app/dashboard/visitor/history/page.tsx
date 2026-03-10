@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   Download,
   History,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,7 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useUser, WithId, useCollection } from '@/supabase';
+import { useUser, useCollection } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
@@ -50,7 +51,7 @@ import { getVisitsForVisitorAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { deductTokensForExport, getVisitsForExport } from '../../owner/history/actions';
 import Papa from 'papaparse';
-import jsPDF from 'jspdf';
+import jsPDF from 'jsPDF';
 import autoTable from 'jspdf-autotable';
 import { Label } from '@/components/ui/label';
 
@@ -61,7 +62,7 @@ export default function VisitorHistoryPage() {
   const { user } = useUser();
   const { data: userProfile } = useUserProfile(user?.id);
   const { data: settings, isLoading: isLoadingSettings } = useSettings();
-  const [premises, setPremises] = React.useState<WithId<Premise>[] | null>(null);
+  const [premises, setPremises] = React.useState<any[] | null>(null);
   const [isLoadingPremises, setIsLoadingPremises] = React.useState(true);
   const { toast } = useToast();
 
@@ -81,7 +82,6 @@ export default function VisitorHistoryPage() {
 
   const exportCost = exportToConfirm === 'csv' ? settings?.csv_export_cost_visitor : settings?.pdf_export_cost_visitor;
 
-  // Realtime Pulse: Automatically refetch visitor history upon database mutations
   const { data: realtimePulse } = useCollection({ table: 'visits', __memo: true });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;
 
@@ -92,8 +92,8 @@ export default function VisitorHistoryPage() {
         const supabase = createClient();
         const { data, error } = await supabase.from('premises').select('*');
         if (error) throw error;
-        setPremises((data as unknown) as WithId<Premise>[]);
-      } catch (err: any) {
+        setPremises(data);
+      } catch (err) {
         console.error('Failed to fetch premises', err);
       } finally {
         setIsLoadingPremises(false);
@@ -104,9 +104,7 @@ export default function VisitorHistoryPage() {
 
   React.useEffect(() => {
     if (!user?.id || !settings) {
-      if (!isLoadingSettings) {
-        setIsLoadingVisits(false);
-      }
+      if (!isLoadingSettings) setIsLoadingVisits(false);
       return;
     }
 
@@ -115,15 +113,8 @@ export default function VisitorHistoryPage() {
       setError(null);
       try {
         const historyDays = settings?.history_days_visitor;
-        const startDate =
-          historyDays && historyDays > 0
-            ? subDays(new Date(), historyDays).toISOString()
-            : undefined;
-        const result = await getVisitsForVisitorAction({
-          visitorId: user.id,
-          limit: PAGE_SIZE,
-          startDate,
-        });
+        const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
+        const result = await getVisitsForVisitorAction({ visitorId: user.id, limit: PAGE_SIZE, startDate: startDateString });
 
         if (result.success && result.visits) {
           setVisits(result.visits);
@@ -134,14 +125,13 @@ export default function VisitorHistoryPage() {
         }
       } catch (e: any) {
         setError(e.message);
-        toast({ variant: 'destructive', title: 'Error', description: e.message });
       } finally {
         setIsLoadingVisits(false);
       }
     };
 
     fetchInitialVisits();
-  }, [user?.id, settings, isLoadingSettings, toast, pulseHash]);
+  }, [user?.id, settings, isLoadingSettings, pulseHash]);
 
   const handleLoadMore = async () => {
     if (!user?.id || !hasMore || isLoadingMore || !settings) return;
@@ -149,16 +139,8 @@ export default function VisitorHistoryPage() {
     setIsLoadingMore(true);
     try {
       const historyDays = settings.history_days_visitor;
-      const startDate =
-        historyDays && historyDays > 0
-          ? subDays(new Date(), historyDays).toISOString()
-          : undefined;
-      const result = await getVisitsForVisitorAction({
-        visitorId: user.id,
-        limit: PAGE_SIZE,
-        startAfter: lastVisible,
-        startDate,
-      });
+      const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
+      const result = await getVisitsForVisitorAction({ visitorId: user.id, limit: PAGE_SIZE, startAfter: lastVisible, startDate: startDateString });
 
       if (result.success && result.visits) {
         setVisits((prev) => [...prev, ...result.visits!]);
@@ -169,19 +151,14 @@ export default function VisitorHistoryPage() {
       }
     } catch (e: any) {
       setError(e.message);
-      toast({ variant: 'destructive', title: 'Error', description: e.message });
     } finally {
       setIsLoadingMore(false);
     }
   };
 
-  const handleDateInputChange = (
-    value: string,
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
+  const handleDateInputChange = (value: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const digitsOnly = value.replace(/\D/g, '');
     let formattedDate = digitsOnly;
-
     if (digitsOnly.length > 4) {
       formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2, 4)}/${digitsOnly.slice(4, 8)}`;
     } else if (digitsOnly.length > 2) {
@@ -210,10 +187,7 @@ export default function VisitorHistoryPage() {
       const exportableDays = settings?.export_history_days_visitor || 30;
       const exportStartDate = subDays(new Date(), exportableDays).toISOString();
 
-      const exportDataResult = await getVisitsForExport({
-        visitorId: userProfile.id,
-        startDate: exportStartDate,
-      });
+      const exportDataResult = await getVisitsForExport({ visitorId: userProfile.id, startDate: exportStartDate });
 
       if (!exportDataResult.success || !exportDataResult.visits) {
         toast({ variant: 'destructive', title: 'Export Failed', description: exportDataResult.error || 'Failed to fetch historical data.' });
@@ -226,8 +200,8 @@ export default function VisitorHistoryPage() {
 
       if (exportType === 'csv') {
         const dataToExport = totalExportVisits.map((visit: any) => ({
-          'Premise Name': premiseMap.get(visit.premise_id) || 'Unknown Premise',
-          'Host Name': visit.host_name || 'N/A',
+          'Location': premiseMap.get(visit.premise_id) || 'Unknown Location',
+          'Host Name': visit.host_name || 'Autonomous',
           'Check-in Time': format(new Date(visit.checkin_time), 'PPpp'),
           'Check-out Time': visit.checkout_time ? format(new Date(visit.checkout_time), 'PPpp') : 'N/A',
           Status: visit.status,
@@ -248,10 +222,10 @@ export default function VisitorHistoryPage() {
 
         autoTable(doc, {
           startY: 30,
-          head: [['Premise', 'Host', 'Check-in', 'Check-out', 'Status']],
+          head: [['Location', 'Host', 'Check-in', 'Check-out', 'Status']],
           body: totalExportVisits.map((visit: any) => [
             premiseMap.get(visit.premise_id) || 'Unknown',
-            visit.host_name || 'N/A',
+            visit.host_name || 'Autonomous',
             format(new Date(visit.checkin_time), 'Pp'),
             visit.checkout_time ? format(new Date(visit.checkout_time), 'Pp') : 'N/A',
             visit.status,
@@ -279,14 +253,13 @@ export default function VisitorHistoryPage() {
   const filteredVisits = React.useMemo(() => {
     if (!visits) return [];
     let dateFilteredVisits = visits;
-    // Apply date range filter
     setDateError(null);
     try {
       const fromDate = parse(startDate, 'dd/MM/yyyy', new Date());
       const toDate = parse(endDate, 'dd/MM/yyyy', new Date());
 
       if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        setDateError('Invalid date format. Please use DD/MM/YYYY.');
+        setDateError('Invalid format: DD/MM/YYYY');
         return [];
       }
       if (fromDate > toDate) {
@@ -302,7 +275,7 @@ export default function VisitorHistoryPage() {
         return visitDate >= fromDate && visitDate <= toDate;
       });
     } catch (e) {
-      setDateError('An error occurred while parsing dates.');
+      setDateError('Date parsing error.');
       return [];
     }
 
@@ -312,31 +285,33 @@ export default function VisitorHistoryPage() {
     return dateFilteredVisits.filter(
       (v) =>
         (premiseMap.get(v.premise_id) || '').toLowerCase().includes(lowerSearch) ||
-        (v.host_name || '').toLowerCase().includes(lowerSearch)
+        (v.host_name || '').toLowerCase().includes(lowerSearch) ||
+        v.status.toLowerCase().includes(lowerSearch)
     );
   }, [visits, searchTerm, premiseMap, startDate, endDate]);
 
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex flex-col h-64 items-center justify-center space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Retrieving Records...</span>
         </div>
       );
     }
 
     if (error) {
       return (
-        <div className="text-center text-red-500 py-10">
-          <p>An error occurred while fetching your visit history.</p>
-          <p className="text-sm">{error}</p>
+        <div className="flex flex-col h-64 items-center justify-center space-y-4 px-8 text-center">
+          <AlertTriangle className="h-10 w-10 text-red-500/50" />
+          <p className="text-zinc-500 text-sm max-w-xs">{error}</p>
         </div>
       );
     }
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-24 text-center border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.01]">
+        <div className="py-24 text-center bg-white/[0.01]">
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
             <History className="h-8 w-8 text-zinc-700" />
           </div>
@@ -349,92 +324,47 @@ export default function VisitorHistoryPage() {
     }
 
     return (
-      <>
-        <div className="space-y-4 mb-6">
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="flex items-end gap-2">
-              <div>
-                <Label htmlFor="start-date" className="text-xs text-muted-foreground">From</Label>
-                <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[150px]" maxLength={10} />
-              </div>
-              <div>
-                <Label htmlFor="end-date" className="text-xs text-muted-foreground">To</Label>
-                <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[150px]" maxLength={10} />
-              </div>
-            </div>
-            <div className="flex items-center gap-2 ml-auto">
-              <Button variant="default" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="bg-emerald-600 hover:bg-emerald-700 text-white border-0">
-                {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-                Export CSV
-              </Button>
-              <Button variant="default" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="bg-red-600 hover:bg-red-700 text-white border-0">
-                {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-                Export PDF
-              </Button>
-            </div>
-            {dateError && <p className="w-full text-xs text-destructive">{dateError}</p>}
-          </div>
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary transition-colors" />
-            <Input
-              placeholder="Filter by location or host name..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-primary/50 focus:ring-primary/20 h-12"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
+      <div className="space-y-8">
         <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-white/10">
-              <TableHead>Premise</TableHead>
-              <TableHead>Host Met</TableHead>
-              <TableHead>Check-in Time</TableHead>
-              <TableHead>Check-out Time</TableHead>
-              <TableHead>Status</TableHead>
+          <TableHeader className="bg-white/[0.03]">
+            <TableRow className="border-white/5 hover:bg-transparent">
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Location</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Host</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id} className="group/row">
-                <TableCell className="font-medium capitalize text-white group-hover/row:text-primary transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-zinc-500 group-hover/row:text-primary transition-colors" />
-                    {premiseMap.get(visit.premise_id) || (
-                      <span className="text-zinc-600 italic">
-                        Unknown Location
-                      </span>
-                    )}
+              <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                <TableCell className="pl-8 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-white/5 border border-white/5 group-hover/row:bg-primary/10 group-hover/row:border-primary/20 transition-all">
+                      <Building className="h-3 w-3 text-zinc-500 group-hover/row:text-primary transition-colors" />
+                    </div>
+                    <span className="font-bold text-white group-hover/row:text-primary transition-colors">{premiseMap.get(visit.premise_id) || 'Unknown Location'}</span>
                   </div>
-                </TableCell>
-                <TableCell className="capitalize text-zinc-300">
-                  <div className="flex items-center gap-2">
-                    <UserIcon className="h-4 w-4 text-zinc-500 group-hover/row:text-primary transition-colors" />
-                    {visit.host_name || (
-                      <span className="text-zinc-600 italic">Redacted</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="text-zinc-400 font-mono text-xs">
-                  {visit.checkin_time
-                    ? format(new Date(visit.checkin_time), 'PPp')
-                    : 'N/A'}
-                </TableCell>
-                <TableCell className="text-zinc-400 font-mono text-xs">
-                  {visit.checkout_time
-                    ? format(new Date(visit.checkout_time), 'PPp')
-                    : 'N/A'}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={visit.status === 'active' ? 'default' : 'outline'}
-                    className={cn(
-                      "capitalize border-white/10",
-                      visit.status === 'active'
-                        ? "bg-primary text-white shadow-[0_0_10px_rgba(59,130,246,0.3)]"
-                        : "text-zinc-500 bg-white/5"
-                    )}
-                  >
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="h-3 w-3 text-zinc-500" />
+                    <span className="text-zinc-300 font-medium">{visit.host_name || 'Autonomous'}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="font-mono text-[11px] text-zinc-500">{visit.checkin_time ? format(new Date(visit.checkin_time), 'PPp') : 'N/A'}</span>
+                </TableCell>
+                <TableCell>
+                  {visit.checkout_time ? (
+                    <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                  ) : (
+                    <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary" className={cn("text-[8px] font-black uppercase tracking-widest",
+                    visit.status === 'active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
                     {visit.status.replace('_', ' ')}
                   </Badge>
                 </TableCell>
@@ -442,56 +372,101 @@ export default function VisitorHistoryPage() {
             ))}
           </TableBody>
         </Table>
-        {filteredVisits.length === 0 && (
-          <p className="py-10 text-center text-muted-foreground">
-            No visits match your search criteria.
-          </p>
-        )}
-        <div className="mt-6 flex justify-center">
+
+        <div className="mt-8 flex justify-center pb-12">
           {hasMore && (
-            <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore}>
-              {isLoadingMore && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Load More
+            <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore} className="h-12 px-10 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all">
+              {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Load More Records"}
             </Button>
           )}
         </div>
-      </>
+      </div>
     );
   };
 
   const visibleDays = settings?.history_days_visitor;
-  const exportableDays = settings?.export_history_days_visitor;
-  const description = `A paginated log of your recent check-ins, showing the last ${visibleDays ?? '...'} days. You can export up to ${exportableDays ?? '...'} days of your history.`;
+  const description = `Audit log of your recent visits across the ecosystem from the last ${visibleDays ?? '...'} days.`;
 
   return (
-    <div className="container py-10">
-      <div className="mb-4">
-        <Button asChild variant="outline">
-          <Link href="/dashboard/visitor">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+    <div className="container py-10 max-w-7xl">
+      <div className="mb-8 flex items-center justify-between">
+        <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+          <Link href="/dashboard/visitor" className="flex items-center">
+            <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
           </Link>
         </Button>
       </div>
-      <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
-        <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
+
+      <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative mb-20">
+        <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
         <CardHeader className="relative z-10 border-b border-white/5 pb-8">
-          <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></CardTitle>
-          <CardDescription className="text-zinc-400 max-w-xl leading-relaxed mt-2">{description}</CardDescription>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <History className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></CardTitle>
+          </div>
+          <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-xl leading-relaxed mt-2">{description}</CardDescription>
         </CardHeader>
-        <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
+        <CardContent className="relative z-10 pt-8">
+          <div className="space-y-8">
+            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
+              <div className="relative z-10 flex flex-wrap items-end gap-6">
+                <div className="flex flex-wrap items-end gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">From Date</Label>
+                    <Input type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">To Date</Label>
+                    <Input type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 ml-auto">
+                  <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                    {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                    {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
+                    Export PDF
+                  </Button>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700 transition-colors group-focus-within:text-primary" />
+                <Input
+                  placeholder="Search by location, host or status..."
+                  className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
+            </div>
+
+            <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+              {renderContent()}
+            </div>
+          </div>
+        </CardContent>
       </Card>
+
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
-        <AlertDialogContent className="bg-[#020617] border-white/10 text-white backdrop-blur-3xl">
+        <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white text-xl">Download Report?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
-              Generating an offline report costs <span className="font-bold text-primary">{exportCost ?? '...'} tokens</span>. This will be deducted from your token balance.
+            <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Download Report</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+              Downloading this report costs <span className="text-primary font-black">{exportCost ?? '...'} tokens</span> from your personal balance.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="border-t border-white/5 pt-6 mt-6">
-            <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white hover:bg-primary/90">
+          <AlertDialogFooter className="gap-3 pt-6">
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirm Download
             </AlertDialogAction>
@@ -501,4 +476,3 @@ export default function VisitorHistoryPage() {
     </div>
   );
 }
-

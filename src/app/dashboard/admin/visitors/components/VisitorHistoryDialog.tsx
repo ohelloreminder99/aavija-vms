@@ -2,8 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { format, addDays, parse } from 'date-fns';
+import { format, parse, subDays } from 'date-fns';
 import Papa from 'papaparse';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -14,6 +13,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/components/ui/dialog';
 import {
   Table,
@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Download, Star, Eye } from 'lucide-react';
+import { Loader2, Download, Eye, History, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -33,26 +33,25 @@ import { Label } from '@/components/ui/label';
 import { getVisitsForVisitor } from '../actions';
 import { WithId } from '@/supabase';
 import { UserProfile } from '@/services/user-service';
-import { Separator } from '@/components/ui/separator';
 import { createLogEntry } from '@/services/log-service';
 import { LogAction } from '@/services/log-actions';
 
 type SerializableVisit = {
-    id: string;
-    visitor_id: string;
-    visitor_name: string;
-    host_id: string;
-    host_name?: string;
-    premise_id: string;
-    checkin_time: string;
-    checkout_time: string | null;
-    vehicle_details?: {
-      plate: string;
-      model: string;
-    };
-    visitor_snapshot_url?: string;
-    status: 'active' | 'completed' | 'declined' | 'force_closed';
+  id: string;
+  visitor_id: string;
+  visitor_name: string;
+  host_id: string;
+  host_name?: string;
+  premise_id: string;
+  checkin_time: string;
+  checkout_time: string | null;
+  vehicle_details?: {
+    plate: string;
+    model: string;
   };
+  visitor_snapshot_url?: string;
+  status: 'active' | 'completed' | 'declined' | 'force_closed';
+};
 
 interface VisitorHistoryDialogProps {
   visitor: WithId<UserProfile> | null;
@@ -72,7 +71,7 @@ export default function VisitorHistoryDialog({
   const [visits, setVisits] = React.useState<SerializableVisit[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [startDate, setStartDate] = React.useState<string>(format(addDays(new Date(), -30), 'dd/MM/yyyy'));
+  const [startDate, setStartDate] = React.useState<string>(format(subDays(new Date(), 30), 'dd/MM/yyyy'));
   const [endDate, setEndDate] = React.useState<string>(format(new Date(), 'dd/MM/yyyy'));
   const [dateError, setDateError] = React.useState<string | null>(null);
   const [imageUrlToView, setImageUrlToView] = React.useState<string | null>(null);
@@ -86,29 +85,29 @@ export default function VisitorHistoryDialog({
         .then((result) => {
           if (result.success && result.visits) {
             setVisits(result.visits);
-            if (adminProfile && visitor) {
-                createLogEntry({
-                    actorId: adminProfile.id,
-                    actorName: adminProfile.name,
-                    actorRole: 'admin',
-                    action: LogAction.VIEW_VISITOR_HISTORY_ADMIN,
-                    description: `Admin "${adminProfile.name}" viewed visit history for visitor "${visitor.name}".`,
-                    context: { viewedUserId: visitor.id }
-                });
+            if (adminProfile) {
+              createLogEntry({
+                actorId: adminProfile.id,
+                actorName: adminProfile.name,
+                actorRole: 'admin',
+                action: LogAction.VIEW_VISITOR_HISTORY_ADMIN,
+                description: `Admin "${adminProfile.name}" viewed visit history for visitor "${visitor.name}".`,
+                context: { viewedUserId: visitor.id }
+              });
             }
           } else {
             setError(result.error || 'Failed to load visit history.');
           }
         })
-        .catch((e) => {
-            setError('An unexpected error occurred.');
+        .catch(() => {
+          setError('An unexpected error occurred.');
         })
         .finally(() => {
           setIsLoading(false);
         });
     }
   }, [open, visitor, adminProfile]);
-  
+
   const handleDateInputChange = (
     value: string,
     setter: React.Dispatch<React.SetStateAction<string>>
@@ -117,14 +116,10 @@ export default function VisitorHistoryDialog({
     let formattedDate = digitsOnly;
 
     if (digitsOnly.length > 4) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(
-        2,
-        4
-      )}/${digitsOnly.slice(4, 8)}`;
+      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2, 4)}/${digitsOnly.slice(4, 8)}`;
     } else if (digitsOnly.length > 2) {
       formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2)}`;
     }
-    
     setter(formattedDate);
   };
 
@@ -134,47 +129,43 @@ export default function VisitorHistoryDialog({
     try {
       const fromDate = parse(startDate, 'dd/MM/yyyy', new Date());
       const toDate = parse(endDate, 'dd/MM/yyyy', new Date());
-      
+
       if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        setDateError('Invalid date format. Please use DD/MM/YYYY.');
+        setDateError('Invalid format: DD/MM/YYYY');
         return [];
       }
-      
       if (fromDate > toDate) {
-        setDateError('Start date cannot be after end date.');
+        setDateError('Start date > End date');
         return [];
       }
 
       fromDate.setHours(0, 0, 0, 0);
       toDate.setHours(23, 59, 59, 999);
-  
+
       return visits.filter((visit) => {
         const visitDate = new Date(visit.checkin_time);
         return visitDate >= fromDate && visitDate <= toDate;
       });
     } catch (e) {
-      setDateError('An error occurred while parsing dates.');
+      setDateError('Parsing error occurred.');
       return [];
     }
   }, [visits, startDate, endDate]);
 
   const handleExportCSV = () => {
     const dataToExport = filteredVisits.map(visit => ({
-        Premise: premiseMap.get(visit.premise_id) || 'Unknown Premise',
-        'Host Met': visit.host_name || 'Unknown',
-        'Check-in': format(new Date(visit.checkin_time), 'PPpp'),
-        'Check-out': visit.checkout_time ? format(new Date(visit.checkout_time), 'PPpp') : 'N/A',
-        Status: visit.status,
-        'Vehicle Plate': visit.vehicle_details?.plate || 'N/A',
-        'Vehicle Model': visit.vehicle_details?.model || 'N/A',
-        'Snapshot URL': visit.visitor_snapshot_url || 'N/A',
+      Premise: premiseMap.get(visit.premise_id) || 'Unknown',
+      'Host Met': visit.host_name || 'N/A',
+      'Check-in': format(new Date(visit.checkin_time), 'PPpp'),
+      'Check-out': visit.checkout_time ? format(new Date(visit.checkout_time), 'PPpp') : 'N/A',
+      Status: visit.status,
+      'Vehicle Plate': visit.vehicle_details?.plate || 'N/A',
     }));
 
     const csv = Papa.unparse(dataToExport);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
+    link.setAttribute('href', URL.createObjectURL(blob));
     link.setAttribute('download', `visitor_${visitor?.name}_history_${format(new Date(), 'yyyy-MM-dd')}.csv`);
     document.body.appendChild(link);
     link.click();
@@ -192,162 +183,186 @@ export default function VisitorHistoryDialog({
       head: [['Premise', 'Host Met', 'Check-in', 'Check-out', 'Status', 'Vehicle']],
       body: filteredVisits.map(visit => [
         premiseMap.get(visit.premise_id) || 'Unknown',
-        visit.host_name || 'Unknown',
+        visit.host_name || 'N/A',
         format(new Date(visit.checkin_time), 'Pp'),
         visit.checkout_time ? format(new Date(visit.checkout_time), 'Pp') : 'N/A',
         visit.status,
-        visit.vehicle_details ? `${visit.vehicle_details.plate} (${visit.vehicle_details.model})` : 'N/A',
+        visit.vehicle_details ? visit.vehicle_details.plate : 'N/A',
       ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [44, 62, 80] },
     });
-    
+
     doc.save(`visitor_${visitor?.name}_history_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-5xl">
-          <DialogHeader>
-              <div className="flex items-start gap-4">
-                  <Avatar className="h-16 w-16 border">
-                      {visitor?.photo_url && <AvatarImage src={visitor.photo_url} alt={visitor.name} />}
-                      <AvatarFallback>{visitor?.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                      <DialogTitle>Visit History for {visitor?.name}</DialogTitle>
-                      <DialogDescription>
-                        Showing all check-ins for this visitor across all premises.
-                      </DialogDescription>
-                  </div>
-              </div>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-5xl bg-black/95 border-white/5 backdrop-blur-3xl p-0 overflow-hidden shadow-2xl">
+          <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
 
-          <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-end gap-2">
-                  <div>
-                      <Label htmlFor="start-date-visitor" className="text-xs text-muted-foreground">From</Label>
-                      <Input
-                          id="start-date-visitor"
-                          type="text"
-                          placeholder="DD/MM/YYYY"
-                          value={startDate}
-                          onChange={(e) => handleDateInputChange(e.target.value, setStartDate)}
-                          className="w-[150px]"
-                          maxLength={10}
-                      />
-                  </div>
-                  <div>
-                      <Label htmlFor="end-date-visitor" className="text-xs text-muted-foreground">To</Label>
-                      <Input
-                          id="end-date-visitor"
-                          type="text"
-                          placeholder="DD/MM/YYYY"
-                          value={endDate}
-                          onChange={(e) => handleDateInputChange(e.target.value, setEndDate)}
-                          className="w-[150px]"
-                          maxLength={10}
-                      />
-                  </div>
+          <div className="relative z-10 p-8 border-b border-white/5 bg-white/[0.02]">
+            <div className="flex items-start gap-6">
+              <div className="relative group">
+                <div className="absolute -inset-1 rounded-2xl bg-primary/20 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-700" />
+                <Avatar className="h-20 w-20 border-2 border-white/10 relative z-10 shadow-2xl">
+                  {visitor?.photo_url && <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />}
+                  <AvatarFallback className="bg-primary/10 text-primary font-black text-2xl uppercase">{visitor?.name?.charAt(0)}</AvatarFallback>
+                </Avatar>
               </div>
-              {dateError && <p className="text-xs text-destructive">{dateError}</p>}
-              <div className='flex items-center gap-2 ml-auto'>
-                  <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading || !!dateError}>
-                      <Download className="mr-2 h-4 w-4" />
-                      Export CSV
-                  </Button>
-                  <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading || !!dateError}>
-                      <Download className="mr-2 h-4 w-4" />
-                      Export PDF
-                  </Button>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="p-1.5 rounded-lg bg-primary/10 border border-primary/20">
+                    <History className="h-4 w-4 text-primary" />
+                  </div>
+                  <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></DialogTitle>
+                </div>
+                <DialogDescription className="text-zinc-500 font-medium uppercase tracking-[0.2em] text-[10px]">
+                  Global check-in audit for {visitor?.name}
+                </DialogDescription>
               </div>
+            </div>
           </div>
 
-          <div className="max-h-[55vh]">
-              <ScrollArea className="h-full">
-                  {isLoading && (
-                      <div className="flex h-48 items-center justify-center">
-                          <Loader2 className="h-8 w-8 animate-spin" />
-                      </div>
-                  )}
-                  {error && (
-                      <div className="flex h-48 items-center justify-center text-destructive">
-                          <p>{error}</p>
-                      </div>
-                  )}
-                  {!isLoading && !error && filteredVisits.length === 0 && !dateError && (
-                      <div className="flex h-48 items-center justify-center text-muted-foreground">
-                          <p>No visit history found for this visitor for the selected date range.</p>
-                      </div>
-                  )}
-                  {!isLoading && !error && filteredVisits.length > 0 && (
-                      <Table>
-                          <TableHeader>
-                              <TableRow>
-                                  <TableHead>Snapshot</TableHead>
-                                  <TableHead>Premise</TableHead>
-                                  <TableHead>Host Met</TableHead>
-                                  <TableHead>Vehicle</TableHead>
-                                  <TableHead>Check-in</TableHead>
-                                  <TableHead>Check-out</TableHead>
-                                  <TableHead>Status</TableHead>
-                              </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                              {filteredVisits.map((visit) => (
-                              <TableRow key={visit.id}>
-                                  <TableCell>
-                                      <Button variant="ghost" size="icon" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url}>
-                                          <Eye className="h-4 w-4" />
-                                      </Button>
-                                  </TableCell>
-                                  <TableCell>{premiseMap.get(visit.premise_id) || 'Unknown Premise'}</TableCell>
-                                  <TableCell>{visit.host_name || <span className="text-muted-foreground text-xs">Unknown</span>}</TableCell>
-                                  <TableCell>
-                                      {visit.vehicle_details ? (
-                                          <div className='text-xs'>
-                                              <div className='font-medium'>{visit.vehicle_details.plate}</div>
-                                              <div className='text-muted-foreground'>{visit.vehicle_details.model}</div>
-                                          </div>
-                                      ) : <span className="text-muted-foreground text-xs">N/A</span>}
-                                  </TableCell>
-                                  <TableCell>{format(new Date(visit.checkin_time), 'PPp')}</TableCell>
-                                  <TableCell>
-                                  {visit.checkout_time ? format(new Date(visit.checkout_time), 'PPp') : <span className="text-muted-foreground text-xs">N/A</span>}
-                                  </TableCell>
-                                  <TableCell>
-                                  <Badge variant={visit.status === 'active' ? 'default' : 'secondary'} className="capitalize">
-                                      {visit.status.replace('_', ' ')}
-                                  </Badge>
-                                  </TableCell>
-                              </TableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  )}
-              </ScrollArea>
+          <ScrollArea className="max-h-[70vh]">
+            <div className="p-8 space-y-8">
+              <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+                <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
+                <div className="relative z-10 flex flex-wrap items-end gap-6 justify-between">
+                  <div className="flex flex-wrap items-end gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">From Date</Label>
+                      <Input
+                        type="text"
+                        placeholder="DD/MM/YYYY"
+                        value={startDate}
+                        onChange={(e) => handleDateInputChange(e.target.value, setStartDate)}
+                        className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4"
+                        maxLength={10}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">To Date</Label>
+                      <Input
+                        type="text"
+                        placeholder="DD/MM/YYYY"
+                        value={endDate}
+                        onChange={(e) => handleDateInputChange(e.target.value, setEndDate)}
+                        className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4"
+                        maxLength={10}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading || !!dateError} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                      <Download className="mr-2 h-4 w-4" />
+                      Export CSV
+                    </Button>
+                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading || !!dateError} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                      <Download className="mr-2 h-4 w-4" />
+                      Export PDF
+                    </Button>
+                  </div>
+                </div>
+                {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
+              </div>
+
+              <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl min-h-[300px]">
+                {isLoading ? (
+                  <div className="flex flex-col h-64 items-center justify-center space-y-4">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Retrieving Records...</span>
+                  </div>
+                ) : error ? (
+                  <div className="flex flex-col h-64 items-center justify-center space-y-4 px-8 text-center">
+                    <AlertTriangle className="h-10 w-10 text-red-500/50" />
+                    <p className="text-zinc-500 text-sm max-w-xs">{error}</p>
+                  </div>
+                ) : filteredVisits.length === 0 ? (
+                  <div className="flex flex-col h-64 items-center justify-center space-y-4">
+                    <div className="p-4 rounded-full bg-white/5 border border-white/5">
+                      <History className="h-8 w-8 text-zinc-700" />
+                    </div>
+                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">No visit logs found</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader className="bg-white/[0.03]">
+                      <TableRow className="border-white/5 hover:bg-transparent">
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Premise</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Host Met</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredVisits.map((visit) => (
+                        <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                          <TableCell className="pl-8 py-4">
+                            <Button variant="ghost" size="icon" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{premiseMap.get(visit.premise_id) || 'Unknown'}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-[11px] font-medium text-zinc-400">{visit.host_name || 'Autonomous'}</div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkin_time), 'PPp')}</span>
+                          </TableCell>
+                          <TableCell>
+                            {visit.checkout_time ? (
+                              <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                            ) : (
+                              <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest bg-zinc-500/10 text-zinc-400 border-zinc-500/20">
+                              {visit.status.replace('_', ' ')}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </div>
+          </ScrollArea>
+
+          <div className="p-4 bg-white/[0.01] border-t border-white/5 flex justify-end">
+            <DialogClose asChild>
+              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-black uppercase tracking-widest px-8 rounded-xl border border-white/5 transition-all">Close History</Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
-      <Dialog open={!!imageUrlToView} onOpenChange={() => setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl">
-            <DialogHeader>
-                <DialogTitle>Visitor Snapshot</DialogTitle>
-            </DialogHeader>
-            {imageUrlToView && (
-                <div className="relative aspect-square w-full">
-                    <Image
-                        src={imageUrlToView}
-                        alt="Visitor snapshot"
-                        fill
-                        className="object-contain rounded-md"
-                    />
-                </div>
-            )}
+
+      <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
+        <DialogContent className="max-w-xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden shadow-2xl z-[70]">
+          <div className="absolute top-4 left-4 z-20">
+            <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Visitor Snapshot</Badge>
+          </div>
+          {imageUrlToView && (
+            <div className="relative aspect-square w-full">
+              <Image src={imageUrlToView} alt="Snapshot" fill className="object-contain" unoptimized />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
+            </div>
+          )}
+          <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
+            <DialogClose asChild>
+              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6 rounded-lg transition-all">Dismiss</Button>
+            </DialogClose>
+          </div>
         </DialogContent>
       </Dialog>
     </>
   );
 }
-

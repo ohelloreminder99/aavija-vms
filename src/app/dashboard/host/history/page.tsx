@@ -11,6 +11,7 @@ import {
   Eye,
   ArrowLeft,
   Download,
+  History,
 } from 'lucide-react';
 import { useUser, WithId } from '@/supabase';
 import { useUserProfile, type UserProfile } from '@/services/user-service';
@@ -247,12 +248,12 @@ export default function HostHistoryPage() {
       setError(null);
       try {
         const historyDays = settings?.history_days_host;
-        const startDate = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
+        const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
         const result = await getVisitsForHostInPremise({
           hostId: user.id,
           premiseId,
           limit: PAGE_SIZE,
-          startDate: startDate
+          startDate: startDateString
         });
 
         if (result.success && result.visits) {
@@ -278,13 +279,13 @@ export default function HostHistoryPage() {
     setIsLoadingMore(true);
     try {
       const historyDays = settings.history_days_host;
-      const startDate = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
+      const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
       const result = await getVisitsForHostInPremise({
         hostId: user.id,
         premiseId,
         limit: PAGE_SIZE,
         startAfter: lastVisible,
-        startDate: startDate,
+        startDate: startDateString,
       });
 
       if (result.success && result.visits) {
@@ -300,7 +301,6 @@ export default function HostHistoryPage() {
       setIsLoadingMore(false);
     }
   };
-
 
   const visitIds = React.useMemo(() => visits?.map((v) => v.id) || [], [visits]);
   const { ratingsMap } = useRatingsForVisits(visitIds);
@@ -482,141 +482,93 @@ export default function HostHistoryPage() {
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-20 text-center text-muted-foreground">
-          <h3 className="text-lg font-semibold">No visits yet</h3>
-          <p>When a visitor checks in to see you at this premise, their visit will appear here.</p>
+        <div className="py-24 text-center bg-white/[0.01]">
+          <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
+            <History className="h-8 w-8 text-zinc-700" />
+          </div>
+          <p className="mb-2 font-bold text-white uppercase tracking-widest text-sm">No History Found</p>
+          <p className="text-xs text-zinc-500 max-w-[200px] mx-auto leading-relaxed">
+            No check-ins have been recorded for you yet.
+          </p>
         </div>
       );
     }
+
     return (
-      <div className="space-y-8">
-        <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
-          <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
-          <div className="relative z-10 flex flex-wrap items-end gap-6">
-            <div className="flex flex-wrap items-end gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Start Date</Label>
-                <div className="relative">
-                  <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">End Date</Label>
-                <div className="relative">
-                  <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
-                </div>
-              </div>
-            </div>
+      <Table>
+        <TableHeader className="bg-white/[0.03]">
+          <TableRow className="border-white/5 hover:bg-transparent">
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Name</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredVisits.map((visit) => {
+            const isRated = ratingsMap.has(visit.id);
+            const canRate = visit.status === 'completed' && !isRated;
 
-            <div className="flex items-center gap-3 ml-auto">
-              <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6">
-                {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
-                Export CSV
-              </Button>
-              <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6">
-                {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
-                Export PDF
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
-            <Input
-              placeholder="Search by visitor name or status..."
-              className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
-        </div>
-
-        <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
-          <Table>
-            <TableHeader className="bg-white/[0.03]">
-              <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Name</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredVisits.map((visit) => {
-                const isRated = ratingsMap.has(visit.id);
-                const canRate = visit.status === 'completed' && !isRated;
-
-                return (
-                  <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
-                    <TableCell className="pl-8 py-4">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
-                        disabled={!visit.visitor_snapshot_url}
-                        className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20"
-                      >
-                        <Eye className="h-4 w-4" />
+            return (
+              <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                <TableCell className="pl-8 py-4">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
+                    disabled={!visit.visitor_snapshot_url}
+                    className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <div className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{visit.visitor_name}</div>
+                </TableCell>
+                <TableCell>
+                  <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkin_time), 'PPp')}</span>
+                </TableCell>
+                <TableCell>
+                  {visit.checkout_time ? (
+                    <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                  ) : (
+                    <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={visit.status === 'active' ? 'default' : 'secondary'} className={cn("text-[8px] font-black uppercase tracking-widest",
+                    visit.status === 'active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
+                    {visit.status.replace('_', ' ')}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right pr-8">
+                  {visit.status === 'completed' ? (
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="icon" title="Rate Visitor" disabled={!canRate} onClick={() => setVisitToRate(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-amber-500 hover:bg-amber-500/10 disabled:opacity-20 transition-all">
+                        <Star className={cn("h-4 w-4", !canRate && "fill-zinc-800")} />
                       </Button>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{visit.visitor_name}</div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkin_time), 'PPp')}</span>
-                    </TableCell>
-                    <TableCell>
-                      {visit.checkout_time ? (
-                        <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkout_time), 'PPp')}</span>
-                      ) : (
-                        <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={visit.status === 'active' ? 'default' : 'secondary'} className={cn("text-[8px] font-black uppercase tracking-widest",
-                        visit.status === 'active' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20")}>
-                        {visit.status.replace('_', ' ')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right pr-8">
-                      {visit.status === 'completed' ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon" title="Rate Visitor" disabled={!canRate} onClick={() => setVisitToRate(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-amber-500 hover:bg-amber-500/10 disabled:opacity-20 transition-all">
-                            <Star className={cn("h-4 w-4", !canRate && "fill-zinc-800")} />
-                          </Button>
-                          <Button variant="ghost" size="icon" title="Block Visitor" onClick={() => setVisitToBlock(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
-                            <UserX className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : isRated ? (
-                        <div className="flex items-center justify-end gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                          <CheckCircle2 className="h-3.3 w-3.5" />
-                          <span>Rated</span>
-                        </div>
-                      ) : (
-                        <div className="h-9 w-9 ml-auto rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-center">
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="mt-8 flex justify-center pb-12">
-          {hasMore && (
-            <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore} className="h-12 px-10 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all">
-              {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Load More"}
-            </Button>
-          )}
-        </div>
-      </div>
+                      <Button variant="ghost" size="icon" title="Block Visitor" onClick={() => setVisitToBlock(visit)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                        <UserX className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : isRated ? (
+                    <div className="flex items-center justify-end gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                      <CheckCircle2 className="h-3.3 w-3.5" />
+                      <span>Rated</span>
+                    </div>
+                  ) : (
+                    <div className="h-9 w-9 ml-auto rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-center">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     );
   };
 
@@ -654,7 +606,63 @@ export default function HostHistoryPage() {
               {description}
             </CardDescription>
           </CardHeader>
-          <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
+          <CardContent className="relative z-10 pt-8">
+            <div className="space-y-8">
+              <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+                <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+                <div className="relative z-10 flex flex-wrap items-end gap-6">
+                  <div className="flex flex-wrap items-end gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Start Date</Label>
+                      <div className="relative">
+                        <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">End Date</Label>
+                      <div className="relative">
+                        <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 ml-auto">
+                    <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={visits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                      {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
+                      Export CSV
+                    </Button>
+                    <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={visits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                      {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
+                      Export PDF
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700 transition-colors group-focus-within:text-primary" />
+                  <Input
+                    placeholder="Search by visitor name or status..."
+                    className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
+              </div>
+
+              <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+                {renderContent()}
+              </div>
+
+              <div className="mt-8 flex justify-center pb-12">
+                {hasMore && (
+                  <Button onClick={handleLoadMore} variant="outline" disabled={isLoadingMore} className="h-12 px-10 bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 font-black uppercase tracking-widest text-[10px] transition-all">
+                    {isLoadingMore ? <Loader2 className="mr-3 h-4 w-4 animate-spin text-primary" /> : "Load More"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
         </Card>
       </div>
 
@@ -733,5 +741,3 @@ export default function HostHistoryPage() {
     </>
   );
 }
-
-

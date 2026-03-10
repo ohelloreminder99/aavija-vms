@@ -130,7 +130,7 @@ export async function deleteCheckinToken(tokenId: string): Promise<{ success: bo
 
     if (tokenDoc) {
       // Ensure the caller actually owns this token before deleting it!
-      if (tokenDoc.userId !== authData.user.id) {
+      if (tokenDoc.visitor_id !== authData.user.id) {
         return { success: false, error: 'Unauthorized: You can only delete your own tokens.' };
       }
 

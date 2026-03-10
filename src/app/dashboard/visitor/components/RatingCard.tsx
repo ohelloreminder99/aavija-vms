@@ -58,7 +58,7 @@ const RatingCardComponent = () => {
                     {renderStars(userProfile?.global_rating ?? 0)}
                 </div>
                 <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider mt-6 border-t border-white/5 pt-4">
-                    Total rating from <span className="text-primary/80">Admins</span>.
+                    Total rating from <span className="text-primary/80">Hosts</span>.
                 </p>
             </CardContent>
         </Card>

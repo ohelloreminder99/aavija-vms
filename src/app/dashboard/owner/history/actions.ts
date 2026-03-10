@@ -49,7 +49,16 @@ export async function deductTokensForExport(
 
     if (profile.role !== 'admin') {
       if (target.type === 'user' && target.id !== user.id) throw new Error('Unauthorized');
-      if (target.type === 'premise' && (targetData as any).owner_id !== user.id) throw new Error('Unauthorized');
+      if (target.type === 'premise') {
+        // Allow owner, gatekeeper, or host of this premise
+        const isOwner = (targetData as any).owner_id === user.id;
+        const premiseRoles = profile.premise_roles || {};
+        const userRolesForPremise = premiseRoles[target.id];
+        const isAssigned = Array.isArray(userRolesForPremise)
+          ? userRolesForPremise.length > 0
+          : !!userRolesForPremise;
+        if (!isOwner && !isAssigned) throw new Error('Unauthorized');
+      }
     }
 
     // --- SECURE COST CALCULATION ---
@@ -97,15 +106,17 @@ export async function deductTokensForExport(
 
     if (updateError) throw updateError;
 
-    // Log the action after the transaction succeeds
+    // Dynamically select the correct role-specific log action
+    const logActionKey = exportType === 'csv'
+      ? `${actorRole.toUpperCase()}_EXPORT_CSV`
+      : `${actorRole.toUpperCase()}_EXPORT_PDF`;
+    const logAction = (LogAction as any)[logActionKey] || (exportType === 'csv' ? LogAction.OWNER_EXPORT_CSV : LogAction.OWNER_EXPORT_PDF);
+
     await createLogEntry({
       actorId: actorId,
       actorName: actorName,
       actorRole: actorRole,
-      action:
-        exportType === 'csv'
-          ? LogAction.OWNER_EXPORT_CSV // Re-using for now, could create new ones
-          : LogAction.OWNER_EXPORT_PDF,
+      action: logAction,
       description: `${actorRole} "${actorName}" exported visit history as ${exportType.toUpperCase()}. Cost: ${finalCost} tokens.`,
       tokenChange: -finalCost,
       context: { premiseId: premiseIdForLog || (target.type === 'premise' ? target.id : undefined) },
