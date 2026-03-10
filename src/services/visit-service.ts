@@ -15,9 +15,9 @@ export interface Visit {
     host_name?: string;
     premise_id: string;
     premise_name?: string;
-    checkin_time: any;
-    checkout_time: any | null;
-    expiresAt?: any;
+    checkin_time: string;
+    checkout_time: string | null;
+    expiresAt?: string;
     vehicle_details?: {
         plate: string;
         model: string;
@@ -63,7 +63,7 @@ export function useVisitsByPremise(premiseId: string | undefined, pageSize: numb
         };
     }, [premiseId, pageSize]);
 
-    return useCollection<Visit>(query as any);
+    return useCollection<Visit>(query);
 }
 
 /**

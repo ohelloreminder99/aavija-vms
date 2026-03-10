@@ -35,7 +35,7 @@ export interface SupabaseQueryRef {
  * React hook to subscribe to a Supabase table/query in real-time.
  * Mimics the old `useCollection` for Firestore.
  */
-export function useCollection<T = any>(
+export function useCollection<T = Record<string, any>>(
   memoizedQuery: SupabaseQueryRef | null | undefined,
 ): UseCollectionResult<T> {
   type ResultItemType = WithId<T>;
@@ -112,11 +112,11 @@ export function useCollection<T = any>(
           setError(error);
           setData(null);
         } else {
-          setData(rows as any);
+          setData(rows as ResultItemType[]);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!isMounted) return;
-        setError(err);
+        setError(err instanceof Error ? err : new Error('An unknown error occurred during fetch.'));
         setData(null);
       } finally {
         if (isMounted) setIsLoading(false);
@@ -129,11 +129,26 @@ export function useCollection<T = any>(
     // of the array (handling INSERT, UPDATE, DELETE). 
     // For simplicity, we refetch the whole query when a change happens on the table.
 
-    // Construct realtime filter if it's a simple equality query to avoid over-fetching
+    // Choose the best equality filter for realtime subscription (prioritizing premise_id or visitor_id)
     let realtimeFilter = undefined;
-    if (memoizedQuery.filters && memoizedQuery.filters.length === 1 && memoizedQuery.filters[0].operator === 'eq') {
-      const f = memoizedQuery.filters[0];
-      realtimeFilter = `${f.column}=eq.${f.value}`;
+    if (memoizedQuery.filters && memoizedQuery.filters.length > 0) {
+      // Look for premise_id equality first
+      const premiseFilter = memoizedQuery.filters.find(f => f.column === 'premise_id' && f.operator === 'eq');
+      if (premiseFilter) {
+        realtimeFilter = `${premiseFilter.column}=eq.${premiseFilter.value}`;
+      } else {
+        // Look for visitor_id equality second
+        const visitorFilter = memoizedQuery.filters.find(f => f.column === 'visitor_id' && f.operator === 'eq');
+        if (visitorFilter) {
+          realtimeFilter = `${visitorFilter.column}=eq.${visitorFilter.value}`;
+        } else {
+          // Default to the first equality filter if available
+          const firstEq = memoizedQuery.filters.find(f => f.operator === 'eq');
+          if (firstEq) {
+            realtimeFilter = `${firstEq.column}=eq.${firstEq.value}`;
+          }
+        }
+      }
     }
 
     // Stable per-mount channel ID (unique per instance, stable across re-renders)

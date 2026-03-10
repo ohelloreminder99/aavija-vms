@@ -55,6 +55,7 @@ import { useSupabase } from '@/supabase';
 import {
   useUserProfile,
   updateUserProfile,
+  UpdateableUserProfile,
   UserProfile,
 } from '@/services/user-service';
 import { useToast } from '@/hooks/use-toast';
@@ -71,6 +72,8 @@ import { sendWhatsAppOtp, verifyWhatsAppOtp } from './actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LinkedAccounts } from './LinkedAccounts';
 import { updatePayoutDetails } from '@/services/agent-service';
+import { VehicleManager } from './VehicleManager';
+import { PhoneVerification } from './PhoneVerification';
 
 const SkeletonProfile = () => (
   <div className="space-y-6">
@@ -114,18 +117,9 @@ export default function ProfilePage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
   const [newProduct, setNewProduct] = React.useState('');
-  const [newVehicleNumber, setNewVehicleNumber] = React.useState('');
-  const [newVehicleType, setNewVehicleType] = React.useState<'car' | 'bike' | 'tempo' | 'other' | 'walking'>('car');
 
   // State for phone verification
   const [isPhoneLocked, setIsPhoneLocked] = React.useState(true);
-  const [isVerifying, setIsVerifying] = React.useState(false);
-  const [isUpdateConfirmOpen, setIsUpdateConfirmOpen] = React.useState(false);
-  const [otpSent, setOtpSent] = React.useState(false);
-  const [otp, setOtp] = React.useState('');
-  const [verificationError, setVerificationError] = React.useState<
-    string | null
-  >(null);
   const [citySearch, setCitySearch] = React.useState('');
 
   const isLoading =
@@ -186,15 +180,7 @@ export default function ProfilePage() {
     [cities, citySearch]
   );
 
-  React.useEffect(() => {
-    if (newVehicleType === 'walking') {
-      setNewVehicleNumber('WALKING');
-    } else {
-      if (newVehicleNumber === 'WALKING') {
-        setNewVehicleNumber('');
-      }
-    }
-  }, [newVehicleType, newVehicleNumber]);
+
 
   React.useEffect(() => {
     if (userProfile) {
@@ -234,27 +220,7 @@ export default function ProfilePage() {
     form.setValue('products', currentProducts.filter((p) => p !== productToRemove));
   };
 
-  const handleAddVehicle = () => {
-    if (newVehicleNumber.trim() === '') {
-      toast({ variant: 'destructive', title: 'Validation Error', description: 'Vehicle number cannot be empty.' });
-      return;
-    }
-    const currentVehicles = form.getValues('vehicles') || [];
-    if (currentVehicles.find(v => v.number.toLowerCase() === newVehicleNumber.trim().toLowerCase())) {
-      toast({ variant: 'destructive', title: 'Duplicate Vehicle', description: 'This vehicle number is already in your list.' });
-      return;
-    }
-    appendVehicle({ type: newVehicleType, number: newVehicleNumber.trim().toUpperCase() });
-    setNewVehicleNumber('');
-  };
 
-  const handleRemoveVehicle = (index: number) => {
-    const vehicleToRemove = (form.getValues('vehicles') || [])[index];
-    if (vehicleToRemove && form.getValues('selected_vehicle_number') === vehicleToRemove.number) {
-      form.setValue('selected_vehicle_number', null);
-    }
-    removeVehicle(index);
-  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -311,44 +277,13 @@ export default function ProfilePage() {
 
       await updateUserProfile(user.id, { photo_url: publicUrl });
       toast({ title: 'Photo updated!', description: 'Your new profile photo has been saved.' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload failed:', error);
-      toast({ variant: 'destructive', title: 'Upload Failed', description: error.message || 'An unexpected error occurred while resizing or uploading.' });
+      toast({ variant: 'destructive', title: 'Upload Failed', description: error instanceof Error ? error.message : 'An unexpected error occurred while resizing or uploading.' });
     } finally { setIsUploading(false); }
   };
 
-  const handleSendVerificationCode = async () => {
-    if (!user) return;
-    const phone = form.getValues('phone');
-    const countryCode = form.getValues('countryCode');
-    const isPhoneValid = await form.trigger(['phone', 'countryCode']);
-    if (!isPhoneValid) { form.setFocus('phone'); return; }
-    if (!hasSufficientTokens) { setVerificationError(`Insufficient tokens. You need ${mobileVerificationCost} tokens to verify.`); return; }
-    setIsVerifying(true); setVerificationError(null);
-    const result = await sendWhatsAppOtp({ userId: user.id, phone, countryCode: countryCode });
-    setIsVerifying(false);
-    if (result.success) { setOtpSent(true); toast({ title: 'OTP Sent', description: 'Please check your WhatsApp for the verification code.' }); }
-    else { setVerificationError(result.error || 'An unknown error occurred.'); }
-  };
 
-  const handleConfirmCode = async () => {
-    if (!user) return;
-    const enteredPhone = form.getValues('phone');
-    const enteredCountryCode = form.getValues('countryCode');
-    if (otp.length !== 6) { setVerificationError('OTP must be 6 digits long.'); return; }
-    setIsVerifying(true); setVerificationError(null);
-    const result = await verifyWhatsAppOtp({ userId: user.id, otp, phone: enteredPhone, countryCode: enteredCountryCode });
-    setIsVerifying(false);
-    if (result.success) {
-      toast({ title: 'Success!', description: result.message });
-      setOtpSent(false);
-      setOtp('');
-      setIsPhoneLocked(true);   // lock field immediately without waiting for realtime
-      router.refresh();          // force server re-render so is_verified=true propagates instantly
-    } else {
-      setVerificationError(result.error || 'Failed to verify OTP.');
-    }
-  };
 
   const onSubmit = async (data: ProfileFormValues) => {
     if (!user) {
@@ -359,7 +294,7 @@ export default function ProfilePage() {
     const phoneChanged = userProfile && data.phone !== userProfile.phone;
     try {
       const selectedCityObj = cities?.find(c => c.id === data.cityId);
-      const dataToUpdate: any = {
+      const dataToUpdate: Partial<UpdateableUserProfile> & { is_verified?: boolean } = {
         name: data.name,
         companyName: data.companyName,
         cityId: data.cityId,
@@ -382,9 +317,9 @@ export default function ProfilePage() {
         });
       }
       toast({ title: phoneChanged ? 'Profile Updated & Phone Changed' : 'Profile Updated', description: 'Your changes have been saved successfully.' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Profile update failed:', error);
-      toast({ variant: 'destructive', title: 'Update Failed', description: error.message || 'An error occurred while saving your profile.' });
+      toast({ variant: 'destructive', title: 'Update Failed', description: error instanceof Error ? error.message : 'An error occurred while saving your profile.' });
     } finally { setIsSubmitting(false); }
   };
 
@@ -422,7 +357,7 @@ export default function ProfilePage() {
                     <div className="space-y-3 flex-1">
                       <Label htmlFor="photo-upload" className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Profile Photo</Label>
                       <div className="flex items-center gap-4">
-                        <Input id="photo-upload" type="file" accept="image/png, image,jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
+                        <Input id="photo-upload" type="file" accept="image/png, image,jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} aria-label="Upload profile photo" className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
                         {isUploading && <span className="text-xs text-primary animate-pulse font-bold tracking-widest uppercase">Uploading...</span>}
                       </div>
                       <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">Support: WEBP, PNG, JPG (5MB Max)</p>
@@ -449,72 +384,26 @@ export default function ProfilePage() {
                       </FormItem>
                     )} />
 
-                    <div className="md:col-span-2 p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-4">
-                      <div className="flex flex-wrap items-end gap-4">
-                        <FormField control={form.control} name="countryCode" render={({ field }) => (
-                          <FormItem className="w-24">
-                            <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Country</FormLabel>
-                            <FormControl>
-                              <Input {...field} disabled className="bg-white/5 border-white/10 text-zinc-500 h-11 text-center" />
-                            </FormControl>
-                          </FormItem>
-                        )} />
-                        <FormField control={form.control} name="phone" render={({ field }) => (
-                          <FormItem className="flex-1 min-w-[200px]">
-                            <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">
-                              Mobile Number
-                              {!isPhoneLocked && <span className="text-[9px] font-normal text-zinc-500 ml-2">({settings?.phone_number_length || '10'} digits required)</span>}
-                            </FormLabel>
-                            <FormControl>
-                              <Input type="tel" placeholder="9876543210" {...field} disabled={isPhoneLocked} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11 font-mono tracking-wider" />
-                            </FormControl>
-                            <FormMessage className="text-red-500 text-[10px]" />
-                          </FormItem>
-                        )} />
-                        <div className="flex gap-2">
-                          {isPhoneLocked ? (
-                            <div className="flex items-center gap-2 text-[10px] text-emerald-400 font-black uppercase tracking-widest px-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl h-11 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                              <ShieldCheck className="h-4 w-4" />
-                              <span>Verified</span>
-                            </div>
-                          ) : (
-                            <Button type="button" onClick={handleSendVerificationCode} disabled={isVerifying || !hasSufficientTokens} className="h-11 px-6 bg-primary text-white font-bold uppercase tracking-widest text-[10px] hover:bg-primary/90">
-                              {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                              Verify
-                            </Button>
-                          )}
-                          {isPhoneLocked && <Button type="button" variant="outline" onClick={() => setIsUpdateConfirmOpen(true)} className="h-11 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest">Change</Button>}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">
-                        {isPhoneLocked ? 'Mobile number verified.' : `Verifying your mobile number costs ${mobileVerificationCost} tokens. OTP will be sent via WhatsApp.`}
-                      </p>
-                      {(!hasSufficientTokens && !userProfile?.is_verified) && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Insufficient tokens to verify.</p>}
-                      {verificationError && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">{verificationError}</p>}
-                      {otpSent && !isPhoneLocked && (
-                        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4 animate-in fade-in slide-in-from-top-2">
-                          <FormItem>
-                            <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Enter OTP</FormLabel>
-                            <div className="flex items-center gap-2">
-                              <FormControl>
-                                <Input type="tel" maxLength={6} placeholder="ENTER 6-DIGIT CODE" value={otp} onChange={(e) => setOtp(e.target.value)} className="bg-black/40 border-white/10 text-white text-center font-mono text-lg tracking-[0.5em] h-12" />
-                              </FormControl>
-                              <Button type="button" onClick={handleConfirmCode} disabled={isVerifying || otp.length !== 6} className="h-12 px-8 bg-emerald-600 text-white font-bold uppercase tracking-widest hover:bg-emerald-500">
-                                {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm'}
-                              </Button>
-                            </div>
-                            <FormDescription className="text-zinc-500 text-[10px]">Checking WhatsApp for OTP...</FormDescription>
-                          </FormItem>
-                        </div>
-                      )}
-                    </div>
+                    <PhoneVerification
+                      form={form}
+                      isPhoneLocked={isPhoneLocked}
+                      setIsPhoneLocked={setIsPhoneLocked}
+                      userProfile={userProfile}
+                      settings={settings}
+                    />
 
                     <FormField control={form.control} name="cityId" render={({ field }) => (
                       <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
-                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">City</FormLabel>
+                        <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">
+                          City {field.value && (
+                            <span className="text-primary ml-2 border-l border-white/10 pl-2">
+                              {cities?.find(c => c.id === field.value)?.name}
+                            </span>
+                          )}
+                        </FormLabel>
                         <div className="relative group/search mb-4">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within/search:text-primary transition-colors" />
-                          <Input placeholder="Search city..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-700 h-10 text-sm" />
+                          <Input placeholder="Search city..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} aria-label="Search cities" className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-700 h-10 text-sm" />
                         </div>
                         <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/20">
                           <FormControl>
@@ -617,63 +506,15 @@ export default function ProfilePage() {
                     </>
                   )}
 
-                  <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6">
-                    <FormField control={form.control} name="vehicles" render={() => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-3 text-zinc-300 font-headline font-bold uppercase tracking-widest text-[10px]">
-                          <Car className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
-                          <span>Vehicle Management</span>
-                        </FormLabel>
-                        <FormDescription className="text-zinc-500 text-[10px]">Add your vehicles for faster entry at gates.</FormDescription>
-                        <div className="space-y-3 pt-4">
-                          <FormField control={form.control} name="selected_vehicle_number" render={({ field }) => (
-                            <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="space-y-3">
-                              {vehicleFields.map((vehicle, index) => (
-                                <div key={vehicle.id} className="flex items-center justify-between rounded-2xl border border-white/5 bg-black/20 p-4 hover:border-white/10 transition-all group/vehicle">
-                                  <div className="flex items-center gap-4">
-                                    <RadioGroupItem value={vehicle.number} id={`vehicle-${index}`} className="border-white/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
-                                    <Label htmlFor={`vehicle-${index}`} className="flex items-center gap-3 font-normal cursor-pointer">
-                                      <Badge variant="outline" className="capitalize w-20 justify-center bg-white/5 border-white/10 text-zinc-400 group-hover/vehicle:text-white transition-colors">{vehicle.type}</Badge>
-                                      <span className="font-mono text-lg font-bold text-white tracking-widest group-hover/vehicle:text-primary transition-colors">{vehicle.number}</span>
-                                    </Label>
-                                  </div>
-                                  <Button type="button" variant="ghost" size="icon" className="text-zinc-700 hover:text-red-500 hover:bg-red-500/5" onClick={() => handleRemoveVehicle(index)}>
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              ))}
-                            </RadioGroup>
-                          )}
-                          />
-                          {vehicleFields.length === 0 && <p className="text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest py-8 border border-dashed border-white/5 rounded-2xl">No vehicles added.</p>}
-                        </div>
-                        <FormMessage className="text-red-500 text-[10px]" />
-                      </FormItem>
-                    )}
-                    />
 
-                    <div className="space-y-4 pt-4 border-t border-white/5">
-                      <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Add New Vehicle</FormLabel>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <Select value={newVehicleType} onValueChange={(value) => setNewVehicleType(value as any)}>
-                          <SelectTrigger className="w-[140px] bg-black/20 border-white/10 text-white h-10">
-                            <SelectValue placeholder="Type" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-[#020617] border-white/10 text-white">
-                            <SelectItem value="walking">Walking</SelectItem>
-                            <SelectItem value="car">Car</SelectItem>
-                            <SelectItem value="bike">Bike</SelectItem>
-                            <SelectItem value="tempo">Tempo</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Input placeholder="Vehicle Number" value={newVehicleNumber} onChange={(e) => setNewVehicleNumber(e.target.value.toUpperCase())} disabled={newVehicleType === 'walking'} className="flex-1 min-w-[150px] bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10 font-mono" />
-                        <Button type="button" variant="outline" onClick={handleAddVehicle} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6 ml-auto">
-                          <Plus className="mr-2 h-4 w-4" /> Add
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+
+
+                  <VehicleManager
+                    form={form}
+                    vehicleFields={vehicleFields}
+                    appendVehicle={appendVehicle}
+                    removeVehicle={removeVehicle}
+                  />
 
                   <Button type="submit" disabled={isSubmitting} className="w-full h-14 bg-primary text-white font-black tracking-[0.2em] uppercase hover:bg-primary/90 shadow-[0_0_30px_rgba(59,130,246,0.3)] text-base">
                     {isSubmitting ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Save className="mr-3 h-5 w-5" />}
@@ -683,21 +524,7 @@ export default function ProfilePage() {
               </Form>
             </CardContent>
           </Card>
-          <AlertDialog open={isUpdateConfirmOpen} onOpenChange={setIsUpdateConfirmOpen}>
-            <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight">Change Mobile Number?</AlertDialogTitle>
-                <AlertDialogDescription className="text-zinc-400 leading-relaxed">
-                  Changing your phone number requires new verification via WhatsApp.
-                  This costs <span className="text-primary font-bold">{mobileVerificationCost} tokens</span>.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="pt-6">
-                <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-white font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Change</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+
 
           <LinkedAccounts />
         </>

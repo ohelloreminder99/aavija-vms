@@ -468,7 +468,7 @@ export default function AnnouncementsPage() {
                   </div>
                 </ScrollArea>
                 <div className="p-8 border-t border-white/5 bg-white/[0.02] flex justify-end gap-4">
-                  <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-8">Abort</Button></DialogClose>
+                  <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-8">Cancel</Button></DialogClose>
                   <Button type="submit" className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-12 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">Inject Signal</Button>
                 </div>
               </form>
@@ -493,7 +493,7 @@ export default function AnnouncementsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-8">
-            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Abort Purge</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel Purge</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">Execute Purge</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

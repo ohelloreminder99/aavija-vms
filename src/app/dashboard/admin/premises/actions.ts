@@ -103,15 +103,15 @@ export async function getPremisesForAdmin(): Promise<{ success: boolean; data?: 
     if (premisesError) throw premisesError;
     if (usersError) throw usersError;
 
-    const userMap = new Map<string, UserProfile>((usersSnap || []).map((doc: any) => [doc.id, doc as UserProfile]));
-    const agentMap = new Map<string, Agent>((agentsSnap || []).map((doc: any) => [doc.id, doc as Agent]));
-    const categoryMap = new Map<string, PremiseCategory>((categoriesSnap || []).map((doc: any) => [doc.id, doc as PremiseCategory]));
+    const userMap = new Map<string, UserProfile>((usersSnap || []).map((doc) => [doc.id, doc as UserProfile]));
+    const agentMap = new Map<string, Agent>((agentsSnap || []).map((doc) => [doc.id, doc as Agent]));
+    const categoryMap = new Map<string, PremiseCategory>((categoriesSnap || []).map((doc) => [doc.id, doc as PremiseCategory]));
 
-    const premisesData: SerializablePremiseWithDetails[] = (premisesSnap || []).map((doc: any) => {
+    const premisesData: SerializablePremiseWithDetails[] = (premisesSnap || []).map((doc) => {
       const premise = doc as Premise;
-      const owner: any = userMap.get(premise.owner_id);
-      const agent: any = premise.agent_id ? agentMap.get(premise.agent_id) : undefined;
-      const category: any = premise.categoryId ? categoryMap.get(premise.categoryId) : undefined;
+      const owner = userMap.get(premise.owner_id);
+      const agent = premise.agent_id ? agentMap.get(premise.agent_id) : undefined;
+      const category = premise.categoryId ? categoryMap.get(premise.categoryId) : undefined;
 
       return {
         id: doc.id,
@@ -134,9 +134,9 @@ export async function getPremisesForAdmin(): Promise<{ success: boolean; data?: 
 
     return { success: true, data: premisesData };
 
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Error fetching premises for admin:", e);
-    return { success: false, error: e.message || 'An unknown server error occurred.' };
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown server error occurred.' };
   }
 }
 
@@ -195,6 +195,23 @@ export async function createPremiseAndNewOwner(
     });
     if (userError) throw userError;
 
+    // 2. Ensure Agent exists in shadow table (Phase 2B requirement)
+    if (agentId && agentId.trim()) {
+      const { data: agentExists } = await adminDb.from('agents').select('id').eq('id', agentId).single();
+      if (!agentExists) {
+        // Fetch agent info from users table
+        const { data: agentUserData } = await adminDb.from('users').select('name, phone').eq('id', agentId).single();
+        // Create shadow agent
+        await adminDb.from('agents').insert({
+          id: agentId,
+          name: agentUserData?.name || 'Unknown Agent',
+          phone: agentUserData?.phone || '',
+          city: premiseCity,
+          commission_balance: 0
+        });
+      }
+    }
+
     const { error: premiseError } = await adminDb.from('premises').insert({
       id: premiseId,
       name: premiseName,
@@ -205,7 +222,7 @@ export async function createPremiseAndNewOwner(
       is_active: true,
       owner_id: ownerUid,
       ownerName: ownerName,
-      agent_id: agentId || null,
+      agent_id: (agentId && agentId.trim()) ? agentId : null,
       categoryId: categoryId,
       categoryName: categoryName || null,
       staff: [],
@@ -230,9 +247,9 @@ export async function createPremiseAndNewOwner(
 
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating premise and owner:', error);
-    return { success: false, error: error.message || 'An unknown server error occurred.' };
+    return { success: false, error: error instanceof Error ? error.message : 'An unknown server error occurred.' };
   }
 }
 
@@ -260,6 +277,21 @@ export async function createPremiseForExistingUser(
 
     const premiseId = uuidv4();
 
+    // 2. Ensure Agent exists in shadow table
+    if (agentId && agentId.trim()) {
+      const { data: agentExists } = await adminDb.from('agents').select('id').eq('id', agentId).single();
+      if (!agentExists) {
+        const { data: agentUserData } = await adminDb.from('users').select('name, phone').eq('id', agentId).single();
+        await adminDb.from('agents').insert({
+          id: agentId,
+          name: agentUserData?.name || 'Unknown Agent',
+          phone: agentUserData?.phone || '',
+          city: premiseCity,
+          commission_balance: 0
+        });
+      }
+    }
+
     const { error: premiseError } = await adminDb.from('premises').insert({
       id: premiseId,
       name: premiseName,
@@ -270,7 +302,7 @@ export async function createPremiseForExistingUser(
       is_active: true,
       owner_id: ownerId,
       ownerName: ownerName,
-      agent_id: agentId || null,
+      agent_id: (agentId && agentId.trim()) ? agentId : null,
       categoryId: categoryId,
       categoryName: categoryName || null,
       staff: [],
@@ -303,9 +335,9 @@ export async function createPremiseForExistingUser(
 
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating premise for existing user:', error);
-    return { success: false, error: error.message || 'An unknown server error occurred.' };
+    return { success: false, error: error instanceof Error ? error.message : 'An unknown server error occurred.' };
   }
 }
 
@@ -325,16 +357,16 @@ export async function deletePremise(
 
     const { data: userDoc } = await adminDb.from('users').select('premise_roles').eq('id', ownerId).single();
     if (userDoc) {
-      let currentRoles = userDoc.premise_roles || {};
-      const { [premiseId]: removedRole, ...updatedRoles } = currentRoles as any;
+      const currentRoles = (userDoc.premise_roles || {}) as Record<string, string[]>;
+      const { [premiseId]: removedRole, ...updatedRoles } = currentRoles;
       await adminDb.from('users').update({ premise_roles: updatedRoles }).eq('id', ownerId);
     }
 
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting premise:', error);
-    return { success: false, error: error.message || 'An unknown server error occurred during deletion.' };
+    return { success: false, error: error instanceof Error ? error.message : 'An unknown server error occurred during deletion.' };
   }
 }
 
@@ -379,9 +411,9 @@ export async function getVisitsForPremise(
       };
     });
     return { success: true, visits, lastVisible: visitsSnapshot[visitsSnapshot.length - 1]?.checkin_time };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching premise visit history:', error);
-    return { success: false, error: error.message || 'An unknown server error occurred.' };
+    return { success: false, error: error instanceof Error ? error.message : 'An unknown server error occurred.' };
   }
 }
 
@@ -442,8 +474,8 @@ export async function changePremiseOwner(payload: {
 
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'An unknown server error occurred.' };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : 'An unknown server error occurred.' };
   }
 }
 
@@ -456,11 +488,25 @@ export async function updatePremiseAdmin(
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
   try {
+    // Ensure agent exists if being updated
+    if (dataToUpdate.agent_id) {
+      const { data: agentExists } = await adminDb.from('agents').select('id').eq('id', dataToUpdate.agent_id).single();
+      if (!agentExists) {
+        const { data: agentUserData } = await adminDb.from('users').select('name, phone').eq('id', dataToUpdate.agent_id).single();
+        await adminDb.from('agents').insert({
+          id: dataToUpdate.agent_id,
+          name: agentUserData?.name || 'Unknown Agent',
+          phone: agentUserData?.phone || '',
+          city: 'Unknown',
+          commission_balance: 0
+        });
+      }
+    }
     const { error: updateError } = await adminDb.from('premises').update(dataToUpdate).eq('id', premiseId);
     if (updateError) throw updateError;
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'An unknown error occurred.' };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred.' };
   }
 }

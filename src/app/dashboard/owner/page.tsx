@@ -10,6 +10,7 @@ import { DashboardCard } from '@/components/shared/DashboardCard';
 import { AnnouncementsCard } from '../visitor/components/AnnouncementsCard';
 import { createClient } from '@/lib/supabase/client';
 import { useSettings } from '@/services/settings-service';
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
 
 export default function OwnerDashboardPage() {
     const searchParams = useSearchParams();
@@ -49,6 +50,7 @@ export default function OwnerDashboardPage() {
 
     return (
         <div className="container py-10">
+            <OnboardingChecklist premise={premise || undefined} isLoading={isLoadingPremise} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Stats column */}
                 <div className="lg:col-span-2 space-y-6">

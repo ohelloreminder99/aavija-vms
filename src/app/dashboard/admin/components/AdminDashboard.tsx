@@ -37,7 +37,7 @@ export function AdminDashboard() {
     links?: { title: string; href: string }[];
   }[] = [
     {
-      title: 'Agents',
+      title: 'Sales Agents',
       href: '/dashboard/admin/referrals',
       icon: Users,
     },
@@ -108,12 +108,12 @@ export function AdminDashboard() {
       icon: UserCog,
     },
     {
-      title: `Premise Token Balances ${settings?.hide_token_economy ? '(Hidden)' : ''}`,
+      title: `Property Balance ${settings?.hide_token_economy ? '(Hidden)' : ''}`,
       href: '/dashboard/admin/owner-tokens',
       icon: Coins,
     },
     {
-      title: 'Premise Categories',
+      title: 'Property Types',
       href: '/dashboard/admin/premise-categories',
       icon: Shapes,
     },
@@ -123,17 +123,17 @@ export function AdminDashboard() {
       icon: Coins,
     },
     {
-      title: 'Total Premises',
+      title: 'All Properties',
       href: '/dashboard/admin/premises',
       icon: Building,
     },
     {
-      title: 'Total Visitors',
+      title: 'All Visitors',
       href: '/dashboard/admin/visitors',
       icon: Users,
     },
     {
-      title: `Visitor Token Balance ${settings?.hide_token_economy ? '(Hidden)' : ''}`,
+      title: `Visitor Balance ${settings?.hide_token_economy ? '(Hidden)' : ''}`,
       href: '/dashboard/admin/visitor-tokens',
       icon: Coins,
     },

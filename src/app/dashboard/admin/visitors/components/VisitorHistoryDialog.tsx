@@ -2,10 +2,8 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { format, parse, subDays } from 'date-fns';
-import Papa from 'papaparse';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { format, subDays } from 'date-fns';
+// Dynamic imports for papaparse and jspdf moved to handleExport methods
 
 import {
   Dialog,
@@ -28,8 +26,7 @@ import { Loader2, Download, Eye, History, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { getVisitsForVisitor } from '../actions';
 import { WithId } from '@/supabase';
 import { UserProfile } from '@/services/user-service';
@@ -71,9 +68,8 @@ export default function VisitorHistoryDialog({
   const [visits, setVisits] = React.useState<SerializableVisit[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [startDate, setStartDate] = React.useState<string>(format(subDays(new Date(), 30), 'dd/MM/yyyy'));
-  const [endDate, setEndDate] = React.useState<string>(format(new Date(), 'dd/MM/yyyy'));
-  const [dateError, setDateError] = React.useState<string | null>(null);
+  const [startDate, setStartDate] = React.useState<Date>(subDays(new Date(), 30));
+  const [endDate, setEndDate] = React.useState<Date>(new Date());
   const [imageUrlToView, setImageUrlToView] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -108,51 +104,23 @@ export default function VisitorHistoryDialog({
     }
   }, [open, visitor, adminProfile]);
 
-  const handleDateInputChange = (
-    value: string,
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const digitsOnly = value.replace(/\D/g, '');
-    let formattedDate = digitsOnly;
-
-    if (digitsOnly.length > 4) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2, 4)}/${digitsOnly.slice(4, 8)}`;
-    } else if (digitsOnly.length > 2) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2)}`;
-    }
-    setter(formattedDate);
-  };
-
   const filteredVisits = React.useMemo(() => {
     if (!visits) return [];
-    setDateError(null);
-    try {
-      const fromDate = parse(startDate, 'dd/MM/yyyy', new Date());
-      const toDate = parse(endDate, 'dd/MM/yyyy', new Date());
 
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        setDateError('Invalid format: DD/MM/YYYY');
-        return [];
-      }
-      if (fromDate > toDate) {
-        setDateError('Start date > End date');
-        return [];
-      }
+    const fromDate = new Date(startDate);
+    const toDate = new Date(endDate);
 
-      fromDate.setHours(0, 0, 0, 0);
-      toDate.setHours(23, 59, 59, 999);
+    fromDate.setHours(0, 0, 0, 0);
+    toDate.setHours(23, 59, 59, 999);
 
-      return visits.filter((visit) => {
-        const visitDate = new Date(visit.checkin_time);
-        return visitDate >= fromDate && visitDate <= toDate;
-      });
-    } catch (e) {
-      setDateError('Parsing error occurred.');
-      return [];
-    }
+    return visits.filter((visit) => {
+      const visitDate = new Date(visit.checkin_time);
+      return visitDate >= fromDate && visitDate <= toDate;
+    });
   }, [visits, startDate, endDate]);
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
+    const Papa = (await import('papaparse')).default;
     const dataToExport = filteredVisits.map(visit => ({
       Premise: premiseMap.get(visit.premise_id) || 'Unknown',
       'Host Met': visit.host_name || 'N/A',
@@ -172,7 +140,10 @@ export default function VisitorHistoryDialog({
     document.body.removeChild(link);
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
+    const { jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
+
     const doc = new jsPDF();
     doc.text(`Visit History for ${visitor?.name}`, 14, 16);
     doc.setFontSize(10);
@@ -231,42 +202,25 @@ export default function VisitorHistoryDialog({
                 <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6 justify-between">
                   <div className="flex flex-wrap items-end gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">From Date</Label>
-                      <Input
-                        type="text"
-                        placeholder="DD/MM/YYYY"
-                        value={startDate}
-                        onChange={(e) => handleDateInputChange(e.target.value, setStartDate)}
-                        className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4"
-                        maxLength={10}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">To Date</Label>
-                      <Input
-                        type="text"
-                        placeholder="DD/MM/YYYY"
-                        value={endDate}
-                        onChange={(e) => handleDateInputChange(e.target.value, setEndDate)}
-                        className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4"
-                        maxLength={10}
-                      />
-                    </div>
+                    <DateRangePicker
+                      startDate={startDate}
+                      endDate={endDate}
+                      onStartDateChange={setStartDate}
+                      onEndDateChange={setEndDate}
+                    />
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading || !!dateError} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
                       <Download className="mr-2 h-4 w-4" />
                       Export CSV
                     </Button>
-                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading || !!dateError} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
                       <Download className="mr-2 h-4 w-4" />
                       Export PDF
                     </Button>
                   </div>
                 </div>
-                {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
               </div>
 
               <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl min-h-[300px]">
@@ -303,7 +257,7 @@ export default function VisitorHistoryDialog({
                       {filteredVisits.map((visit) => (
                         <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
                           <TableCell className="pl-8 py-4">
-                            <Button variant="ghost" size="icon" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all">
+                            <Button variant="ghost" size="icon" aria-label="View visitor snapshot" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </TableCell>

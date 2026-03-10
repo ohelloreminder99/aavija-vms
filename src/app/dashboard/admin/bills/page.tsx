@@ -1,30 +1,30 @@
 'use client';
 
 import * as React from 'react';
-import { 
-    ArrowLeft, 
-    Loader2, 
-    Download, 
-    FileText, 
+import {
+    ArrowLeft,
+    Loader2,
+    Download,
+    FileText,
     Search,
     IndianRupee,
     CalendarDays
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
 import {
     Select,
@@ -37,11 +37,13 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { getMonthlyInvoices, type SerializableInvoice } from './actions';
+import { getMonthlyInvoices, getReconciliationData, type SerializableInvoice } from './actions';
 import { generateInvoicePdf } from '@/services/invoice-service';
-import Papa from 'papaparse';
+import { cn } from '@/lib/utils';
+import { CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 const months = [
+    // ... (rest of months remains same)
     { value: '1', label: 'January' },
     { value: '2', label: 'February' },
     { value: '3', label: 'March' },
@@ -61,7 +63,14 @@ const years = [2024, 2025, 2026, 2027];
 export default function AdminBillsPage() {
     const { toast } = useToast();
     const [invoices, setInvoices] = React.useState<SerializableInvoice[]>([]);
+    const [reconData, setReconData] = React.useState<{
+        totalInvoiceAmount: number;
+        invoiceCount: number;
+        paymentLogCount: number;
+        isReconciled: boolean;
+    } | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
+    const [isReconLoading, setIsReconLoading] = React.useState(true);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [selectedMonth, setSelectedMonth] = React.useState((new Date().getMonth() + 1).toString());
     const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
@@ -78,22 +87,33 @@ export default function AdminBillsPage() {
         setIsLoading(false);
     }, [selectedMonth, selectedYear, toast]);
 
+    const fetchRecon = React.useCallback(async () => {
+        setIsReconLoading(true);
+        const result = await getReconciliationData(parseInt(selectedMonth), parseInt(selectedYear));
+        if (result.data) {
+            setReconData(result.data);
+        }
+        setIsReconLoading(false);
+    }, [selectedMonth, selectedYear]);
+
     React.useEffect(() => {
         fetchInvoices();
-    }, [fetchInvoices]);
+        fetchRecon();
+    }, [fetchInvoices, fetchRecon]);
 
     const filteredInvoices = React.useMemo(() => {
         const lower = searchTerm.toLowerCase();
-        return invoices.filter(inv => 
-            inv.userName.toLowerCase().includes(lower) || 
+        return invoices.filter(inv =>
+            inv.userName.toLowerCase().includes(lower) ||
             inv.id.toLowerCase().includes(lower) ||
             inv.userEmail.toLowerCase().includes(lower)
         );
     }, [invoices, searchTerm]);
 
-    const handleDownloadAllCsv = () => {
+    const handleDownloadAllCsv = async () => {
         if (filteredInvoices.length === 0) return;
         setIsExporting(true);
+        const Papa = (await import('papaparse')).default;
         const data = filteredInvoices.map(inv => ({
             'Invoice No': inv.id,
             'Date': format(parseISO(inv.timestamp), 'PPpp'),
@@ -167,6 +187,67 @@ export default function AdminBillsPage() {
                 </div>
             </div>
 
+            {/* GST Reconciliation Block */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <Card className={cn(
+                    "border-l-4",
+                    isReconLoading ? "border-gray-300" : (reconData?.isReconciled ? "border-green-500" : "border-red-500")
+                )}>
+                    <CardHeader className="pb-2">
+                        <CardDescription className="flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-blue-500" />
+                            GST RECONCILIATION
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {isReconLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        ) : (
+                            <div className="flex flex-col gap-1">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-2xl font-bold">
+                                        {reconData?.isReconciled ? "Perfect" : "Mismatch"}
+                                    </span>
+                                    {reconData?.isReconciled ? (
+                                        <CheckCircle2 className="h-6 w-6 text-green-500" />
+                                    ) : (
+                                        <AlertTriangle className="h-6 w-6 text-red-500" />
+                                    )}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    Invoices: {reconData?.invoiceCount} vs. Logs: {reconData?.paymentLogCount}
+                                </p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-blue-500">
+                    <CardHeader className="pb-2">
+                        <CardDescription>TOTAL REVENUE (MONTH)</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center gap-1 text-2xl font-bold">
+                            <IndianRupee className="h-5 w-5" />
+                            {isReconLoading ? "---" : (reconData?.totalInvoiceAmount.toLocaleString() || "0")}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">Based on generated invoices</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-indigo-500">
+                    <CardHeader className="pb-2">
+                        <CardDescription>TAX COMPLIANCE</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {isReconLoading ? "---" : (reconData?.invoiceCount || 0)} Invoices
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">Ready for GST return filing</p>
+                    </CardContent>
+                </Card>
+            </div>
+
             <Card>
                 <CardHeader>
                     <CardTitle>Bill Management</CardTitle>
@@ -177,8 +258,8 @@ export default function AdminBillsPage() {
                 <CardContent>
                     <div className="relative mb-6">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                            placeholder="Search by customer name, email or invoice no..." 
+                        <Input
+                            placeholder="Search by customer name, email or invoice no..."
                             className="pl-10"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}

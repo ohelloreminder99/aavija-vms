@@ -67,7 +67,7 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
       .eq('visitorId', visitorId);
     if (ratingsError) throw ratingsError;
 
-    const allRatings = (allRatingsDocs || []).map((r: any) => r.rating);
+    const allRatings = (allRatingsDocs || []).map((r: { rating: number }) => r.rating);
 
     // 4. Calculate new average
     const newTotalRating = allRatings.reduce((sum: number, r: number) => sum + r, 0) + rating;
@@ -111,13 +111,13 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
     // 9. Revalidate path
     revalidatePath('/dashboard/host/history');
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in submitRatingAndRecalculate transaction:', error);
-    const msg = error.message;
-    if (msg && (msg.includes('Credential') || msg.includes('Could not refresh access token'))) {
+    const msg = error instanceof Error ? error.message : 'An unknown server error occurred.';
+    if (msg.includes('Credential') || msg.includes('Could not refresh access token')) {
       return { success: false, error: 'The server could not authenticate.' };
     }
-    return { success: false, error: msg || 'An unknown server error occurred.' };
+    return { success: false, error: msg };
   }
 }
 
@@ -185,7 +185,7 @@ export async function getVisitsForHostInPremise(
       return { success: true, visits: [], lastVisible: undefined };
     }
 
-    const visits: SerializableVisit[] = (visitsSnapshot || []).map((data: any) => {
+    const visits: SerializableVisit[] = (visitsSnapshot || []).map((data: Record<string, any>) => {
       return {
         id: data.id,
         visitor_id: data.visitor_id,
@@ -194,24 +194,24 @@ export async function getVisitsForHostInPremise(
         host_name: data.host_name,
         premise_id: data.premise_id,
         checkin_time: data.checkin_time,
-        checkout_time: data.checkout_time || null,
-        status: data.status,
-        visitor_snapshot_url: data.visitor_snapshot_url,
+        checkout_time: (data.checkout_time as string | null) || null,
+        status: data.status as SerializableVisit['status'],
+        visitor_snapshot_url: data.visitor_snapshot_url as string | undefined,
       };
     });
 
     const lastVisibleDocId = visitsSnapshot[visitsSnapshot.length - 1]?.checkin_time;
 
     return { success: true, visits, lastVisible: lastVisibleDocId };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching host visit history:', error);
-    const msg = error.message;
-    if (msg && (msg.includes('Could not refresh access token') || msg.includes('Credential'))) {
+    const msg = error instanceof Error ? error.message : 'An unknown server error occurred.';
+    if (msg.includes('Could not refresh access token') || msg.includes('Credential')) {
       return { success: false, error: 'Could not access database with admin privileges.' };
     }
     return {
       success: false,
-      error: msg || 'An unknown server error occurred.',
+      error: msg,
     };
   }
 }
@@ -250,12 +250,12 @@ export async function setHostAvailability(payload: { hostId: string; premiseId: 
     revalidatePath('/dashboard/host');
     revalidatePath(`/dashboard/gatekeeper?premiseId=${premiseId}`);
     return { success: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Error setting host availability:", e);
-    const msg = e.message;
-    if (msg && (msg.includes('Credential') || msg.includes('Could not refresh access token'))) {
+    const msg = e instanceof Error ? e.message : 'An unknown error occurred.';
+    if (msg.includes('Credential') || msg.includes('Could not refresh access token')) {
       return { success: false, error: 'The server could not authenticate.' };
     }
-    return { success: false, error: msg || 'An unknown error occurred.' };
+    return { success: false, error: msg };
   }
 }

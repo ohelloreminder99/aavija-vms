@@ -21,7 +21,7 @@ export interface SupabaseDocRef {
  * React hook to subscribe to a single Supabase row in real-time.
  * Mimics the old `useDoc` for Firestore.
  */
-export function useDoc<T = any>(
+export function useDoc<T = Record<string, any>>(
   memoizedDocRef: SupabaseDocRef | null | undefined,
 ): UseDocResult<T> {
   type StateDataType = WithId<T> | null;
@@ -72,13 +72,13 @@ export function useDoc<T = any>(
             setData(null);
           }
         } else if (row) {
-          setData(row as any);
+          setData(row as WithId<T>);
         } else {
           setData(null);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!isMounted) return;
-        setError(err);
+        setError(err instanceof Error ? err : new Error('An unknown error occurred.'));
         setData(null);
       } finally {
         if (isMounted) setIsLoading(false);
@@ -105,7 +105,7 @@ export function useDoc<T = any>(
           if (payload.eventType === 'DELETE') {
             setData(null);
           } else {
-            setData(payload.new as any);
+            setData(payload.new as WithId<T>);
           }
         }
       )

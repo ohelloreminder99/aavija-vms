@@ -42,7 +42,8 @@ import { useUserProfile } from '@/services/user-service';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { format, subDays, parse } from 'date-fns';
+import { format, subDays } from 'date-fns';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/services/settings-service';
 import { createClient } from '@/lib/supabase/client';
@@ -50,9 +51,7 @@ import { Premise } from '@/services/premise-service';
 import { getVisitsForVisitorAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { deductTokensForExport, getVisitsForExport } from '../../owner/history/actions';
-import Papa from 'papaparse';
-import jsPDF from 'jsPDF';
-import autoTable from 'jspdf-autotable';
+// Dynamic imports for papaparse and jspdf moved to handleExecuteExport
 import { Label } from '@/components/ui/label';
 
 type SerializableVisit = NonNullable<Awaited<ReturnType<typeof getVisitsForVisitorAction>>['visits']>[0];
@@ -62,7 +61,7 @@ export default function VisitorHistoryPage() {
   const { user } = useUser();
   const { data: userProfile } = useUserProfile(user?.id);
   const { data: settings, isLoading: isLoadingSettings } = useSettings();
-  const [premises, setPremises] = React.useState<any[] | null>(null);
+  const [premises, setPremises] = React.useState<Premise[] | null>(null);
   const [isLoadingPremises, setIsLoadingPremises] = React.useState(true);
   const { toast } = useToast();
 
@@ -76,13 +75,16 @@ export default function VisitorHistoryPage() {
 
   const [exportToConfirm, setExportToConfirm] = React.useState<'csv' | 'pdf' | null>(null);
   const [isExporting, setIsExporting] = React.useState<'csv' | 'pdf' | null>(null);
-  const [startDate, setStartDate] = React.useState<string>(format(subDays(new Date(), 30), 'dd/MM/yyyy'));
-  const [endDate, setEndDate] = React.useState<string>(format(new Date(), 'dd/MM/yyyy'));
-  const [dateError, setDateError] = React.useState<string | null>(null);
+  const [startDate, setStartDate] = React.useState<Date>(subDays(new Date(), 30));
+  const [endDate, setEndDate] = React.useState<Date>(new Date());
 
   const exportCost = exportToConfirm === 'csv' ? settings?.csv_export_cost_visitor : settings?.pdf_export_cost_visitor;
 
-  const { data: realtimePulse } = useCollection({ table: 'visits', __memo: true });
+  const { data: realtimePulse } = useCollection({
+    table: 'visits',
+    filters: user?.id ? [{ column: 'visitor_id', operator: 'eq', value: user.id }] : undefined,
+    __memo: true
+  });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;
 
   React.useEffect(() => {
@@ -123,8 +125,8 @@ export default function VisitorHistoryPage() {
         } else {
           throw new Error(result.error || 'Failed to load visits.');
         }
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Failed to load visits.');
       } finally {
         setIsLoadingVisits(false);
       }
@@ -149,23 +151,14 @@ export default function VisitorHistoryPage() {
       } else {
         throw new Error(result.error || 'Failed to load more visits.');
       }
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to load more visits.');
     } finally {
       setIsLoadingMore(false);
     }
   };
 
-  const handleDateInputChange = (value: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
-    const digitsOnly = value.replace(/\D/g, '');
-    let formattedDate = digitsOnly;
-    if (digitsOnly.length > 4) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2, 4)}/${digitsOnly.slice(4, 8)}`;
-    } else if (digitsOnly.length > 2) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2)}`;
-    }
-    setter(formattedDate);
-  };
+
 
   const handleExecuteExport = async (exportType: 'csv' | 'pdf') => {
     if (!userProfile) {
@@ -199,7 +192,8 @@ export default function VisitorHistoryPage() {
       const totalExportVisits = exportDataResult.visits;
 
       if (exportType === 'csv') {
-        const dataToExport = totalExportVisits.map((visit: any) => ({
+        const Papa = (await import('papaparse')).default;
+        const dataToExport = totalExportVisits.map((visit: SerializableVisit) => ({
           'Location': premiseMap.get(visit.premise_id) || 'Unknown Location',
           'Host Name': visit.host_name || 'Autonomous',
           'Check-in Time': format(new Date(visit.checkin_time), 'PPpp'),
@@ -215,6 +209,9 @@ export default function VisitorHistoryPage() {
         link.click();
         document.body.removeChild(link);
       } else { // PDF
+        const { jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
+
         const doc = new jsPDF();
         doc.text(`Your Visit History`, 14, 16);
         doc.setFontSize(10);
@@ -223,7 +220,7 @@ export default function VisitorHistoryPage() {
         autoTable(doc, {
           startY: 30,
           head: [['Location', 'Host', 'Check-in', 'Check-out', 'Status']],
-          body: totalExportVisits.map((visit: any) => [
+          body: totalExportVisits.map((visit: SerializableVisit) => [
             premiseMap.get(visit.premise_id) || 'Unknown',
             visit.host_name || 'Autonomous',
             format(new Date(visit.checkin_time), 'Pp'),
@@ -253,31 +250,17 @@ export default function VisitorHistoryPage() {
   const filteredVisits = React.useMemo(() => {
     if (!visits) return [];
     let dateFilteredVisits = visits;
-    setDateError(null);
-    try {
-      const fromDate = parse(startDate, 'dd/MM/yyyy', new Date());
-      const toDate = parse(endDate, 'dd/MM/yyyy', new Date());
 
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        setDateError('Invalid format: DD/MM/YYYY');
-        return [];
-      }
-      if (fromDate > toDate) {
-        setDateError('Start date cannot be after end date.');
-        return [];
-      }
+    const fromDate = new Date(startDate);
+    const toDate = new Date(endDate);
 
-      fromDate.setHours(0, 0, 0, 0);
-      toDate.setHours(23, 59, 59, 999);
+    fromDate.setHours(0, 0, 0, 0);
+    toDate.setHours(23, 59, 59, 999);
 
-      dateFilteredVisits = visits.filter((visit) => {
-        const visitDate = new Date(visit.checkin_time);
-        return visitDate >= fromDate && visitDate <= toDate;
-      });
-    } catch (e) {
-      setDateError('Date parsing error.');
-      return [];
-    }
+    dateFilteredVisits = visits.filter((visit) => {
+      const visitDate = new Date(visit.checkin_time);
+      return visitDate >= fromDate && visitDate <= toDate;
+    });
 
     const lowerSearch = searchTerm.toLowerCase();
     if (!lowerSearch) return dateFilteredVisits;
@@ -414,23 +397,19 @@ export default function VisitorHistoryPage() {
             <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
               <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
               <div className="relative z-10 flex flex-wrap items-end gap-6">
-                <div className="flex flex-wrap items-end gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">From Date</Label>
-                    <Input type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">To Date</Label>
-                    <Input type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
-                  </div>
-                </div>
+                <DateRangePicker
+                  startDate={startDate}
+                  endDate={endDate}
+                  onStartDateChange={setStartDate}
+                  onEndDateChange={setEndDate}
+                />
 
                 <div className="flex items-center gap-3 ml-auto">
-                  <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                  <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={filteredVisits.length === 0 || isLoading || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
                     {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
                     Export CSV
                   </Button>
-                  <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                  <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={filteredVisits.length === 0 || isLoading || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
                     {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
                     Export PDF
                   </Button>
@@ -446,7 +425,7 @@ export default function VisitorHistoryPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
+
             </div>
 
             <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">

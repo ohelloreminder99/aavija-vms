@@ -69,7 +69,7 @@ export async function getVisitsForVisitorAction(
       return { success: true, visits: [], lastVisible: undefined };
     }
 
-    const visits: SerializableVisit[] = visitsSnapshot.map((data: any) => {
+    const visits: SerializableVisit[] = (visitsSnapshot || []).map((data: Record<string, any>) => {
       const checkinTime = data.checkin_time;
       const checkoutTime = data.checkout_time || null;
 
@@ -90,9 +90,9 @@ export async function getVisitsForVisitorAction(
 
     return { success: true, visits, lastVisible: lastVisibleDocId };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching visitor visit history:', error);
-    const msg = error.message;
+    const msg = error instanceof Error ? error.message : 'An unknown server error occurred.';
     if (msg && (msg.includes('Could not refresh access token') || msg.includes('Credential'))) {
       return { success: false, error: 'Could not access database with admin privileges.' };
     }

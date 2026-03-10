@@ -196,7 +196,7 @@ export async function purchaseTokens(
     }
 
     // 3. Create Invoice
-    await adminDb.from('invoices').insert({
+    const { error: invoiceError } = await adminDb.from('invoices').insert({
       id: invoiceId,
       userId,
       userName: customerLegalName,
@@ -215,6 +215,7 @@ export async function purchaseTokens(
       igstRate,
       currency,
       timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       hsnSacCode: settingsData.hsn_sac_code || '997331',
       companyGstin: settingsData.company_gstin || '',
       companyName: settingsData.company_name_billing || '',
@@ -223,7 +224,7 @@ export async function purchaseTokens(
       customerGstin,
       customerBillingAddress,
       razorpay_order_id
-    });
+    }).throwOnError();
 
     // 4. Create Audit Log
     const logTtlDays = settingsData.log_ttl_days;
@@ -247,7 +248,7 @@ export async function purchaseTokens(
         invoiceId,
         ...(roleToCredit === 'owner' && premiseId ? { premiseId } : {}),
       },
-    });
+    }).throwOnError();
 
     console.log(`Token purchase fulfillment successful for user: ${userId}`);
 

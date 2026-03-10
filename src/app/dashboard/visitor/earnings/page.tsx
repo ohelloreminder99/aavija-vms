@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { submitPayoutRequest, updatePayoutDetails } from '@/services/agent-service';
+import { submitPayoutRequest, updatePayoutDetails, PayoutRequest } from '@/services/agent-service';
 import { useUser } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import { useSettings } from '@/services/settings-service';
@@ -34,13 +34,13 @@ export default function EarningsPage() {
     const [panNumber, setPanNumber] = React.useState('');
 
     // Fetch payout history
-    const { data: payoutHistory } = useCollection<any>({
+    const { data: payoutHistory } = useCollection<PayoutRequest>({
         table: 'payout_requests',
         filters: user?.id ? [{ column: 'user_id', operator: 'eq', value: user.id }] : [],
         orderBy: { column: 'requested_at', ascending: false },
         limit: 20,
         __memo: true,
-    } as any);
+    });
 
     React.useEffect(() => {
         if (profile) {
@@ -64,7 +64,7 @@ export default function EarningsPage() {
     const tdsEnabled = settings?.tds_enabled;
     const tdsRate = settings?.tds_rate || 0;
     const isEligible = balance >= threshold && threshold > 0;
-    const hasPendingReq = payoutHistory?.some((r: any) => ['pending', 'processing'].includes(r.status));
+    const hasPendingReq = payoutHistory?.some((r: PayoutRequest) => ['pending', 'processing'].includes(r.status));
     const canRequestPayout = isEligible && !hasPendingReq && profile.kyc_verified;
 
     const tokensForConversion = Math.floor(balance * conversionRate);
@@ -179,12 +179,12 @@ export default function EarningsPage() {
                         <p className="text-sm text-muted-foreground text-center py-6">No payout requests yet.</p>
                     ) : (
                         <div className="space-y-3">
-                            {payoutHistory.map((req: any) => (
+                            {payoutHistory.map((req: PayoutRequest) => (
                                 <div key={req.id} className="flex items-center justify-between border rounded-lg p-3">
                                     <div className="flex items-center gap-3">
                                         {req.type === 'cash' ? <Receipt className="h-5 w-5 text-muted-foreground" /> : <Coins className="h-5 w-5 text-muted-foreground" />}
                                         <div>
-                                            <p className="text-sm font-medium">₹{parseFloat(req.amount).toFixed(2)} — {req.type === 'cash' ? 'Cash' : `${req.tokens_credited} Tokens`}</p>
+                                            <p className="text-sm font-medium">₹{req.amount.toFixed(2)} — {req.type === 'cash' ? 'Cash' : `${req.tokens_credited} Tokens`}</p>
                                             <p className="text-xs text-muted-foreground">{new Date(req.requested_at).toLocaleDateString('en-IN')}</p>
                                         </div>
                                     </div>

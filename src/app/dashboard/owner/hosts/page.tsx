@@ -408,7 +408,7 @@ export default function HostsPage() {
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Abort</Button></DialogClose>
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                 {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Create Host'}
                                             </Button>

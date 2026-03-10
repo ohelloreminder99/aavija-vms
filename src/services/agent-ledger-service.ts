@@ -48,7 +48,7 @@ export async function getAgentLedgerAction(agentId: string): Promise<{
     if (error) throw error;
     if (!snapshot || snapshot.length === 0) return { success: true, ledger: [] };
 
-    const ledger: AgentLedgerEntry[] = snapshot.map((data: any) => {
+    const ledger: AgentLedgerEntry[] = snapshot.map((data: Record<string, any>) => {
       return {
         id: data.id,
         timestamp: data.timestamp,
@@ -61,8 +61,8 @@ export async function getAgentLedgerAction(agentId: string): Promise<{
     });
 
     return { success: true, ledger };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Error fetching agent ledger:', e);
-    return { success: false, error: e.message || 'An unknown server error occurred.' };
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown server error occurred.' };
   }
 }

@@ -133,8 +133,8 @@ export async function notifyPayoutApproved(p: {
       templateName: 'aavija_payout_approved',
       params: [p.name, p.amount, p.utr],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyPayoutApproved failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyPayoutApproved failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
 
@@ -154,8 +154,8 @@ export async function notifyPayoutRejected(p: {
       templateName: 'aavija_payout_rejected',
       params: [p.name, p.amount, p.reason],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyPayoutRejected failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyPayoutRejected failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
 
@@ -173,8 +173,8 @@ export async function notifyKycVerified(p: {
       templateName: 'aavija_kyc_verified',
       params: [p.name],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyKycVerified failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyKycVerified failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
 
@@ -193,8 +193,8 @@ export async function notifyTokensConverted(p: {
       templateName: 'aavija_tokens_converted',
       params: [p.name, p.tokens],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyTokensConverted failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyTokensConverted failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
 
@@ -214,8 +214,8 @@ export async function notifyReferralCommission(p: {
       templateName: 'aavija_referral_commission',
       params: [p.name, p.earned, p.newBalance],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyReferralCommission failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyReferralCommission failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
 
@@ -237,8 +237,8 @@ export async function notifyThresholdReached(p: {
       templateName: 'aavija_threshold_reached',
       params: [p.name, p.balance],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyThresholdReached failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyThresholdReached failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
 
@@ -272,9 +272,10 @@ export async function sendVisitorArrivalNotification(p: {
       ],
     });
     return { success: true };
-  } catch (e: any) {
-    console.error('[WhatsApp] sendVisitorArrivalNotification failed (non-fatal):', e.message);
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    console.error('[WhatsApp] sendVisitorArrivalNotification failed (non-fatal):', msg);
+    return { success: false, error: msg };
   }
 }
 
@@ -298,9 +299,10 @@ export async function sendOtpVerification(p: {
       params: [p.otp],
     });
     return { success: true };
-  } catch (e: any) {
-    console.error('[WhatsApp] sendOtpVerification failed (non-fatal):', e.message);
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    console.error('[WhatsApp] sendOtpVerification failed (non-fatal):', msg);
+    return { success: false, error: msg };
   }
 }
 
@@ -322,7 +324,7 @@ export async function notifyAgentAssigned(p: {
       templateName: 'aavija_agent_assigned',
       params: [p.agentName, p.premiseName],
     });
-  } catch (e: any) {
-    console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', e.message);
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }

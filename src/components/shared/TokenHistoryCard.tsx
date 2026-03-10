@@ -119,7 +119,14 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const { data: realtimePulse } = useCollection({ table: 'logs', __memo: true });
+  const { data: realtimePulse } = useCollection({
+    table: 'logs',
+    filters:
+      target.type === 'user'
+        ? [{ column: 'actorId', operator: 'eq', value: target.id }]
+        : [{ column: 'premiseId', operator: 'eq', value: target.id }],
+    __memo: true
+  });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;
 
   React.useEffect(() => {

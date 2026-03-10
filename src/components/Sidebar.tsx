@@ -162,6 +162,7 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
             <Button
                 variant="ghost"
                 size="icon"
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-[#0F172A] text-zinc-400 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:bg-[#1E293B] hover:text-white transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
@@ -174,20 +175,20 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                 </div>
             ) : (
                 <div className="flex flex-col items-center py-10 space-y-6">
-                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="Visitor Dashboard">
-                        <Link href="/dashboard/visitor"><Briefcase className="h-5 w-5" /></Link>
+                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild aria-label="Visitor Dashboard">
+                        <Link href="/dashboard/visitor" title="Visitor Dashboard"><Briefcase className="h-5 w-5" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="My Profile">
-                        <Link href="/dashboard/profile"><UserCircle className="h-5 w-5" /></Link>
+                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild aria-label="My Profile">
+                        <Link href="/dashboard/profile" title="My Profile"><UserCircle className="h-5 w-5" /></Link>
                     </Button>
                     {userProfile?.is_agent && (
-                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="My Earnings">
-                            <Link href="/dashboard/visitor/earnings"><Wallet className="h-5 w-5" /></Link>
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild aria-label="My Earnings">
+                            <Link href="/dashboard/visitor/earnings" title="My Earnings"><Wallet className="h-5 w-5" /></Link>
                         </Button>
                     )}
                     {userProfile?.role === 'admin' && (
-                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild title="Admin Console">
-                            <Link href="/dashboard/admin"><Settings className="h-5 w-5" /></Link>
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-primary" asChild aria-label="Admin Console">
+                            <Link href="/dashboard/admin" title="Admin Console"><Settings className="h-5 w-5" /></Link>
                         </Button>
                     )}
                 </div>

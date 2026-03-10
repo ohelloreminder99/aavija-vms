@@ -19,12 +19,11 @@ import { useCollection } from '@/supabase/firestore/use-collection';
 import { useRatingsForVisits } from '@/services/rating-service';
 import { submitRatingAndRecalculate, getVisitsForHostInPremise } from '../actions';
 import { useToast } from '@/hooks/use-toast';
-import { format, subDays, parse } from 'date-fns';
+import { format, subDays } from 'date-fns';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import Papa from 'papaparse';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Dynamic imports for jspdf and papaparse moved to handleExecuteExport
 
 import {
   Card,
@@ -69,134 +68,13 @@ import { blockVisitorFromHost } from '@/services/block-service';
 import { useSettings } from '@/services/settings-service';
 import { deductTokensForExport } from '../../owner/history/actions';
 import Link from 'next/link';
+import { RatingDialog } from './components/RatingDialog';
+import { SnapshotDialog } from '@/components/SnapshotDialog';
 
 type SerializableVisit = NonNullable<Awaited<ReturnType<typeof getVisitsForHostInPremise>>['visits']>[0];
 const PAGE_SIZE = 10;
 
-const StarRatingInput = ({
-  rating,
-  setRating,
-}: {
-  rating: number;
-  setRating: (rating: number) => void;
-}) => {
-  const [hoverRating, setHoverRating] = React.useState(0);
-  return (
-    <div className="flex items-center gap-1.5 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={cn(
-            'h-10 w-10 cursor-pointer text-zinc-800 transition-all duration-300 transform hover:scale-110',
-            (hoverRating || rating) >= star
-              ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]'
-              : 'hover:text-zinc-600'
-          )}
-          onMouseEnter={() => setHoverRating(star)}
-          onMouseLeave={() => setHoverRating(0)}
-          onClick={() => setRating(star)}
-        />
-      ))}
-    </div>
-  );
-};
 
-function RatingDialog({
-  visit,
-  hostProfile,
-  open,
-  onOpenChange,
-}: {
-  visit: SerializableVisit | null;
-  hostProfile: WithId<UserProfile> | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const [rating, setRating] = React.useState(0);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async () => {
-    if (!visit || !hostProfile) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Missing user or visit data to submit rating.' })
-      return;
-    }
-    if (rating === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'Rating Required',
-        description: 'Please select at least one star.',
-      });
-      return;
-    }
-    setIsSubmitting(true);
-    const result = await submitRatingAndRecalculate({
-      visitId: visit.id,
-      visitorId: visit.visitor_id,
-      hostId: visit.host_id,
-      premiseId: visit.premise_id,
-      rating,
-      actor: {
-        id: hostProfile.id,
-        name: hostProfile.name,
-        role: 'host',
-      },
-    });
-
-    if (result.success) {
-      toast({
-        title: 'Rating Submitted!',
-        description: `You've rated ${visit.visitor_name}.`,
-      });
-      onOpenChange(false);
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Submission Failed',
-        description: result.error,
-      });
-    }
-    setIsSubmitting(false);
-  };
-
-  React.useEffect(() => {
-    if (open) {
-      setRating(0);
-    }
-  }, [open]);
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#020617]/90 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-        <DialogHeader className="space-y-4">
-          <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-            <Star className="h-6 w-6 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-          </div>
-          <div>
-            <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Rate Your Visitor</DialogTitle>
-            <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
-              Rating visit for <span className="text-primary">{visit?.visitor_name}</span>
-            </DialogDescription>
-          </div>
-        </DialogHeader>
-        <div className="py-8 space-y-8">
-          <div className="flex flex-col items-center gap-6">
-            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">Overall Experience</p>
-            <StarRatingInput rating={rating} setRating={setRating} />
-          </div>
-        </div>
-        <DialogFooter className="gap-3">
-          <DialogClose asChild>
-            <Button variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 border-white/5">Cancel</Button>
-          </DialogClose>
-          <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
-            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Submit Rating'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 export default function HostHistoryPage() {
   const { user } = useUser();
@@ -221,14 +99,17 @@ export default function HostHistoryPage() {
 
   const [exportToConfirm, setExportToConfirm] = React.useState<'csv' | 'pdf' | null>(null);
   const [isExporting, setIsExporting] = React.useState<'csv' | 'pdf' | null>(null);
-  const [startDate, setStartDate] = React.useState<string>(format(subDays(new Date(), 30), 'dd/MM/yyyy'));
-  const [endDate, setEndDate] = React.useState<string>(format(new Date(), 'dd/MM/yyyy'));
-  const [dateError, setDateError] = React.useState<string | null>(null);
+  const [startDate, setStartDate] = React.useState<Date>(subDays(new Date(), 30));
+  const [endDate, setEndDate] = React.useState<Date>(new Date());
 
   const exportCost = exportToConfirm === 'csv' ? settings?.csv_export_cost_host : settings?.pdf_export_cost_host;
 
   // Realtime Pulse: Refetch when the visits table changes natively
-  const { data: realtimePulse } = useCollection({ table: 'visits', __memo: true });
+  const { data: realtimePulse } = useCollection({
+    table: 'visits',
+    filters: premiseId ? [{ column: 'premise_id', operator: 'eq', value: premiseId }] : undefined,
+    __memo: true
+  });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;
 
   // Effect for initial data fetch
@@ -263,8 +144,8 @@ export default function HostHistoryPage() {
         } else {
           throw new Error(result.error || 'Failed to load visits.');
         }
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Failed to load visits.');
       } finally {
         setIsLoading(false);
       }
@@ -295,8 +176,8 @@ export default function HostHistoryPage() {
       } else {
         throw new Error(result.error || 'Failed to load more visits.');
       }
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to load more visits.');
     } finally {
       setIsLoadingMore(false);
     }
@@ -336,20 +217,7 @@ export default function HostHistoryPage() {
     setVisitToBlock(null);
   };
 
-  const handleDateInputChange = (
-    value: string,
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const digitsOnly = value.replace(/\D/g, '');
-    let formattedDate = digitsOnly;
 
-    if (digitsOnly.length > 4) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2, 4)}/${digitsOnly.slice(4, 8)}`;
-    } else if (digitsOnly.length > 2) {
-      formattedDate = `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2)}`;
-    }
-    setter(formattedDate);
-  };
 
   const handleExecuteExport = async (exportType: 'csv' | 'pdf') => {
     if (!hostProfile) {
@@ -373,6 +241,7 @@ export default function HostHistoryPage() {
       });
 
       if (exportType === 'csv') {
+        const Papa = (await import('papaparse')).default;
         const dataToExport = filteredVisits.map((visit) => ({
           'Visitor Name': visit.visitor_name,
           'Check-in Time': format(new Date(visit.checkin_time), 'PPpp'),
@@ -388,6 +257,9 @@ export default function HostHistoryPage() {
         link.click();
         document.body.removeChild(link);
       } else { // PDF
+        const { jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
+
         const doc = new jsPDF();
         doc.text(`Your Visitor History`, 14, 16);
         doc.setFontSize(10);
@@ -419,32 +291,17 @@ export default function HostHistoryPage() {
     if (!visits) return [];
 
     let dateFilteredVisits = visits;
-    // Apply date range filter
-    setDateError(null);
-    try {
-      const fromDate = parse(startDate, 'dd/MM/yyyy', new Date());
-      const toDate = parse(endDate, 'dd/MM/yyyy', new Date());
 
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        setDateError('Invalid date format. Please use DD/MM/YYYY.');
-        return [];
-      }
-      if (fromDate > toDate) {
-        setDateError('Start date cannot be after end date.');
-        return [];
-      }
+    const fromDate = new Date(startDate);
+    const toDate = new Date(endDate);
 
-      fromDate.setHours(0, 0, 0, 0);
-      toDate.setHours(23, 59, 59, 999);
+    fromDate.setHours(0, 0, 0, 0);
+    toDate.setHours(23, 59, 59, 999);
 
-      dateFilteredVisits = visits.filter((visit) => {
-        const visitDate = new Date(visit.checkin_time);
-        return visitDate >= fromDate && visitDate <= toDate;
-      });
-    } catch (e) {
-      setDateError('An error occurred while parsing dates.');
-      return [];
-    }
+    dateFilteredVisits = visits.filter((visit) => {
+      const visitDate = new Date(visit.checkin_time);
+      return visitDate >= fromDate && visitDate <= toDate;
+    });
 
     const lowerSearch = searchTerm.toLowerCase();
     if (!lowerSearch) return dateFilteredVisits;
@@ -517,6 +374,7 @@ export default function HostHistoryPage() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="View visitor snapshot"
                     onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
                     disabled={!visit.visitor_snapshot_url}
                     className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all"
@@ -611,27 +469,19 @@ export default function HostHistoryPage() {
               <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
                 <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6">
-                  <div className="flex flex-wrap items-end gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="start-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Start Date</Label>
-                      <div className="relative">
-                        <Input id="start-date" type="text" placeholder="DD/MM/YYYY" value={startDate} onChange={(e) => handleDateInputChange(e.target.value, setStartDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="end-date" className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">End Date</Label>
-                      <div className="relative">
-                        <Input id="end-date" type="text" placeholder="DD/MM/YYYY" value={endDate} onChange={(e) => handleDateInputChange(e.target.value, setEndDate)} className="w-[140px] bg-black/20 border-white/10 text-white h-11 font-mono text-xs pl-4" maxLength={10} />
-                      </div>
-                    </div>
-                  </div>
+                  <DateRangePicker
+                    startDate={startDate}
+                    endDate={endDate}
+                    onStartDateChange={setStartDate}
+                    onEndDateChange={setEndDate}
+                  />
 
                   <div className="flex items-center gap-3 ml-auto">
-                    <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={visits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                    <Button variant="outline" onClick={() => setExportToConfirm('csv')} disabled={visits.length === 0 || isLoading || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
                       {isExporting === 'csv' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
                       Export CSV
                     </Button>
-                    <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={visits.length === 0 || isLoading || !!dateError || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
+                    <Button variant="outline" onClick={() => setExportToConfirm('pdf')} disabled={visits.length === 0 || isLoading || !!isExporting} className="h-11 bg-black/20 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6 transition-all">
                       {isExporting === 'pdf' ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" /> : <Download className="mr-2 h-4 w-4" />}
                       Export PDF
                     </Button>
@@ -647,7 +497,7 @@ export default function HostHistoryPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                {dateError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-widest mt-2 ml-1">{dateError}</p>}
+
               </div>
 
               <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
@@ -696,30 +546,11 @@ export default function HostHistoryPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden">
-          <div className="absolute top-4 left-4 z-20">
-            <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Visitor Photo</Badge>
-          </div>
-          {imageUrlToView && (
-            <div className="relative aspect-square w-full">
-              <Image
-                src={imageUrlToView}
-                alt="Visitor snapshot"
-                fill
-                className="object-contain"
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
-            </div>
-          )}
-          <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
-            <DialogClose asChild>
-              <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6">Close</Button>
-            </DialogClose>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SnapshotDialog
+        imageUrl={imageUrlToView}
+        open={!!imageUrlToView}
+        onOpenChange={(open) => !open && setImageUrlToView(null)}
+      />
 
       <AlertDialog open={!!exportToConfirm} onOpenChange={(open) => !open && setExportToConfirm(null)}>
         <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">

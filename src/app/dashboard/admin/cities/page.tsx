@@ -13,7 +13,7 @@ import {
   Map,
   UploadCloud,
 } from 'lucide-react';
-import Papa from 'papaparse';
+// Dynamic import for papaparse moved to handleFileUpload
 
 import { Button } from '@/components/ui/button';
 import {
@@ -101,7 +101,7 @@ export default function CitiesPage() {
   const [isUploading, setIsUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [selectedStateId, setSelectedStateId] = React.useState<string>('');
-  
+
   const { data: districts } = useDistricts(selectedStateId);
 
   const form = useForm<CityFormValues>({
@@ -111,22 +111,22 @@ export default function CitiesPage() {
 
   React.useEffect(() => {
     if (cityToEdit) {
-        setSelectedStateId(cityToEdit.stateId);
+      setSelectedStateId(cityToEdit.stateId);
       form.reset({
         name: cityToEdit.name,
         districtId: cityToEdit.districtId
       });
     } else {
-        setSelectedStateId('');
+      setSelectedStateId('');
       form.reset({ name: '', districtId: '' });
     }
   }, [cityToEdit, form]);
 
   const handleFormSubmit = async (data: CityFormValues) => {
     const selectedDistrict = districts?.find(d => d.id === data.districtId);
-    if(!selectedDistrict) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Selected district is invalid.' });
-        return;
+    if (!selectedDistrict) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Selected district is invalid.' });
+      return;
     }
     const cityData = { ...data, districtName: selectedDistrict.name, stateId: selectedDistrict.stateId, stateName: selectedDistrict.stateName };
 
@@ -174,11 +174,12 @@ export default function CitiesPage() {
     setIsAlertOpen(true);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    const Papa = (await import('papaparse')).default;
 
     Papa.parse<{ name: string; districtName: string; stateName: string }>(file, {
       header: true,
@@ -287,17 +288,17 @@ export default function CitiesPage() {
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 py-4">
-                <FormField
+                  <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                        <FormItem>
+                      <FormItem>
                         <FormLabel>City Name</FormLabel>
                         <FormControl><Input placeholder="e.g., Pune" {...field} /></FormControl>
                         <FormMessage />
-                        </FormItem>
+                      </FormItem>
                     )}
-                    />
+                  />
                   <FormItem>
                     <FormLabel>State</FormLabel>
                     <Select onValueChange={setSelectedStateId} value={selectedStateId}>

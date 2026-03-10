@@ -13,7 +13,7 @@ import {
   Landmark,
   UploadCloud,
 } from 'lucide-react';
-import Papa from 'papaparse';
+// Dynamic import for papaparse moved to handleFileUpload
 
 import { Button } from '@/components/ui/button';
 import {
@@ -150,11 +150,12 @@ export default function StatesPage() {
     setIsAlertOpen(true);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    const Papa = (await import('papaparse')).default;
 
     Papa.parse<{ name: string }>(file, {
       header: true,

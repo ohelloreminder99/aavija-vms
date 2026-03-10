@@ -6,7 +6,7 @@ import { useUser, useDoc, useAuth, WithId } from '@/supabase';
 import { AavijaLogo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Loader2, ArrowLeftRight, LogOut, User } from 'lucide-react';
+import { Loader2, ArrowLeftRight, LogOut, User, Search } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Separator } from '@/components/ui/separator';
 import { useUserProfile, UserProfile } from '@/services/user-service';
@@ -17,6 +17,7 @@ import { UserSetupDialog } from '@/components/UserSetupDialog';
 import { DesktopSidebar, MobileSidebar } from '@/components/Sidebar';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { needsSetup, shouldBypassSetup } from '@/lib/user-setup-check';
+import { CommandMenu } from '@/components/CommandMenu';
 import * as React from 'react';
 
 function HeaderContent() {
@@ -101,6 +102,9 @@ function HeaderContent() {
                     </>
                 )}
             </div>
+            <div className="hidden lg:flex flex-1 justify-center max-w-sm px-4">
+                <CommandMenu />
+            </div>
             <div className="flex shrink-0 items-center gap-1">
                 <LanguageSwitcher />
                 <Button variant="ghost" asChild size="sm" className="hidden sm:inline-flex text-zinc-400 hover:text-white hover:bg-white/5">
@@ -112,6 +116,17 @@ function HeaderContent() {
                 <Button variant="ghost" onClick={handleSignOut} size="sm" className="hidden sm:inline-flex text-zinc-400 hover:text-white hover:bg-white/5">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign Out</span>
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden text-zinc-400 hover:text-white"
+                    onClick={() => {
+                        // Dispatch a custom event to open the command menu
+                        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+                    }}
+                >
+                    <Search className="h-5 w-5" />
                 </Button>
                 {/* Mobile sidebar trigger icon */}
                 <MobileSidebar userProfile={userProfile} />

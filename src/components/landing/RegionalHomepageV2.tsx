@@ -17,6 +17,7 @@ import {
     Coins
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { AavijaLogo } from '@/components/icons';
 import { useSettings } from '@/services/settings-service';
@@ -39,18 +40,67 @@ const defaultFeatures = [
     },
     {
         title: 'Token Economy',
-        description: 'A fair, integrated token system simplifies billing for premises and provides value for visitors.',
+        description: 'Pay-as-you-use efficiency. Ideal for everything from single-gate shops to multi-gate industrial parks.',
         icon: 'Coins',
     },
     {
-        title: 'Role-Based Dashboard',
-        description: 'Tailored experiences for Owners, Hosts, Staff, and Visitors in one unified ecosystem.',
-        icon: 'LayoutDashboard',
+        title: 'Privacy-First QR',
+        description: 'Anonymous QR tokens protect PII. No names or phone numbers are exposed until authorized.',
+        icon: 'QrCode',
     },
     {
-        title: 'Audit-Ready Logs',
-        description: 'Searchable digital history replaces messy registers for complete transparency.',
+        title: 'Immutable Audit Trail',
+        description: 'Once a visitor is checked in, the log is permanent and unchangeable. Full accountability at your fingertips.',
         icon: 'ClipboardCheck',
+    }
+];
+
+const testimonials = [
+    {
+        quote: "Aavija has completely transformed how we manage visitors at our tech park. The WhatsApp notifications are a game changer.",
+        author: "Vikram S.",
+        role: "Estate Manager",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100&h=100"
+    },
+    {
+        quote: "The QR-based entry is so fast. No more long queues at the gate. Highly recommend for any gated community!",
+        author: "Anjali R.",
+        role: "Resident Secretary",
+        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100&h=100"
+    },
+    {
+        quote: "Finally, a VMS that actually works and looks great. The token system is simple and the analytics are deep.",
+        author: "Rajesh K.",
+        role: "Business Owner",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100&h=100"
+    }
+];
+
+const pricingTiers = [
+    {
+        name: "Micro",
+        price: "₹0",
+        description: "Zero upfront cost. Perfect for individual homeowners or small shops.",
+        features: ["Pay-as-you-use tokens", "1 Gatekeeper", "Basic WhatsApp Alerts", "Community Support"],
+        cta: "Start Scaling",
+        highlight: false
+    },
+    {
+        name: "Economical",
+        price: "₹999",
+        period: "/mo",
+        description: "Optimized for apartment complexes and small offices.",
+        features: ["500 Free Tokens/mo", "Unlimited Gatekeepers", "Priority WhatsApp Alerts", "CSV History Export", "Dashboard Analytics"],
+        cta: "Go Pro",
+        highlight: true
+    },
+    {
+        name: "Enterprise",
+        price: "Flexible",
+        description: "Custom volume for industrial parks & massive tech hubs.",
+        features: ["Bulk Token Rates", "API Access", "Custom Security Rules", "Priority 24/7 Support", "Multi-premise Admin"],
+        cta: "Contact Sales",
+        highlight: false
     }
 ];
 
@@ -144,8 +194,8 @@ export function RegionalHomepageV2() {
                                     {ctaPrimary} <ArrowRight className="w-5 h-5" />
                                 </Link>
                             </Button>
-                            <Button size="lg" variant="outline" className="h-14 px-8 rounded-full border-white/10 hover:bg-white/5 bg-transparent">
-                                <Link href="/demo" className="text-lg">{ctaSecondary}</Link>
+                            <Button size="lg" variant="outline" className="h-14 px-8 rounded-full border-white/10 hover:bg-white/5 bg-transparent" asChild>
+                                <Link href="/signup" className="text-lg">{ctaSecondary}</Link>
                             </Button>
                         </div>
                     </motion.div>
@@ -160,17 +210,19 @@ export function RegionalHomepageV2() {
                         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-[2.5rem] blur-2xl opacity-50" />
                         <div className="relative rounded-[2rem] border border-white/10 bg-black/40 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
                             <div className="aspect-[21/9] w-full relative group">
-                                <img
+                                <Image
                                     src="/hero-mockup.png"
                                     alt="Aavija Dashboard Preview"
-                                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-[2s]"
+                                    fill
+                                    className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-[2s]"
+                                    priority
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-60" />
 
                                 {/* Overlay Floating Badges for 'Complete' feel */}
                                 <div className="absolute top-6 left-6 flex gap-3">
                                     <div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 backdrop-blur-md text-[10px] uppercase font-bold text-blue-400">
-                                        VMS Alpha 2.0
+                                        Production Ready 9.0
                                     </div>
                                     <div className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 backdrop-blur-md text-[10px] uppercase font-bold text-green-400">
                                         Encrypted
@@ -186,6 +238,7 @@ export function RegionalHomepageV2() {
 
                 {/* Features Grid */}
                 <section id="features" className="container max-w-7xl px-6 py-40">
+                    <div id="security" className="absolute -top-40" />
                     <div className="text-center mb-24">
                         <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Built for Trust at Every Layer</h2>
                         <p className="text-gray-400 text-lg max-w-2xl mx-auto font-light">
@@ -218,6 +271,90 @@ export function RegionalHomepageV2() {
                     </div>
                 </section>
 
+                {/* Testimonials */}
+                <section id="testimonials" className="container max-w-7xl px-6 py-20">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {testimonials.map((t, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className="p-8 rounded-3xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent flex flex-col justify-between"
+                            >
+                                <div className="flex gap-1 mb-6">
+                                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-blue-400 fill-blue-400" />)}
+                                </div>
+                                <p className="text-gray-300 text-lg italic mb-8 font-light leading-relaxed">"{t.quote}"</p>
+                                <div className="flex items-center gap-4">
+                                    <Image src={t.avatar} alt={t.author} width={40} height={40} className="rounded-full grayscale group-hover:grayscale-0 transition-all" />
+                                    <div>
+                                        <p className="font-bold text-sm">{t.author}</p>
+                                        <p className="text-xs text-gray-500">{t.role}</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Pricing Grid */}
+                <section id="pricing" className="container max-w-7xl px-6 py-40">
+                    <div className="text-center mb-20">
+                        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Pay-As-You-Use Economy</h2>
+                        <p className="text-gray-400 text-lg max-w-2xl mx-auto font-light">
+                            From 1 visit a month to 1 million. Aavija scales with your business size. No wastage, just efficiency.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {pricingTiers.map((tier, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                                className={`relative p-8 rounded-3xl border transition-all duration-300 ${tier.highlight
+                                    ? 'border-blue-500/50 bg-blue-500/5 scale-105 shadow-[0_0_40px_rgba(37,99,235,0.1)]'
+                                    : 'border-white/5 bg-white/5 hover:border-white/10'
+                                    }`}
+                            >
+                                {tier.highlight && (
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-blue-500 text-[10px] font-bold uppercase tracking-wider">
+                                        Most Popular
+                                    </div>
+                                )}
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-4xl font-bold tracking-tight">{tier.price}</span>
+                                        {tier.period && <span className="text-gray-500 text-sm">{tier.period}</span>}
+                                    </div>
+                                    <p className="text-gray-500 text-sm mt-4 font-light">{tier.description}</p>
+                                </div>
+                                <ul className="space-y-4 mb-8">
+                                    {tier.features.map((f, j) => (
+                                        <li key={j} className="flex items-center gap-3 text-sm text-gray-400">
+                                            <ShieldCheck className="w-4 h-4 text-blue-400" />
+                                            {f}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <Button
+                                    className={`w-full rounded-2xl h-12 font-bold ${tier.highlight
+                                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                        : 'bg-white/10 hover:bg-white/20 text-white'
+                                        }`}
+                                >
+                                    {tier.cta}
+                                </Button>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+
                 {/* Call to Action */}
                 <section className="container max-w-5xl px-6 py-20">
                     <div className="relative p-12 md:p-20 rounded-3xl border border-white/10 bg-gradient-to-br from-blue-600/20 to-indigo-900/20 text-center overflow-hidden">
@@ -231,11 +368,11 @@ export function RegionalHomepageV2() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button size="lg" className="rounded-full px-10 h-14 bg-white text-black hover:bg-white/90 font-bold text-lg">
-                                Create Free Account
+                            <Button size="lg" className="rounded-full px-10 h-14 bg-white text-black hover:bg-white/90 font-bold text-lg" asChild>
+                                <Link href="/signup">Create Free Account</Link>
                             </Button>
-                            <Button size="lg" variant="ghost" className="rounded-full px-10 h-14 text-white hover:bg-white/5 border border-white/10">
-                                Contact Sales
+                            <Button size="lg" variant="ghost" className="rounded-full px-10 h-14 text-white hover:bg-white/5 border border-white/10" asChild>
+                                <Link href="/contact">Contact Sales</Link>
                             </Button>
                         </div>
                     </div>

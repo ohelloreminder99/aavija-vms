@@ -38,6 +38,13 @@ export type PayoutRequest = {
   context?: Record<string, any>;
 };
 
+export type Agent = {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+};
+
 export type AgentOverview = {
   id: string;
   name: string;
@@ -102,14 +109,14 @@ export async function designateAgentByEmail(
           premiseName: premiseData.name,
         });
       }
-    } catch (notifyErr: any) {
-      console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', notifyErr.message);
+    } catch (notifyErr: unknown) {
+      console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', notifyErr instanceof Error ? notifyErr.message : 'Unknown error');
     }
 
     return { success: true, agentId: data.agentId, agentName: data.agentName };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Error designating agent:', e);
-    return { success: false, error: e.message };
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -138,8 +145,8 @@ export async function lookupUserByEmail(
     }
 
     return { success: true, user: data };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -160,8 +167,8 @@ export async function removeAgentDesignation(
     await adminDb.from('users').update({ is_agent: false }).eq('id', userId);
     revalidatePath('/dashboard/admin/agents');
     return { success: true };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -248,9 +255,9 @@ export async function submitPayoutRequest(payload: {
 
     revalidatePath('/dashboard/visitor/earnings');
     return { success: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Error submitting payout request:', e);
-    return { success: false, error: e.message };
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -313,15 +320,15 @@ export async function adminProcessPayout(
             void notifyPayoutApproved({ phone: reqUser.phone, name: reqUser.name, amount: String(reqInfo.amount), utr: utrNote || 'N/A' });
           }
         }
-      } catch (notifyErr: any) {
-        console.error('[WhatsApp] Payout approved notify failed (non-fatal):', notifyErr.message);
+      } catch (notifyErr: unknown) {
+        console.error('[WhatsApp] Payout approved notify failed (non-fatal):', notifyErr instanceof Error ? notifyErr.message : 'Unknown error');
       }
     }
 
     return { success: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Error processing payout:', e);
-    return { success: false, error: e.message };
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -374,9 +381,9 @@ export async function adminRejectPayout(
     }
 
     return { success: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error('Error rejecting payout:', e);
-    return { success: false, error: e.message };
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -404,8 +411,8 @@ export async function updatePayoutDetails(payload: {
     if (error) throw error;
     revalidatePath('/dashboard/visitor/earnings');
     return { success: true };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -433,15 +440,15 @@ export async function getPayoutRequestsForAdmin(): Promise<{
 
     if (error) throw error;
 
-    const userIds = [...new Set((requests || []).map((r: any) => r.user_id))];
+    const userIds = [...new Set((requests || []).map((r: PayoutRequest) => r.user_id))];
     const { data: users } = await adminDb
       .from('users')
       .select('id, name, email, photo_url')
       .in('id', userIds);
 
-    const userMap = new Map((users || []).map((u: any) => [u.id, u]));
+    const userMap = new Map((users || []).map((u: Record<string, any>) => [u.id, u]));
 
-    const enriched = (requests || []).map((r: any) => ({
+    const enriched = (requests || []).map((r: PayoutRequest) => ({
       ...r,
       userName: userMap.get(r.user_id)?.name || 'Unknown',
       userEmail: userMap.get(r.user_id)?.email || '',
@@ -449,8 +456,8 @@ export async function getPayoutRequestsForAdmin(): Promise<{
     }));
 
     return { success: true, data: enriched };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -477,8 +484,8 @@ export async function getAgentsOverview(): Promise<{
 
     if (error) throw error;
     return { success: true, data: data || [] };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
 
@@ -498,7 +505,7 @@ export async function adminApproveKyc(
     await adminDb.from('users').update({ kyc_verified: true }).eq('id', userId);
     revalidatePath('/dashboard/admin/agents');
     return { success: true };
-  } catch (e: any) {
-    return { success: false, error: e.message };
+  } catch (e: unknown) {
+    return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
   }
 }
