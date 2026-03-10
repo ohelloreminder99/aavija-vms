@@ -21,11 +21,14 @@ export async function getRegionConfig(hostname: string): Promise<RegionConfig> {
 
     // 1. Check for hardcoded development overrides
     if (cleanHost === 'localhost' || cleanHost === '127.0.0.1' || cleanHost === '::1' || hostname.includes('preview')) {
+        const FALLBACK_URL = "https://plruocrysgpyyfypcjwe.supabase.co";
+        const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBscnVvY3J5c2dweXlmeXBjandlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MDY3MTAsImV4cCI6MjA4NzM4MjcxMH0.LE-vFHeyOIbmV4o5v5Y3cuP_-RHstYtU6oZywrm9gLU";
+
         return {
             code: 'DEV',
             domain: hostname,
-            supabase_url: (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/['"]/g, ''),
-            supabase_anon_key: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').replace(/['"]/g, ''),
+            supabase_url: (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/['"]/g, '').trim() || FALLBACK_URL,
+            supabase_anon_key: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').replace(/['"]/g, '').trim() || FALLBACK_KEY,
         };
     }
 

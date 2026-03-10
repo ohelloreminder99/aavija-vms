@@ -62,7 +62,7 @@ export async function generateCheckinToken(userId: string): Promise<{
 
   try {
     // 1. Find and delete any pre-existing 'unused' tokens for this user.
-    await adminDb.from('checkin_tokens').delete().eq('userId', userId).eq('status', 'unused');
+    await adminDb.from('checkin_tokens').delete().eq('visitor_id', userId).eq('status', 'unused');
 
     // 2. Create the new token
     const token = randomBytes(16).toString('hex');
@@ -71,8 +71,8 @@ export async function generateCheckinToken(userId: string): Promise<{
 
     const { error } = await adminDb.from('checkin_tokens').insert({
       id: token,
-      userId: userId,
-      createdAt: new Date(now).toISOString(),
+      visitor_id: userId,
+      created_at: new Date(now).toISOString(),
       expiresAt: new Date(expiresAt).toISOString(),
       status: 'unused',
     });

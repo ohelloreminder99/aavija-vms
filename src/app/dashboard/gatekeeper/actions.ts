@@ -90,7 +90,7 @@ export async function processScannedToken(
       throw new Error('Token data is invalid (missing expiry date).');
     }
 
-    const userId = tokenData.userId;
+    const userId = tokenData.visitor_id;
     if (!userId) {
       throw new Error('Token is not associated with a user.');
     }
@@ -222,7 +222,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     }
 
     // If this was an offline scan, the UI passed the dummy ID. We must resolve the actual user from the token.
-    const resolvedVisitorId = visitorId === 'offline-visitor' ? tokenDoc.userId : visitorId;
+    const resolvedVisitorId = visitorId === 'offline-visitor' ? tokenDoc.visitor_id : visitorId;
 
     const { data: premiseData } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
     if (!premiseData) throw new Error("Premise not found.");
