@@ -59,22 +59,22 @@
 
 @layer utilities {
   .bg-liquid-obsidian {
-    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
+    background: radial-gradient(circle at 50% 0%, #f8fafc 0%, #f1f5f9 100%);
   }
 
   .glass-card {
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
   }
 
   .glass-morphism {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.03);
   }
 
   .text-glow {
@@ -86,11 +86,19 @@
   }
 
   .mesh-obsidian {
-    background-color: #020617;
+    background-color: #f8fafc;
     background-image:
-      radial-gradient(at 0% 0%, hsla(217, 91%, 15%, 1) 0, transparent 40%),
-      radial-gradient(at 50% 0%, hsla(217, 91%, 20%, 0.2) 0, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(217, 91%, 15%, 1) 0, transparent 40%);
+      radial-gradient(at 0% 0%, hsla(217, 91%, 95%, 1) 0, transparent 40%),
+      radial-gradient(at 50% 0%, hsla(217, 91%, 90%, 0.1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(217, 91%, 95%, 1) 0, transparent 40%);
+  }
+
+  .mesh-porcelain {
+    background-color: #ffffff;
+    background-image:
+      radial-gradient(at 0% 0%, hsla(220, 30%, 96%, 1) 0, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(220, 30%, 98%, 0.5) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(220, 30%, 96%, 1) 0, transparent 50%);
   }
 
   .liquid-neon-border {

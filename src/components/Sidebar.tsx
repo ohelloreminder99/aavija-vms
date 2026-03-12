@@ -155,7 +155,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { userProfile: UserProfile | null, isCollapsed: boolean, toggleCollapse: () => void }) {
     return (
         <aside className={cn(
-            "hidden md:flex flex-col border-r border-white/5 glass-card transition-all duration-500 relative",
+            "hidden md:flex flex-col border-r border-zinc-200 glass-card transition-all duration-500 relative",
             isCollapsed ? "w-20 items-center" : "w-72"
         )}>
             {/* Collapse Toggle */}
@@ -163,7 +163,7 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                 variant="ghost"
                 size="icon"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-[#0F172A] text-zinc-400 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:bg-[#1E293B] hover:text-white transition-all transform active:scale-95"
+                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-zinc-200 bg-white text-zinc-400 shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:bg-zinc-50 hover:text-primary transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
                 {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}

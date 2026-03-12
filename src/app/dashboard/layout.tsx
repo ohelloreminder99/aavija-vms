@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
@@ -203,9 +203,9 @@ export default function DashboardLayout({
 
     if (user) {
         return (
-            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#020617]"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
-                <div className="flex min-h-screen flex-col relative mesh-obsidian selection:bg-primary/30 selection:text-white">
-                    <header className="sticky top-0 z-50 w-full border-b border-white/5 glass-card">
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
+                <div className="flex min-h-screen flex-col relative mesh-porcelain selection:bg-primary/20 selection:text-primary-foreground">
+                    <header className="sticky top-0 z-50 w-full border-b border-zinc-200 glass-card">
                         <HeaderContent />
                     </header>
                     <div className="flex flex-1 overflow-hidden">

@@ -168,9 +168,9 @@ export default function StaffManagementPage() {
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                     <div className="relative">
                         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                        <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+                        <div className="absolute inset-0 bg-primary/10 blur-xl animate-pulse" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Staff Data...</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Syncing Staff Data...</p>
                 </div>
             );
         }
@@ -186,10 +186,10 @@ export default function StaffManagementPage() {
 
         if (!staffMembers || staffMembers.length === 0) {
             return (
-                <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
-                    <UserCog className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
+                <div className="py-32 text-center border-2 border-dashed border-zinc-200 rounded-3xl bg-zinc-50">
+                    <UserCog className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">No Active Staff</p>
-                    <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">Create a new staff account to manage the system.</p>
+                    <p className="text-zinc-400 text-[9px] mt-2 font-medium uppercase tracking-widest">Create a new staff account to manage the system.</p>
                 </div>
             );
         }
@@ -200,16 +200,16 @@ export default function StaffManagementPage() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
                     <Input
                         placeholder="Search name or email..."
-                        className="pl-11 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
+                        className="pl-11 bg-white/50 border-zinc-200 text-zinc-900 h-12 rounded-2xl placeholder:text-zinc-400 focus:border-primary/30 transition-all focus:ring-primary/20"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
-                <div className="rounded-2xl border border-white/5 bg-black/20 overflow-hidden">
+                <div className="rounded-2xl border border-zinc-200 bg-white/40 overflow-hidden shadow-xl">
                     <Table>
-                        <TableHeader className="bg-white/[0.02]">
-                            <TableRow className="border-white/5 hover:bg-transparent">
+                        <TableHeader className="bg-zinc-50">
+                            <TableRow className="border-zinc-100 hover:bg-transparent">
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Staff Member</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Email</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Phone Number</TableHead>
@@ -217,24 +217,26 @@ export default function StaffManagementPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredStaff.map((staff: WithId<UserProfile>) => (
-                                <TableRow key={staff.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+                            {filteredStaff.map((person: WithId<UserProfile>) => (
+                                <TableRow key={person.id} className="border-zinc-100 hover:bg-zinc-50 transition-colors group">
                                     <TableCell className="px-6 py-4">
                                         <div className="flex items-center gap-4">
-                                            <Avatar className="h-10 w-10 border border-white/5 group-hover:border-primary/30 transition-all">
-                                                {staff.photo_url && <AvatarImage src={staff.photo_url} alt={staff.name} />}
-                                                <AvatarFallback className="bg-zinc-900 text-zinc-500 font-bold">{staff.name.charAt(0)}</AvatarFallback>
+                                            <Avatar className="h-10 w-10 border border-zinc-200 group-hover:border-primary/30 transition-all">
+                                                {person.photo_url && <AvatarImage src={person.photo_url} alt={person.name} />}
+                                                <AvatarFallback className="bg-zinc-100 text-zinc-500 font-bold">{person.name.charAt(0)}</AvatarFallback>
                                             </Avatar>
-                                            <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">{staff.name}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">{person.name}</span>
+                                            </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-zinc-400 text-xs font-medium">{staff.email}</TableCell>
-                                    <TableCell className="text-zinc-400 text-xs font-mono">{staff.phone || '—'}</TableCell>
+                                    <TableCell className="text-zinc-400 text-xs font-medium">{person.email}</TableCell>
+                                    <TableCell className="text-zinc-400 text-xs font-mono">{person.phone || '—'}</TableCell>
                                     <TableCell className="px-6 py-4 text-right">
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            onClick={() => setStaffToRemove(staff)}
+                                            onClick={() => setStaffToRemove(person)}
                                             className="h-8 w-8 rounded-lg hover:bg-red-500/10 hover:text-red-500 text-zinc-600 transition-all"
                                         >
                                             <Trash2 className="h-4 w-4" />
@@ -265,7 +267,7 @@ export default function StaffManagementPage() {
                             <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                                 <UserCog className="h-6 w-6 text-primary" />
                             </div>
-                            <h1 className="text-4xl font-headline font-bold text-white tracking-tighter">
+                            <h1 className="text-4xl font-headline font-bold text-zinc-900 tracking-tighter">
                                 Staff <span className="text-primary/80">Management</span>
                             </h1>
                         </div>
@@ -351,14 +353,14 @@ export default function StaffManagementPage() {
                                         <FormField control={assignForm.control} name="email" render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">User Email</FormLabel>
-                                                <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Assign staff permissions to an existing user account.</FormDescription>
+                                                <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-white border-zinc-200 text-zinc-900 h-11 rounded-xl placeholder:text-zinc-400" /></FormControl>
+                                                <FormDescription className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Assign staff permissions to an existing user account.</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         <div className="flex justify-end gap-4 pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
-                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
+                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 shadow-lg hover:bg-primary/90 transition-all">
                                                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                                 Assign Staff Role
                                             </Button>
@@ -371,30 +373,30 @@ export default function StaffManagementPage() {
                 </Dialog>
             </div>
 
-            <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden bg-black/40">
-                <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+            <Card className="glass-card border-zinc-200 shadow-xl relative overflow-hidden bg-white/40">
+                <div className="absolute inset-0 mesh-porcelain opacity-20 pointer-events-none" />
                 <CardContent className="relative z-10 p-6 sm:p-8">
                     {renderContent()}
                 </CardContent>
             </Card>
 
             <AlertDialog open={!!staffToRemove} onOpenChange={(open) => { if (!open) { setStaffToRemove(null); } }}>
-                <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
+                <AlertDialogContent className="bg-white border-zinc-200 shadow-2xl max-w-md">
                     <AlertDialogHeader>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="h-10 w-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                            <div className="h-10 w-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center shadow-sm">
                                 <Trash2 className="h-5 w-5 text-red-500" />
                             </div>
-                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Remove <span className="text-red-500">Access?</span></AlertDialogTitle>
+                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-zinc-900">Remove <span className="text-red-500">Access?</span></AlertDialogTitle>
                         </div>
-                        <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-                            This will remove the staff role from <span className="text-white font-bold">{staffToRemove?.name}</span>.
+                        <AlertDialogDescription className="text-zinc-500 leading-relaxed text-sm">
+                            This will remove the staff role from <span className="text-zinc-900 font-bold">{staffToRemove?.name}</span>.
                             The user will be demoted to standard visitor status and will no longer have access to admin functions.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-8">
-                        <AlertDialogCancel onClick={() => setStaffToRemove(null)} className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-                             <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                        <AlertDialogCancel onClick={() => setStaffToRemove(null)} className="bg-zinc-50 border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100">Cancel</AlertDialogCancel>
+                             <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-lg">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Remove Access
                         </AlertDialogAction>
@@ -403,21 +405,21 @@ export default function StaffManagementPage() {
             </AlertDialog>
 
             <AlertDialog open={showDuplicateUserDialog} onOpenChange={setShowDuplicateUserDialog}>
-                <AlertDialogContent className="bg-black/90 border-white/10 backdrop-blur-2xl">
+                <AlertDialogContent className="bg-white border-zinc-200 shadow-2xl max-w-sm">
                     <AlertDialogHeader>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                            <div className="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shadow-sm">
                                 <UserCog className="h-5 w-5 text-amber-500" />
                             </div>
-                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Account <span className="text-amber-500">Exists</span></AlertDialogTitle>
+                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-zinc-900">Account <span className="text-amber-500">Exists</span></AlertDialogTitle>
                         </div>
-                        <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
+                        <AlertDialogDescription className="text-zinc-500 leading-relaxed text-sm">
                             The email provided is already associated with an account in the system.
-                            Please change the selection to <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Existing User</span> instead of "New Staff User" to safely assign staff permissions.
+                            Please change the selection to <span className="text-zinc-900 font-black uppercase tracking-widest text-[10px] bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">Existing User</span> instead of "New Staff User" to safely assign staff permissions.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
-                         <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Close</AlertDialogAction>
+                         <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-zinc-900 font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600 shadow-md">Close</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -1,4 +1,4 @@
-﻿
+
 'use client';
 
 import { ArrowLeft, Loader2, Search, Eye } from 'lucide-react';
@@ -127,7 +127,7 @@ export default function VisitorsPage() {
                       >
                         <Avatar className="h-12 w-12 border border-white/5 group-hover/avatar:border-primary/50 transition-all">
                           {visitor.photo_url && <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />}
-                          <AvatarFallback className="bg-zinc-900 text-zinc-500 font-bold">{visitor.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="bg-zinc-100 text-zinc-500">{visitor.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         {visitor.photo_url && (
                           <div className="absolute inset-0 bg-primary/20 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
@@ -164,8 +164,8 @@ export default function VisitorsPage() {
             </TableBody>
           </Table>
           {filteredVisitors.length === 0 && (
-            <div className="py-20 text-center bg-white/[0.01]">
-              <p className="text-zinc-700 text-[10px] font-black uppercase tracking-widest">No Match Found</p>
+            <div className="py-20 text-center bg-zinc-50/50">
+              <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">No Match Found</p>
             </div>
           )}
         </div>
@@ -177,7 +177,7 @@ export default function VisitorsPage() {
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-8 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-4">
-          <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
+          <Button asChild variant="ghost" className="text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
             <Link href="/dashboard/admin">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
@@ -189,7 +189,7 @@ export default function VisitorsPage() {
               <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                 <Search className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-4xl font-headline font-bold text-white tracking-tighter">
+              <h1 className="text-4xl font-headline font-bold text-zinc-900 tracking-tighter">
                 Visitor <span className="text-primary/80">Registry</span>
               </h1>
             </div>
@@ -200,8 +200,8 @@ export default function VisitorsPage() {
         </div>
       </div>
 
-      <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden bg-black/40">
-        <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
+      <Card className="glass-card border-zinc-200 shadow-xl relative overflow-hidden bg-white/40">
+        <div className="absolute inset-0 mesh-porcelain opacity-20 pointer-events-none" />
         <CardContent className="relative z-10 p-6 sm:p-8">
           {renderContent()}
         </CardContent>
@@ -224,10 +224,10 @@ export default function VisitorsPage() {
       )}
 
       <Dialog open={!!imageUrlToView} onOpenChange={() => setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden">
-          <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+        <DialogContent className="max-w-xl bg-white border-zinc-200 shadow-2xl p-0 overflow-hidden">
+          <div className="p-6 border-b border-zinc-100 bg-zinc-50/30">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-white tracking-tight">Visitor <span className="text-primary/80">Photo</span></DialogTitle>
+              <DialogTitle className="text-2xl font-bold text-zinc-900 tracking-tight">Visitor <span className="text-primary/80">Photo</span></DialogTitle>
             </DialogHeader>
           </div>
           {imageUrlToView && (
@@ -243,8 +243,8 @@ export default function VisitorsPage() {
               </div>
             </div>
           )}
-          <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end">
-            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close</Button>
+          <div className="p-6 border-t border-zinc-100 bg-zinc-50/30 flex justify-end">
+            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -336,15 +336,15 @@ export default function PremisesPage() {
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
           <Input
             placeholder="Search by property name, type, or city..."
-            className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all font-medium"
+            className="pl-12 bg-white/50 border-zinc-200 text-zinc-900 h-12 rounded-2xl placeholder:text-zinc-400 focus:border-primary/30 transition-all font-medium"
             value={searchTerm}
             aria-label="Search properties"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
+        <div className="rounded-3xl border border-zinc-200 bg-white/40 overflow-hidden shadow-xl">
           <Table>
-            <TableHeader className="bg-white/[0.03]">
+            <TableHeader className="bg-zinc-50">
               <TableRow className="border-white/5 hover:bg-transparent">
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Property Name</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Type</TableHead>
@@ -358,8 +358,8 @@ export default function PremisesPage() {
               {filteredPremises.map((p) => (
                 <TableRow key={p.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
                   <TableCell className="pl-8 py-5">
-                    <Button variant="link" className="p-0 h-auto font-bold text-white tracking-tight hover:text-primary transition-colors flex items-center gap-3 no-underline group-hover/row:text-primary" onClick={() => openHistoryDialog(p)}>
-                      <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover/row:border-primary/30 transition-all">
+                    <Button variant="link" className="p-0 h-auto font-bold text-zinc-900 tracking-tight hover:text-primary transition-colors flex items-center gap-3 no-underline group-hover/row:text-primary" onClick={() => openHistoryDialog(p)}>
+                      <div className="h-8 w-8 rounded-lg bg-white/50 border border-zinc-200 flex items-center justify-center group-hover/row:border-primary/30 transition-all">
                         <Building className="h-4 w-4" />
                       </div>
                       {p.name}
@@ -399,9 +399,9 @@ export default function PremisesPage() {
                   </TableCell>
                   <TableCell className="text-right pr-8">
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="icon" aria-label="Edit premise" className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-primary hover:bg-primary/5 transition-all" onClick={() => { setSelectedPremise(p); setIsEditOpen(true); }}><Edit className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" aria-label="Transfer ownership" className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-amber-500 hover:bg-amber-500/5 transition-all" title="Transfer Ownership" onClick={() => { setPremiseToChangeOwner(p); setIsChangeOwnerOpen(true); }}><Users className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" aria-label="Delete premise" className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/5 transition-all" onClick={() => { setSelectedPremise(p); setIsDeleteAlertOpen(true); }}><Trash2 className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" aria-label="Edit premise" className="h-9 w-9 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-500 hover:text-primary hover:bg-primary/5 transition-all" onClick={() => { setSelectedPremise(p); setIsEditOpen(true); }}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" aria-label="Transfer ownership" className="h-9 w-9 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-500 hover:text-amber-500 hover:bg-amber-500/5 transition-all" title="Transfer Ownership" onClick={() => { setPremiseToChangeOwner(p); setIsChangeOwnerOpen(true); }}><Users className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" aria-label="Delete premise" className="h-9 w-9 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-500 hover:text-red-500 hover:bg-red-500/5 transition-all" onClick={() => { setSelectedPremise(p); setIsDeleteAlertOpen(true); }}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -466,14 +466,14 @@ export default function PremisesPage() {
         </div>
       </div>
 
-      <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
-        <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
-        <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+      <Card className="glass-card border-zinc-200 shadow-xl relative overflow-hidden mb-20">
+        <div className="absolute inset-0 mesh-porcelain opacity-20 pointer-events-none" />
+        <CardHeader className="relative z-10 border-b border-zinc-100 pb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
               <Building className="h-5 w-5 text-primary" />
             </div>
-            <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Property <span className="text-primary/80">Management</span></CardTitle>
+            <CardTitle className="text-4xl font-headline font-bold text-zinc-900 tracking-tight">Property <span className="text-primary/80">Management</span></CardTitle>
           </div>
           <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
             Manage all properties in the system. View property details, owners, and assigned sales agents.
