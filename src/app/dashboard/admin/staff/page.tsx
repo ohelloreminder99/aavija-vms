@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -170,7 +170,7 @@ export default function StaffManagementPage() {
                         <Loader2 className="h-12 w-12 animate-spin text-primary" />
                         <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Personnel Data...</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Staff Data...</p>
                 </div>
             );
         }
@@ -178,7 +178,7 @@ export default function StaffManagementPage() {
         if (error) {
             return (
                 <div className="text-center py-20 px-6 border border-red-500/20 bg-red-500/5 rounded-2xl">
-                    <p className="text-red-400 font-bold mb-2">Protocol Malfunction</p>
+                    <p className="text-red-400 font-bold mb-2">Error</p>
                     <p className="text-xs text-red-500/60 font-medium uppercase tracking-wider">{error.message}</p>
                 </div>
             );
@@ -189,7 +189,7 @@ export default function StaffManagementPage() {
                 <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
                     <UserCog className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
                     <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">No Active Staff</p>
-                    <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">Establish a new operative to manage local mesh sectors.</p>
+                    <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">Create a new staff account to manage the system.</p>
                 </div>
             );
         }
@@ -199,7 +199,7 @@ export default function StaffManagementPage() {
                 <div className="relative group max-w-md">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
                     <Input
-                        placeholder="Scan name or neural mail..."
+                        placeholder="Search name or email..."
                         className="pl-11 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -210,10 +210,10 @@ export default function StaffManagementPage() {
                     <Table>
                         <TableHeader className="bg-white/[0.02]">
                             <TableRow className="border-white/5 hover:bg-transparent">
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Staff Identity</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Neural Mail</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Sever Peripheral</TableHead>
-                                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Terminal</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Staff Member</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Email</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Phone Number</TableHead>
+                                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14 px-6">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -256,7 +256,7 @@ export default function StaffManagementPage() {
                     <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
                         <Link href="/dashboard/admin">
                             <ArrowLeft className="mr-2 h-4 w-4" />
-                            Retreat to Command
+                            Back to Dashboard
                         </Link>
                     </Button>
 
@@ -266,11 +266,11 @@ export default function StaffManagementPage() {
                                 <UserCog className="h-6 w-6 text-primary" />
                             </div>
                             <h1 className="text-4xl font-headline font-bold text-white tracking-tighter">
-                                Staff <span className="text-primary/80">Command</span>
+                                Staff <span className="text-primary/80">Management</span>
                             </h1>
                         </div>
                         <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
-                            Operational directory of authenticated staff nodes. Manage personnel access and sector permissions.
+                            List of all authenticated staff members. Manage their access and permissions.
                         </p>
                     </div>
                 </div>
@@ -278,15 +278,15 @@ export default function StaffManagementPage() {
                 <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                     <DialogTrigger asChild>
                         <Button disabled={isLoading} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all">
-                            <Plus className="mr-2 h-4 w-4" /> Establish Operative
+                            <Plus className="mr-2 h-4 w-4" /> Add Staff Member
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-lg bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden">
                         <div className="p-8 border-b border-white/5 bg-white/[0.02]">
                             <DialogHeader>
-                                <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Access <span className="text-primary/80">Calibration</span></DialogTitle>
+                                <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Add <span className="text-primary/80">Staff</span></DialogTitle>
                                 <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
-                                    Initialize new staff node or link an existing operative to the protocol.
+                                    Create a new staff account or link an existing user.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="mt-8">
@@ -296,7 +296,7 @@ export default function StaffManagementPage() {
                                         creationMode === 'new' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
                                     )} onClick={() => setCreationMode('new')}>
                                         <RadioGroupItem value="new" id="s-r1" className="sr-only" />
-                                        <Label htmlFor="s-r1" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">New Core User</Label>
+                                        <Label htmlFor="s-r1" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">New Staff User</Label>
                                         {creationMode === 'new' && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
                                     </div>
                                     <div className={cn(
@@ -304,7 +304,7 @@ export default function StaffManagementPage() {
                                         creationMode === 'existing' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
                                     )} onClick={() => setCreationMode('existing')}>
                                         <RadioGroupItem value="existing" id="s-r2" className="sr-only" />
-                                        <Label htmlFor="s-r2" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">Linked Operative</Label>
+                                        <Label htmlFor="s-r2" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">Existing User</Label>
                                         {creationMode === 'existing' && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
                                     </div>
                                 </RadioGroup>
@@ -317,21 +317,21 @@ export default function StaffManagementPage() {
                                     <form onSubmit={createForm.handleSubmit(handleCreateFormSubmit)} className="space-y-6">
                                         <FormField control={createForm.control} name="name" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Identity Name</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Staff Name</FormLabel>
                                                 <FormControl><Input placeholder="John Doe" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="email" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Neural Mail</FormLabel>
-                                                <FormControl><Input type="email" placeholder="staff@aavija.mesh" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Email</FormLabel>
+                                                <FormControl><Input type="email" placeholder="staff@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="password" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Access Cipher</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Account Password</FormLabel>
                                                 <FormControl><Input type="password" placeholder="Min. 8 characters" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -340,7 +340,7 @@ export default function StaffManagementPage() {
                                             <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
                                                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                                Initialize Node
+                                                Create Staff Member
                                             </Button>
                                         </div>
                                     </form>
@@ -350,9 +350,9 @@ export default function StaffManagementPage() {
                                     <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-6">
                                         <FormField control={assignForm.control} name="email" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Operative Neural Mail</FormLabel>
-                                                <FormControl><Input type="email" placeholder="user@aavija.mesh" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Inject staff permissions into an existing network identity.</FormDescription>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">User Email</FormLabel>
+                                                <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Assign staff permissions to an existing user account.</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
@@ -360,7 +360,7 @@ export default function StaffManagementPage() {
                                             <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
                                                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                                Inject Privileges
+                                                Assign Staff Role
                                             </Button>
                                         </div>
                                     </form>
@@ -385,18 +385,18 @@ export default function StaffManagementPage() {
                             <div className="h-10 w-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                                 <Trash2 className="h-5 w-5 text-red-500" />
                             </div>
-                            <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Sever <span className="text-red-500">Access?</span></AlertDialogTitle>
+                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Remove <span className="text-red-500">Access?</span></AlertDialogTitle>
                         </div>
                         <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-                            This will irreversibly purge the staff role from <span className="text-white font-bold">{staffToRemove?.name}</span>.
-                            The identity will be demoted to standard visitor status and detached from all admin terminal protocols.
+                            This will remove the staff role from <span className="text-white font-bold">{staffToRemove?.name}</span>.
+                            The user will be demoted to standard visitor status and will no longer have access to admin functions.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-8">
                         <AlertDialogCancel onClick={() => setStaffToRemove(null)} className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                             <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Purge Access
+                            Remove Access
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -409,19 +409,18 @@ export default function StaffManagementPage() {
                             <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                                 <UserCog className="h-5 w-5 text-amber-500" />
                             </div>
-                            <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Identity <span className="text-amber-500">Collision</span></AlertDialogTitle>
+                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white">Account <span className="text-amber-500">Exists</span></AlertDialogTitle>
                         </div>
                         <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-                            The neural mail provided is already associated with an identity inside the network registry.
-                            Please recalibrate the request: select <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Linked Operative</span> instead of "New Core User" to safely assign staff privileges.
+                            The email provided is already associated with an account in the system.
+                            Please change the selection to <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Existing User</span> instead of "New Staff User" to safely assign staff permissions.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
-                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Recalibrate</AlertDialogAction>
+                         <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Close</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </div>
     );
 }
-

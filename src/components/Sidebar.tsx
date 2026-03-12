@@ -104,7 +104,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                 {/* Global Links */}
                 <div className="space-y-2">
                     <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
-                        Core Systems
+                        Quick Links
                     </h4>
                     {renderLink('/dashboard/visitor', 'Visitor Portal', roleIcons.visitor, 'global-visitor')}
                     {renderLink('/dashboard/visitor/refer', 'Refer & Earn', Gift, 'global-refer')}
@@ -113,7 +113,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     {userProfile.role === 'admin' && (
                         <div className="pt-4 mt-4 border-t border-border/40 space-y-2">
                             <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60 mb-4">
-                                Governance
+                                Administration
                             </h4>
                             {renderLink('/dashboard/admin', 'Admin Console', roleIcons.admin, 'global-admin')}
                             {renderLink('/dashboard/admin/referrals', 'Referral Network', Users, 'admin-referrals')}
@@ -125,7 +125,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                 {userProfile.premise_roles && Object.keys(userProfile.premise_roles).length > 0 && (
                     <div className="space-y-4 pt-4 border-t border-border/40">
                         <h4 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
-                            Operational Contexts
+                            My Properties
                         </h4>
                         {Object.entries(userProfile.premise_roles).map(([premiseId, roles]) => {
                             const name = premiseNames[premiseId] || 'Loading...';

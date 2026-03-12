@@ -252,9 +252,9 @@ export function PremiseDialogs({
                                     ) : (
                                         <FormField control={createForm.control} name="ownerEmail" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Linked Neural Mail</FormLabel>
-                                                <FormControl><Input type="email" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" placeholder="operative@aavija.mesh" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Assign an existing operative to master this infrastructural node.</FormDescription>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Linked Email</FormLabel>
+                                                <FormControl><Input type="email" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" placeholder="owner@aavija.com" /></FormControl>
+                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Assign an existing user as the owner of this property.</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
@@ -308,18 +308,18 @@ export function PremiseDialogs({
                                     <div className="grid grid-cols-2 gap-6">
                                         <FormField control={editForm.control} name="name" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Node Designation</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Name</FormLabel>
                                                 <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         <FormField control={editForm.control} name="categoryId" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Unit Classification</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Type</FormLabel>
                                                 <Select onValueChange={field.onChange} value={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="bg-black/40 border-white/5 text-white h-11 rounded-xl">
-                                                            <SelectValue placeholder="Classification..." />
+                                                            <SelectValue placeholder="Property Type..." />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent className="bg-zinc-900 border-white/10 text-white">
@@ -332,7 +332,7 @@ export function PremiseDialogs({
                                     </div>
                                     <FormField control={editForm.control} name="address" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Geographic Coordinates</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Address</FormLabel>
                                             <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -340,7 +340,7 @@ export function PremiseDialogs({
                                     <FormField control={editForm.control} name="cityId" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">
-                                                Nodal Hub (City) {field.value && (
+                                                City {field.value && (
                                                     <span className="text-primary ml-2 border-l border-white/10 pl-2">
                                                         {cities.find(c => c.id === field.value)?.name}
                                                     </span>
@@ -349,7 +349,7 @@ export function PremiseDialogs({
                                             <div className="space-y-4">
                                                 <div className="relative">
                                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
-                                                    <Input placeholder="Scan grids..." className="pl-10 bg-black/40 border-white/5 text-white h-11 rounded-xl" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
+                                                    <Input placeholder="Search city..." className="pl-10 bg-black/40 border-white/5 text-white h-11 rounded-xl" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
                                                 </div>
                                                 <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/40 p-2">
                                                     <FormControl>
@@ -376,7 +376,7 @@ export function PremiseDialogs({
 
                                     <FormField control={editForm.control} name="agentId" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Local Facilitator (Agent)</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Sales Agent</FormLabel>
                                             <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
                                             <FormMessage />
                                         </FormItem>
@@ -385,8 +385,8 @@ export function PremiseDialogs({
                                     <FormField control={editForm.control} name="is_active" render={({ field }) => (
                                         <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-white/5 bg-black/40 p-6">
                                             <div className="space-y-1">
-                                                <FormLabel className="text-sm font-bold text-white tracking-tight">Node Operational Status</FormLabel>
-                                                <FormDescription className="text-[10px] text-zinc-600 font-medium uppercase tracking-tight">Toggle to temporarily decouple this node from the active mesh.</FormDescription>
+                                                <FormLabel className="text-sm font-bold text-white tracking-tight">Property Status</FormLabel>
+                                                <FormDescription className="text-[10px] text-zinc-600 font-medium uppercase tracking-tight">Toggle to temporarily deactivate this property.</FormDescription>
                                             </div>
                                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-primary" /></FormControl>
                                         </FormItem>
@@ -443,12 +443,12 @@ export function PremiseDialogs({
                             <AlertDialogTitle className="text-2xl font-bold tracking-tight text-white font-headline">Identity <span className="text-amber-500">Collision</span></AlertDialogTitle>
                         </div>
                         <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm">
-                            The neural mail provided is already associated with an identity inside the network registry.
-                            Please recalibrate the request: select <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Linked Operative</span> instead of "New Nodal Principal" to securely bind the existing identity to this node.
+                            The email provided is already associated with an account in the system.
+                            Please select <span className="text-white font-black uppercase tracking-widest text-[10px] bg-white/5 px-2 py-0.5 rounded border border-white/10">Existing User</span> instead of "New Owner" to securely link the existing account to this property.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
-                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Recalibrate</AlertDialogAction>
+                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Close</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -464,18 +464,18 @@ export function PremiseDialogs({
                             <DialogTitle className="text-2xl font-bold text-white tracking-tight">Ownership <span className="text-primary/80">Transfer</span></DialogTitle>
                         </div>
                         <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                            Reassign archival principal control for node: <span className="text-white">{premiseToChangeOwner?.name}</span>
+                            Transfer ownership control for property: <span className="text-white">{premiseToChangeOwner?.name}</span>
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleChangeOwnerSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">New Principal Neural Mail</Label>
-                            <Input type="email" required value={newOwnerEmail || ''} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="principal@aavija.mesh" className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" />
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">New Owner Email</Label>
+                            <Input type="email" required value={newOwnerEmail || ''} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="owner@aavija.com" className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" />
                         </div>
                         <div className="flex justify-end gap-4 pt-4">
                             <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
-                                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Commit Transfer'}
+                                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Transfer Ownership'}
                             </Button>
                         </div>
                     </form>

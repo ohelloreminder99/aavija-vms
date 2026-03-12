@@ -1,1 +1,15 @@
-{ "welcome": "en translation" }
+{
+  "welcome": "Welcome back",
+  "dashboard": "Dashboard",
+  "logout": "Logout",
+  "profile": "Profile",
+  "settings": "Settings",
+  "actions": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}
+

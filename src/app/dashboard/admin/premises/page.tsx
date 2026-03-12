@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * AAVIJA VMS — Admin Premises Page (Phase 2B Update)
@@ -394,7 +394,7 @@ export default function PremisesPage() {
                         </div>
                       </div>
                     ) : (
-                      <span className='text-[9px] font-black uppercase tracking-widest text-zinc-800'>Orphan Node</span>
+                      <span className='text-[9px] font-black uppercase tracking-widest text-zinc-800'>No Owner</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right pr-8">
@@ -424,37 +424,46 @@ export default function PremisesPage() {
             <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
           </Link>
         </Button>
-        <PremiseDialogs
-          isCreateOpen={isCreateOpen}
-          setIsCreateOpen={setIsCreateOpen}
-          creationMode={creationMode}
-          setCreationMode={setCreationMode}
-          newOwnerForm={newOwnerForm}
-          existingUserForm={existingUserForm}
-          handleCreateSubmit={handleCreateSubmit}
-          isEditOpen={isEditOpen}
-          setIsEditOpen={setIsEditOpen}
-          editForm={editForm}
-          handleEditSubmit={handleEditSubmit}
-          selectedPremise={selectedPremise}
-          isDeleteAlertOpen={isDeleteAlertOpen}
-          setIsDeleteAlertOpen={setIsDeleteAlertOpen}
-          handleDeleteConfirm={handleDeleteConfirm}
-          isChangeOwnerOpen={isChangeOwnerOpen}
-          setIsChangeOwnerOpen={setIsChangeOwnerOpen}
-          premiseToChangeOwner={premiseToChangeOwner}
-          newOwnerEmail={newOwnerEmail}
-          setNewOwnerEmail={setNewOwnerEmail}
-          handleChangeOwnerSubmit={handleChangeOwnerSubmit}
-          showDuplicateUserDialog={showDuplicateUserDialog}
-          setShowDuplicateUserDialog={setShowDuplicateUserDialog}
-          isSubmitting={isSubmitting}
-          categories={categories || []}
-          cities={cities || []}
-          filteredCities={filteredCities}
-          citySearch={citySearch}
-          setCitySearch={setCitySearch}
-        />
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add Property
+          </Button>
+
+          <PremiseDialogs
+            isCreateOpen={isCreateOpen}
+            setIsCreateOpen={setIsCreateOpen}
+            creationMode={creationMode}
+            setCreationMode={setCreationMode}
+            newOwnerForm={newOwnerForm}
+            existingUserForm={existingUserForm}
+            handleCreateSubmit={handleCreateSubmit}
+            isEditOpen={isEditOpen}
+            setIsEditOpen={setIsEditOpen}
+            editForm={editForm}
+            handleEditSubmit={handleEditSubmit}
+            selectedPremise={selectedPremise}
+            isDeleteAlertOpen={isDeleteAlertOpen}
+            setIsDeleteAlertOpen={setIsDeleteAlertOpen}
+            handleDeleteConfirm={handleDeleteConfirm}
+            isChangeOwnerOpen={isChangeOwnerOpen}
+            setIsChangeOwnerOpen={setIsChangeOwnerOpen}
+            premiseToChangeOwner={premiseToChangeOwner}
+            newOwnerEmail={newOwnerEmail}
+            setNewOwnerEmail={setNewOwnerEmail}
+            handleChangeOwnerSubmit={handleChangeOwnerSubmit}
+            showDuplicateUserDialog={showDuplicateUserDialog}
+            setShowDuplicateUserDialog={setShowDuplicateUserDialog}
+            isSubmitting={isSubmitting}
+            categories={categories || []}
+            cities={cities || []}
+            filteredCities={filteredCities}
+            citySearch={citySearch}
+            setCitySearch={setCitySearch}
+          />
+        </div>
       </div>
 
       <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
