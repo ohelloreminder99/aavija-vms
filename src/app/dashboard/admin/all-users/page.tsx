@@ -50,9 +50,11 @@ export default function AllUsersPage() {
   const { toast } = useToast();
   const { user } = useUser();
   const { data: adminProfile } = useUserProfile(user?.id);
+  const hasLoggedView = React.useRef(false);
 
   React.useEffect(() => {
-    if (users && users.length > 0 && adminProfile) {
+    if (users && users.length > 0 && adminProfile && !hasLoggedView.current) {
+      hasLoggedView.current = true;
       createLogEntry({
         actorId: adminProfile.id,
         actorName: adminProfile.name,

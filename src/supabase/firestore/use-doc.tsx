@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -119,5 +120,9 @@ export function useDoc<T = Record<string, any>>(
     };
   }, [memoizedDocRef]);
 
-  return { data, isLoading, error };
+  return React.useMemo(() => ({
+    data,
+    isLoading,
+    error
+  }), [data, isLoading, error]);
 }
