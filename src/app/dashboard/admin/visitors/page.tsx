@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ArrowLeft, Loader2, Search, Eye } from 'lucide-react';
+import { ArrowLeft, Loader2, Search, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,11 +31,14 @@ import Image from 'next/image';
 const VisitorHistoryDialog = React.lazy(() => import('./components/VisitorHistoryDialog'));
 
 export default function VisitorsPage() {
+  const [page, setPage] = React.useState(0);
+  const pageSize = 50;
   const {
     data: visitors,
     isLoading: isLoadingVisitors,
+    hasMore,
     error,
-  } = useUsersByRole('visitor');
+  } = useUsersByRole('visitor', { page, pageSize });
   const { data: premises, isLoading: isLoadingPremises } = usePremises();
   const [selectedVisitor, setSelectedVisitor] =
     React.useState<WithId<UserProfile> | null>(null);
@@ -95,39 +98,67 @@ export default function VisitorsPage() {
 
     return (
       <div className="space-y-6">
-        <div className="relative group max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
-          <Input
-            placeholder="Search name or email..."
-            className="pl-11 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative group max-w-md flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Search name or email..."
+              className="pl-11 bg-white/20 border-zinc-200/60 text-zinc-900 h-12 rounded-2xl placeholder:text-zinc-500 focus:border-primary/30 transition-all focus:ring-primary/20 font-semibold"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(0);
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-2 bg-zinc-100/50 border border-zinc-200/60 rounded-2xl px-4 py-2 self-end md:self-auto shadow-sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0 || isLoading}
+              className="h-8 w-8 p-0 text-zinc-600 hover:text-zinc-900"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-700 min-w-[80px] text-center">
+              Sector {page + 1}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!hasMore || isLoading}
+              className="h-8 w-8 p-0 text-zinc-600 hover:text-zinc-900"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-white/5 bg-black/20 overflow-hidden">
+        <div className="rounded-2xl border border-zinc-200/60 bg-white/40 overflow-hidden shadow-xl mt-4">
           <Table>
-            <TableHeader className="bg-white/[0.02]">
-              <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Visitor Profile</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Email Address</TableHead>
-                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Phone Number</TableHead>
-                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-500 h-14">Token Balance</TableHead>
+            <TableHeader className="bg-zinc-100/50">
+              <TableRow className="border-zinc-200/60 hover:bg-transparent">
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 h-14 pl-6">Visitor Profile</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 h-14">Email Address</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 h-14">Phone Number</TableHead>
+                <TableHead className="text-right text-[10px] font-black uppercase tracking-widest text-zinc-600 h-14 pr-6">Token Balance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredVisitors.map((visitor: WithId<UserProfile>) => (
-                <TableRow key={visitor.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
-                  <TableCell className="py-4">
+                <TableRow key={visitor.id} className="border-zinc-200/60 hover:bg-zinc-100/30 transition-colors group">
+                  <TableCell className="py-4 pl-6">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => setImageUrlToView(visitor.photo_url || null)}
                         disabled={!visitor.photo_url}
                         className="relative group/avatar"
                       >
-                        <Avatar className="h-12 w-12 border border-white/5 group-hover/avatar:border-primary/50 transition-all">
+                        <Avatar className="h-12 w-12 border border-zinc-200 group-hover/avatar:border-primary/50 transition-all shadow-sm">
                           {visitor.photo_url && <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />}
-                          <AvatarFallback className="bg-zinc-100 text-zinc-500">{visitor.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="bg-zinc-100 text-zinc-500 font-bold">{visitor.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         {visitor.photo_url && (
                           <div className="absolute inset-0 bg-primary/20 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity">
@@ -138,20 +169,20 @@ export default function VisitorsPage() {
                       <div className="flex flex-col">
                         <Button
                           variant="link"
-                          className="p-0 h-auto text-sm font-bold text-white hover:text-primary hover:no-underline transition-colors justify-start"
+                          className="p-0 h-auto text-sm font-bold text-zinc-900 hover:text-primary hover:no-underline transition-colors justify-start"
                           onClick={() => setSelectedVisitor(visitor)}
                         >
                           {visitor.name}
                         </Button>
-                        <span className="text-[9px] text-zinc-600 font-mono tracking-tighter uppercase mt-0.5">
+                        <span className="text-[9px] text-zinc-700 font-black tracking-tighter uppercase mt-0.5">
                           ID: {visitor.id.split('-')[0]}...
                         </span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-zinc-400 text-xs font-medium">{visitor.email}</TableCell>
-                  <TableCell className="text-zinc-400 text-xs font-mono">{visitor.phone || '—'}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-zinc-700 text-xs font-semibold">{visitor.email}</TableCell>
+                  <TableCell className="text-zinc-700 text-xs font-mono font-bold">{visitor.phone || '—'}</TableCell>
+                  <TableCell className="text-right pr-6">
                     <div className="flex flex-col items-end">
                       <span className="text-sm font-bold text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] tabular-nums">
                         {(visitor.token_balance_visitor ?? 0).toLocaleString()}
@@ -177,7 +208,7 @@ export default function VisitorsPage() {
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-8 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-4">
-          <Button asChild variant="ghost" className="text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
+          <Button asChild variant="ghost" className="text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
             <Link href="/dashboard/admin">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
@@ -193,7 +224,7 @@ export default function VisitorsPage() {
                 Visitor <span className="text-primary/80">Registry</span>
               </h1>
             </div>
-            <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
+            <p className="text-zinc-600 text-[11px] font-semibold uppercase tracking-[0.2em] ml-1">
               View and manage all registered visitors and their account status.
             </p>
           </div>
@@ -225,26 +256,26 @@ export default function VisitorsPage() {
 
       <Dialog open={!!imageUrlToView} onOpenChange={() => setImageUrlToView(null)}>
         <DialogContent className="max-w-xl bg-white border-zinc-200 shadow-2xl p-0 overflow-hidden">
-          <div className="p-6 border-b border-zinc-100 bg-zinc-50/30">
+          <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-zinc-900 tracking-tight">Visitor <span className="text-primary/80">Photo</span></DialogTitle>
             </DialogHeader>
           </div>
           {imageUrlToView && (
-            <div className="relative aspect-square w-full bg-black/40 p-8 flex items-center justify-center">
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
+            <div className="relative aspect-square w-full bg-zinc-100/30 p-8 flex items-center justify-center">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-zinc-200 shadow-2xl">
                 <Image
                   src={imageUrlToView}
                   alt="Visitor identity"
                   fill
                   className="object-contain"
                 />
-                <div className="absolute inset-0 pointer-events-none border border-white/10 rounded-2xl" />
+                <div className="absolute inset-0 pointer-events-none border border-zinc-200/20 rounded-2xl" />
               </div>
             </div>
           )}
-          <div className="p-6 border-t border-zinc-100 bg-zinc-50/30 flex justify-end">
-            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close</Button>
+          <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 flex justify-end">
+            <Button onClick={() => setImageUrlToView(null)} className="h-10 px-8 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all">Close</Button>
           </div>
         </DialogContent>
       </Dialog>

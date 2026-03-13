@@ -18,6 +18,7 @@ import { DesktopSidebar, MobileSidebar } from '@/components/Sidebar';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { needsSetup, shouldBypassSetup } from '@/lib/user-setup-check';
 import { CommandMenu } from '@/components/CommandMenu';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 import * as React from 'react';
 
 function HeaderContent() {
@@ -212,7 +213,61 @@ export default function DashboardLayout({
                         <DesktopSidebar userProfile={userProfile} isCollapsed={isSidebarCollapsed} toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
                         <main className="flex-1 overflow-y-auto w-full bg-transparent">
                             <div className="min-h-full">
-                                {children}
+                                {(() => {
+                                    const pathSegments = pathname?.split('/') || [];
+                                    const section = pathSegments.length > 2 ? pathSegments[2] : null;
+
+                                    if (section === 'admin') {
+                                        return (
+                                            <RoleGuard allowedRoles={['admin']}>
+                                                {children}
+                                            </RoleGuard>
+                                        );
+                                    }
+
+                                    if (section === 'owner') {
+                                        // Owners and Hosts (who often acting on behalf of owners in this app's context)
+                                        return (
+                                            <RoleGuard allowedRoles={['owner', 'host']}>
+                                                {children}
+                                            </RoleGuard>
+                                        );
+                                    }
+
+                                    if (section === 'visitor') {
+                                        return (
+                                            <RoleGuard allowedRoles={['visitor']}>
+                                                {children}
+                                            </RoleGuard>
+                                        );
+                                    }
+
+                                    if (section === 'gatekeeper') {
+                                        return (
+                                            <RoleGuard allowedRoles={['gatekeeper']}>
+                                                {children}
+                                            </RoleGuard>
+                                        );
+                                    }
+
+                                    if (section === 'staff') {
+                                        return (
+                                            <RoleGuard allowedRoles={['staff']}>
+                                                {children}
+                                            </RoleGuard>
+                                        );
+                                    }
+
+                                    if (section === 'host') {
+                                        return (
+                                            <RoleGuard allowedRoles={['host']}>
+                                                {children}
+                                            </RoleGuard>
+                                        );
+                                    }
+
+                                    return children;
+                                })()}
                             </div>
                         </main>
                     </div>

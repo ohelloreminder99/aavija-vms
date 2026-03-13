@@ -189,7 +189,7 @@ export default function VisitorHistoryDialog({
                   </div>
                   <DialogTitle className="text-3xl font-headline font-bold text-zinc-900 tracking-tight">Visit <span className="text-primary/80">History</span></DialogTitle>
                 </div>
-                <DialogDescription className="text-zinc-500 font-medium uppercase tracking-[0.2em] text-[10px]">
+                <DialogDescription className="text-zinc-600 font-semibold uppercase tracking-[0.2em] text-[10px]">
                   Global check-in audit for {visitor?.name}
                 </DialogDescription>
               </div>
@@ -211,11 +211,11 @@ export default function VisitorHistoryDialog({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-zinc-50 border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
+                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-zinc-50 border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
                       <Download className="mr-2 h-4 w-4" />
                       Export CSV
                     </Button>
-                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-zinc-50 border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
+                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-zinc-50 border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
                       <Download className="mr-2 h-4 w-4" />
                       Export PDF
                     </Button>
@@ -227,30 +227,30 @@ export default function VisitorHistoryDialog({
                 {isLoading ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4">
                     <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Retrieving Records...</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Retrieving Records...</span>
                   </div>
                 ) : error ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4 px-8 text-center">
-                    <AlertTriangle className="h-10 w-10 text-red-500/50" />
-                    <p className="text-zinc-500 text-sm max-w-xs">{error}</p>
+                    <AlertTriangle className="h-10 w-10 text-red-600/50" />
+                    <p className="text-zinc-600 font-medium text-sm max-w-xs">{error}</p>
                   </div>
                 ) : filteredVisits.length === 0 ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4">
                     <div className="p-4 rounded-full bg-zinc-50 border border-zinc-100 shadow-inner">
-                      <History className="h-8 w-8 text-zinc-300" />
+                      <History className="h-8 w-8 text-zinc-400" />
                     </div>
-                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">No visit logs found</p>
+                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">No visit logs found</p>
                   </div>
                 ) : (
                   <Table>
                     <TableHeader className="bg-zinc-50/50">
                       <TableRow className="border-zinc-100 hover:bg-transparent">
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Premise</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Host Met</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6 pl-8 w-16">Snapshot</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Premise</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Host Met</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Check-in</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Check-out</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -265,20 +265,20 @@ export default function VisitorHistoryDialog({
                             <div className="font-bold text-zinc-900 tracking-tight group-hover/row:text-primary transition-colors">{premiseMap.get(visit.premise_id) || 'Unknown'}</div>
                           </TableCell>
                           <TableCell>
-                            <div className="text-[11px] font-medium text-zinc-400">{visit.host_name || 'Autonomous'}</div>
+                            <div className="text-[11px] font-semibold text-zinc-600">{visit.host_name || 'Autonomous'}</div>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkin_time), 'PPp')}</span>
+                            <span className="font-mono text-[11px] text-zinc-600 font-semibold">{format(new Date(visit.checkin_time), 'PPp')}</span>
                           </TableCell>
                           <TableCell>
                             {visit.checkout_time ? (
-                              <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                              <span className="font-mono text-[11px] text-zinc-600 font-semibold">{format(new Date(visit.checkout_time), 'PPp')}</span>
                             ) : (
-                              <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
+                              <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-600 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
                             )}
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest bg-zinc-500/10 text-zinc-400 border-zinc-500/20">
+                            <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest bg-zinc-500/10 text-zinc-600 border-zinc-500/20 font-bold">
                               {visit.status.replace('_', ' ')}
                             </Badge>
                           </TableCell>

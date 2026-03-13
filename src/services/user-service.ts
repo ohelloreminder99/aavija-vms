@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * AAVIJA VMS — User Service (Client-Side Reads & Safe Profile Updates)
@@ -139,27 +139,41 @@ export async function updateUserProfile(uid: string, data: Partial<UpdateableUse
 }
 
 /**
- * Hook to fetch all users, ordered by name.
- * @returns The same result as useCollection: { data, isLoading, error }
+ * Hook to fetch all users, ordered by name, with pagination.
+ * @returns The same result as useCollection: { data, isLoading, error, hasMore }
  */
-export function useAllUsers() {
+export function useAllUsers(options?: { pageSize?: number; page?: number }) {
+  const { pageSize = 50, page = 0 } = options || {};
   const query = React.useMemo(() => {
-    return { table: 'users', orderBy: { column: 'name', ascending: true }, __memo: true };
-  }, []);
+    return { 
+      table: 'users', 
+      orderBy: { column: 'name', ascending: true }, 
+      limit: pageSize,
+      offset: page * pageSize,
+      __memo: true 
+    };
+  }, [pageSize, page]);
 
   return useCollection<UserProfile>(query as any);
 }
 
 
 /**
- * Hook to fetch users with a specific role in real-time.
+ * Hook to fetch users with a specific role in real-time, with pagination.
  * @param role The role to filter users by.
- * @returns The same result as useCollection: { data, isLoading, error }
+ * @returns The same result as useCollection: { data, isLoading, error, hasMore }
  */
-export function useUsersByRole(role: UserProfile['role']) {
+export function useUsersByRole(role: UserProfile['role'], options?: { pageSize?: number; page?: number }) {
+  const { pageSize = 50, page = 0 } = options || {};
   const query = React.useMemo(() => {
-    return { table: 'users', filters: [{ column: 'role', operator: 'eq', value: role }], __memo: true };
-  }, [role]);
+    return { 
+      table: 'users', 
+      filters: [{ column: 'role', operator: 'eq' as const, value: role }], 
+      limit: pageSize,
+      offset: page * pageSize,
+      __memo: true 
+    };
+  }, [role, pageSize, page]);
 
   return useCollection<UserProfile>(query as any);
 }

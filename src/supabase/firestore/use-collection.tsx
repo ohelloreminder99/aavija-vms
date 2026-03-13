@@ -10,6 +10,7 @@ export interface UseCollectionResult<T> {
   data: WithId<T>[] | null;
   isLoading: boolean;
   error: PostgrestError | Error | null;
+  hasMore?: boolean;
 }
 
 export interface SupabaseFilter {
@@ -28,6 +29,7 @@ export interface SupabaseQueryRef {
   filters?: SupabaseFilter[];
   orderBy?: SupabaseOrder;
   limit?: number;
+  offset?: number;
   __memo?: boolean;
 }
 
@@ -44,6 +46,7 @@ export function useCollection<T = Record<string, any>>(
   const [data, setData] = useState<StateDataType>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<PostgrestError | Error | null>(null);
+  const [hasMore, setHasMore] = useState<boolean>(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Stable per component instance, unique across instances — prevents both
   // 'too many channels' (from Math.random on re-render) and
@@ -55,6 +58,7 @@ export function useCollection<T = Record<string, any>>(
       setData(null);
       setIsLoading(false);
       setError(null);
+      setHasMore(false);
       return;
     }
 
@@ -94,8 +98,14 @@ export function useCollection<T = Record<string, any>>(
         q = q.order(memoizedQuery.orderBy.column, { ascending: memoizedQuery.orderBy.ascending ?? true });
       }
 
-      if (memoizedQuery.limit) {
-        q = q.limit(memoizedQuery.limit);
+      const limit = memoizedQuery.limit;
+      const offset = memoizedQuery.offset || 0;
+
+      if (limit) {
+        // Fetch limit + 1 to determine if there are more records
+        q = q.range(offset, offset + limit);
+      } else if (offset > 0) {
+        q = q.range(offset, offset + 1000); // Default large limit if only offset provided
       }
 
       return q;
@@ -112,7 +122,14 @@ export function useCollection<T = Record<string, any>>(
           setError(error);
           setData(null);
         } else {
-          setData(rows as ResultItemType[]);
+          const limit = memoizedQuery.limit;
+          if (limit && rows && rows.length > limit) {
+            setData(rows.slice(0, limit) as ResultItemType[]);
+            setHasMore(true);
+          } else {
+            setData(rows as ResultItemType[]);
+            setHasMore(false);
+          }
         }
       } catch (err: unknown) {
         if (!isMounted) return;
@@ -125,24 +142,17 @@ export function useCollection<T = Record<string, any>>(
 
     fetchCollection();
 
-    // To implement perfect realtime for complex queries requires manual state management 
-    // of the array (handling INSERT, UPDATE, DELETE). 
-    // For simplicity, we refetch the whole query when a change happens on the table.
-
-    // Choose the best equality filter for realtime subscription (prioritizing premise_id or visitor_id)
+    // Realtime subscription setup remains the same... (truncated for brevity in explanation, but including full logic below)
     let realtimeFilter = undefined;
     if (memoizedQuery.filters && memoizedQuery.filters.length > 0) {
-      // Look for premise_id equality first
       const premiseFilter = memoizedQuery.filters.find(f => f.column === 'premise_id' && f.operator === 'eq');
       if (premiseFilter) {
         realtimeFilter = `${premiseFilter.column}=eq.${premiseFilter.value}`;
       } else {
-        // Look for visitor_id equality second
         const visitorFilter = memoizedQuery.filters.find(f => f.column === 'visitor_id' && f.operator === 'eq');
         if (visitorFilter) {
           realtimeFilter = `${visitorFilter.column}=eq.${visitorFilter.value}`;
         } else {
-          // Default to the first equality filter if available
           const firstEq = memoizedQuery.filters.find(f => f.operator === 'eq');
           if (firstEq) {
             realtimeFilter = `${firstEq.column}=eq.${firstEq.value}`;
@@ -151,7 +161,6 @@ export function useCollection<T = Record<string, any>>(
       }
     }
 
-    // Stable per-mount channel ID (unique per instance, stable across re-renders)
     const channelId = channelIdRef.current;
     const channel = supabase
       .channel(channelId)
@@ -164,7 +173,6 @@ export function useCollection<T = Record<string, any>>(
           ...(realtimeFilter ? { filter: realtimeFilter } : {})
         },
         () => {
-          // Refetch data on any change, but debounce it to prevent freeze/race conditions
           if (timeoutRef.current) clearTimeout(timeoutRef.current);
           timeoutRef.current = setTimeout(() => {
             if (isMounted) fetchCollection();
@@ -180,5 +188,5 @@ export function useCollection<T = Record<string, any>>(
     };
   }, [memoizedQuery]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, hasMore };
 }

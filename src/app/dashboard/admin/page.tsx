@@ -11,9 +11,9 @@ export default function AdminDashboardPage() {
           <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
             <Shield className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
           </div>
-          <h1 className="text-4xl font-headline font-bold tracking-tight text-white">Admin <span className="text-primary/80">Dashboard</span></h1>
+          <h1 className="text-4xl font-headline font-bold tracking-tight text-zinc-900">Admin <span className="text-primary/80">Dashboard</span></h1>
         </div>
-        <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] max-w-2xl leading-relaxed ml-1">
+        <p className="text-zinc-600 text-[11px] font-semibold uppercase tracking-[0.2em] max-w-2xl leading-relaxed ml-1">
           Manage your properties, users, and system settings. Monitor revenue, payments, and GST compliance from one place.
         </p>
       </div>
