@@ -1,4 +1,4 @@
-﻿
+
 'use client';
 
 import * as React from 'react';
@@ -536,8 +536,8 @@ export default function TokenSettingsPage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField control={form.control} name="referral_enabled" render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 md:col-span-2 bg-green-50 dark:bg-green-950/20">
-                      <div className="space-y-0.5"><FormLabel className="text-base text-green-700 dark:text-green-400">Enable Referral Program</FormLabel><FormDescription>Allow users to share referral codes and earn real-money commission.</FormDescription></div>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 md:col-span-2 bg-green-50">
+                      <div className="space-y-0.5"><FormLabel className="text-base text-green-700">Enable Referral Program</FormLabel><FormDescription>Allow users to share referral codes and earn real-money commission.</FormDescription></div>
                       <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                     </FormItem>
                   )} />

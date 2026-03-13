@@ -135,7 +135,7 @@ export default function AdminPayoutsPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {filtered.map(req => (
-                                            <TableRow key={req.id} className={cn(req.status === 'pending' && 'bg-amber-50/30 dark:bg-amber-900/10')}>
+                                            <TableRow key={req.id} className={cn(req.status === 'pending' && 'bg-amber-50/30')}>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="h-8 w-8">
