@@ -47,14 +47,14 @@ const RoleCard = React.memo(({ title, description, href, icon: Icon }: { title: 
     )}>
       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
       <CardHeader className="flex flex-row items-center gap-6 p-6 relative z-10">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 border border-zinc-200 group-hover:border-primary group-hover:bg-primary/20 transition-all duration-500 shadow-[inset_0_0_20px_rgba(0,0,0,0.02)]">
-          <Icon className="h-7 w-7 text-foreground group-hover:text-primary group-hover:scale-110 transition-all duration-500" />
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:border-primary group-hover:bg-primary/20 transition-all duration-500 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]">
+          <Icon className="h-7 w-7 text-white group-hover:text-primary group-hover:scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all duration-500" />
         </div>
         <div className="flex-1 min-w-0">
-          <CardTitle className="text-xl font-headline tracking-wide text-foreground transition-all duration-300">
+          <CardTitle className="text-xl font-headline tracking-wide text-white group-hover:text-glow transition-all duration-300">
             {title}
           </CardTitle>
-          <CardDescription className="text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+          <CardDescription className="text-zinc-400 group-hover:text-zinc-200 transition-colors duration-300">
             {description}
           </CardDescription>
         </div>
@@ -105,18 +105,18 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-screen items-center justify-center bg-[#020617]">
         <div className="flex flex-col items-center gap-8">
-          <AavijaLogo iconClassName="text-primary animate-pulse" textClassName="text-foreground scale-150" />
+          <AavijaLogo iconClassName="text-primary animate-pulse" textClassName="text-white scale-150" />
           <div className="relative">
-            <Loader2 className="h-12 w-12 animate-spin text-muted-foreground/20" />
+            <Loader2 className="h-12 w-12 animate-spin text-white/10" />
             <div className="absolute inset-0 h-12 w-12 animate-pulse text-primary blur-md">
               <Loader2 className="h-12 w-12 animate-spin" />
             </div>
           </div>
           <div className="space-y-2 text-center">
-            <p className="text-muted-foreground font-medium tracking-[0.2em] uppercase text-xs animate-pulse">Initialising...</p>
-            <div className="h-1 w-48 bg-zinc-100 rounded-full overflow-hidden">
+            <p className="text-zinc-400 font-medium tracking-[0.2em] uppercase text-xs animate-pulse">Initialising...</p>
+            <div className="h-1 w-48 bg-white/5 rounded-full overflow-hidden">
               <div className="h-full bg-primary animate-[shimmer_2s_infinite] w-full" />
             </div>
           </div>
@@ -138,8 +138,8 @@ export default function DashboardPage() {
               SECURE SESSION ACTIVE
             </div>
             <div className="space-y-2">
-              <h1 className="text-4xl font-headline font-bold tracking-tight text-foreground sm:text-5xl">Select Your Role</h1>
-              <p className="text-lg text-muted-foreground max-w-sm mx-auto">Choose how you want to continue.</p>
+              <h1 className="text-4xl font-headline font-bold tracking-tight text-white sm:text-5xl">Select Your Role</h1>
+              <p className="text-lg text-zinc-400 max-w-sm mx-auto">Choose how you want to continue.</p>
             </div>
           </div>
 

@@ -78,8 +78,8 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                 className={cn(
                     "w-full justify-start overflow-hidden group relative transition-all duration-300",
                     isActive
-                        ? "bg-primary/10 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-bold shadow-[0_0_20px_rgba(59,130,246,0.15)]"
-                        : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/30 font-semibold"
+                        ? "bg-primary/20 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-bold shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                        : "text-zinc-400 hover:text-white hover:bg-white/5 font-semibold"
                 )}
                 asChild
                 onClick={onClose}
@@ -88,7 +88,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     {isActive && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
                     <Icon className={cn(
                         "mr-3 h-5 w-5 shrink-0 transition-all duration-300",
-                        isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" : "group-hover:text-zinc-900"
+                        isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" : "group-hover:text-white text-zinc-400"
                     )} />
                     <span className="truncate">{label}</span>
                 </Link>
@@ -131,11 +131,11 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                             const name = premiseNames[premiseId] || 'Loading...';
                             return (
                                 <div key={premiseId} className="space-y-2">
-                                    <div className="px-4 py-2 text-xs font-black text-zinc-800 truncate" title={name}>
+                                    <div className="px-4 py-2 text-xs font-black text-white truncate" title={name}>
                                         {name}
                                     </div>
                                     <div className="pl-4 space-y-1 relative">
-                                        <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40 ml-4" />
+                                        <div className="absolute left-0 top-0 bottom-0 w-px bg-white/10 ml-4" />
                                         {roles.map(role => {
                                             const href = `/dashboard/${role}?premiseId=${premiseId}`;
                                             const label = role.charAt(0).toUpperCase() + role.slice(1);
@@ -155,7 +155,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { userProfile: UserProfile | null, isCollapsed: boolean, toggleCollapse: () => void }) {
     return (
         <aside className={cn(
-            "hidden md:flex flex-col border-r border-zinc-200 glass-card transition-all duration-500 relative",
+            "hidden md:flex flex-col border-r border-white/10 bg-[#020617]/50 backdrop-blur-xl transition-all duration-500 relative",
             isCollapsed ? "w-20 items-center" : "w-72"
         )}>
             {/* Collapse Toggle */}
@@ -163,7 +163,7 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                 variant="ghost"
                 size="icon"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-zinc-200 bg-white text-zinc-400 shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:bg-zinc-50 hover:text-primary transition-all transform active:scale-95"
+                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-[#020617] text-zinc-400 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
                 {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
@@ -175,19 +175,19 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                 </div>
             ) : (
                 <div className="flex flex-col items-center py-10 space-y-6">
-                    <Button variant="ghost" size="icon" className="text-zinc-600 hover:text-primary" asChild aria-label="Visitor Dashboard">
+                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:bg-white/5 hover:text-white" asChild aria-label="Visitor Dashboard">
                         <Link href="/dashboard/visitor" title="Visitor Dashboard"><Briefcase className="h-5 w-5" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-zinc-600 hover:text-primary" asChild aria-label="My Profile">
+                    <Button variant="ghost" size="icon" className="text-zinc-400 hover:bg-white/5 hover:text-white" asChild aria-label="My Profile">
                         <Link href="/dashboard/profile" title="My Profile"><UserCircle className="h-5 w-5" /></Link>
                     </Button>
                     {userProfile?.is_agent && (
-                        <Button variant="ghost" size="icon" className="text-zinc-600 hover:text-primary" asChild aria-label="My Earnings">
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:bg-white/5 hover:text-white" asChild aria-label="My Earnings">
                             <Link href="/dashboard/visitor/earnings" title="My Earnings"><Wallet className="h-5 w-5" /></Link>
                         </Button>
                     )}
                     {userProfile?.role === 'admin' && (
-                        <Button variant="ghost" size="icon" className="text-zinc-600 hover:text-primary" asChild aria-label="Admin Console">
+                        <Button variant="ghost" size="icon" className="text-zinc-400 hover:bg-white/5 hover:text-white" asChild aria-label="Admin Console">
                             <Link href="/dashboard/admin" title="Admin Console"><Settings className="h-5 w-5" /></Link>
                         </Button>
                     )}

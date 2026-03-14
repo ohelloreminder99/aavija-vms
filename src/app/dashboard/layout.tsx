@@ -205,8 +205,8 @@ export default function DashboardLayout({
     if (user) {
         return (
             <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
-                <div className="flex min-h-screen flex-col relative mesh-porcelain selection:bg-primary/20 selection:text-primary-foreground">
-                    <header className="sticky top-0 z-50 w-full border-b border-zinc-200 glass-card">
+                <div className="flex min-h-screen flex-col relative bg-[#020617] text-white selection:bg-primary/20 selection:text-white">
+                    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#020617]/80 backdrop-blur-md">
                         <HeaderContent />
                     </header>
                     <div className="flex flex-1 overflow-hidden">

@@ -420,38 +420,7 @@ export async function cancelCheckin(token: string): Promise<{ success: boolean }
   return { success: true };
 }
 
-export async function getActiveVisitsForPremise(premiseId: string): Promise<{ success: boolean, visits?: SerializableVisit[], error?: string }> {
-  const adminDb = await getAdminDb();
-  if (!adminDb) return { success: false, error: "Server database connection not available." };
 
-  try {
-    const { profile } = await requireAuth();
-    const isOwner = profile.role === 'owner';
-    const premiseRoles = profile.premise_roles?.[premiseId] || [];
-    if (profile.role !== 'admin' && !isOwner && !premiseRoles.includes('gatekeeper') && !premiseRoles.includes('host')) {
-      throw new Error('Unauthorized: You do not have permission to view visits for this premise.');
-    }
-
-    const { data: visitsSnapshot, error } = await adminDb
-      .from('visits')
-      .select('*')
-      .eq('premise_id', premiseId)
-      .eq('status', 'active')
-      .order('checkin_time', { ascending: false });
-
-    if (error) throw error;
-
-    const visits = (visitsSnapshot || []).map((doc: any) => ({
-      id: doc.id,
-      ...doc,
-      checkin_time: doc.checkin_time,
-    }));
-    return { success: true, visits };
-
-  } catch (e: any) {
-    return { success: false, error: e.message || "Could not fetch active visits." };
-  }
-}
 
 interface CheckoutPayload {
   visitId: string;

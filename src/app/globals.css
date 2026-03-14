@@ -41,18 +41,18 @@
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(2, 6, 23, 0.4);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   }
 
   .glass-morphism {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(2, 6, 23, 0.3);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .text-glow {

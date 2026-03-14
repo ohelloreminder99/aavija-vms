@@ -208,6 +208,4 @@ export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperByEma
   }
 }
 
-export async function deleteGatekeeper(uid: string, premiseId: string): Promise<{ success: boolean; error?: string }> {
-  return { success: false, error: 'Delete functionality not yet implemented.' };
-}
+
