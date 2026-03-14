@@ -50,8 +50,9 @@ export default function StaffDashboardPage() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 animate-pulse">Syncing Submissions...</p>
         </div>
       );
     }
@@ -67,36 +68,39 @@ export default function StaffDashboardPage() {
 
     if (!submissions || submissions.length === 0) {
       return (
-        <div className="py-20 text-center text-muted-foreground border-2 border-dashed rounded-lg">
-          <Inbox className="mx-auto h-12 w-12" />
-          <p className="mt-4 mb-2">No contact submissions found.</p>
+        <div className="py-24 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-3xl">
+          <Inbox className="mx-auto h-12 w-12 text-zinc-700 mb-4" />
+          <p className="font-bold text-white uppercase tracking-widest text-sm">Clear Horizon</p>
+          <p className="text-xs text-zinc-500 mt-1 uppercase tracking-tighter">No contact submissions found.</p>
         </div>
       );
     }
 
     return (
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Received</TableHead>
-            <TableHead>From</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Message</TableHead>
+        <TableHeader className="bg-white/5">
+          <TableRow className="border-white/10">
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 pl-8">Received</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500">From</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Email</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 pr-8">Message</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {submissions.map((submission) => (
-            <TableRow key={submission.id}>
-              <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+            <TableRow key={submission.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+              <TableCell className="text-[11px] font-mono text-zinc-500 whitespace-nowrap pl-8">
                 {format(new Date(submission.createdAt), 'PP p')}
               </TableCell>
-              <TableCell className="font-medium">{submission.name}</TableCell>
+              <TableCell className="font-bold text-white group-hover:text-primary transition-colors">{submission.name}</TableCell>
               <TableCell>
-                <a href={`mailto:${submission.email}`} className="text-primary hover:underline">
+                <a href={`mailto:${submission.email}`} className="text-primary/80 hover:text-primary transition-colors text-sm font-medium">
                   {submission.email}
                 </a>
               </TableCell>
-              <TableCell className="max-w-sm whitespace-pre-wrap">{submission.message}</TableCell>
+              <TableCell className="max-w-sm whitespace-pre-wrap text-zinc-400 text-sm italic pr-8 group-hover:text-zinc-200">
+                "{submission.message}"
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -111,17 +115,19 @@ export default function StaffDashboardPage() {
                 <AnnouncementsCard role="staff" />
             </div>
             <div className="lg:col-span-2">
-                <Card>
-                    <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                        <MessageCircle className="h-6 w-6" />
-                        <span>Contact Form Submissions</span>
+                <Card className="glass-card border-white/5 overflow-hidden">
+                    <CardHeader className="border-b border-white/5 pb-6">
+                    <CardTitle className="flex items-center gap-3 text-white">
+                        <div className="p-2 rounded-lg bg-white/5 border border-white/10 shadow-inner">
+                            <MessageCircle className="h-5 w-5 text-primary" />
+                        </div>
+                        <span className="text-xl font-headline tracking-tight">Contact Form Submissions</span>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-zinc-500 font-medium ml-10">
                         Messages sent from the public contact page.
                     </CardDescription>
                     </CardHeader>
-                    <CardContent>{renderContent()}</CardContent>
+                    <CardContent className="p-0">{renderContent()}</CardContent>
                 </Card>
             </div>
         </div>

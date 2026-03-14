@@ -200,12 +200,12 @@ export default function GatekeeperHistoryPage() {
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-24 text-center bg-white/[0.01]">
+        <div className="py-24 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.01]">
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
-            <History className="h-8 w-8 text-zinc-700" />
+            <History className="h-8 w-8 text-zinc-400" />
           </div>
           <p className="mb-2 font-bold text-white uppercase tracking-widest text-sm">No History Found</p>
-          <p className="text-xs text-zinc-500 max-w-[200px] mx-auto leading-relaxed">
+          <p className="text-xs text-zinc-400 max-w-[200px] mx-auto leading-relaxed">
             No check-ins have been recorded at this premise yet.
           </p>
         </div>
@@ -215,19 +215,19 @@ export default function GatekeeperHistoryPage() {
     return (
       <div className="space-y-8">
         <Table>
-          <TableHeader className="bg-white/[0.03]">
+          <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
             <TableRow className="border-white/5 hover:bg-transparent">
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">Snapshot</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor Name</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Host Met</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">Snapshot</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Visitor Name</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Host Met</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-in</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-out</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+              <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                 <TableCell className="pl-8 py-4">
                   <Button
                     variant="ghost"
@@ -235,7 +235,7 @@ export default function GatekeeperHistoryPage() {
                     aria-label="View visitor snapshot"
                     onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)}
                     disabled={!visit.visitor_snapshot_url}
-                    className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all"
+                    className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all"
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
@@ -282,7 +282,7 @@ export default function GatekeeperHistoryPage() {
     <>
       <div className="container py-10 max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
-          <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+          <Button asChild variant="ghost" className="text-zinc-400 hover:text-primary hover:bg-white/5 group/back">
             <Link href={`/dashboard/gatekeeper?premiseId=${premiseId}`} className="flex items-center">
               <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
               <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
@@ -291,7 +291,7 @@ export default function GatekeeperHistoryPage() {
 
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live Sync Active</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Live Sync Active</span>
           </div>
         </div>
 
@@ -304,13 +304,13 @@ export default function GatekeeperHistoryPage() {
               </div>
               <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></CardTitle>
             </div>
-            <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
+            <CardDescription className="text-zinc-400 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
               {description}
             </CardDescription>
           </CardHeader>
           <CardContent className="relative z-10 pt-8">
             <div className="space-y-8">
-              <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
                 <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6">
                   <DateRangePicker
@@ -322,10 +322,10 @@ export default function GatekeeperHistoryPage() {
                 </div>
 
                 <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700 transition-colors group-focus-within:text-primary" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 transition-colors group-focus-within:text-primary" />
                   <Input
                     placeholder="Search by visitor name, host name, or status..."
-                    className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-600 focus:border-primary/30 transition-all focus:ring-primary/20"
+                    className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-400 focus:border-primary/30 transition-all focus:ring-primary/20"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />

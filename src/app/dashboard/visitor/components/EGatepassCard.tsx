@@ -58,7 +58,7 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
     return (
         <div className="space-y-6">
             {/* The E-Gatepass Glassmorphism Card */}
-            <div className="relative overflow-hidden rounded-[2rem] bg-zinc-900/40 p-[1px] shadow-2xl border border-white/5 group">
+            <div className="relative overflow-hidden rounded-[2rem] bg-black/40 p-[1px] shadow-2xl border border-white/5 group">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 group-hover:from-primary/30 transition-all duration-500" />
 
                 <div className="relative z-10 backdrop-blur-3xl rounded-[2rem] p-8 h-full border border-white/5 overflow-hidden">
@@ -72,7 +72,7 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
                             </div>
                             <div>
                                 <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic">E-GATEPASS</h2>
-                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em]">Authorized Access</p>
+                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em]">Authorized Access</p>
                             </div>
                         </div>
                         <div className="flex items-center space-x-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
@@ -84,12 +84,12 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
                     <div className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="space-y-1">
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-black flex items-center"><MapPin className="w-3 h-3 mr-2 text-primary" /> Facility Designation</p>
+                                <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-black flex items-center"><MapPin className="w-3 h-3 mr-2 text-primary" /> Facility Designation</p>
                                 <p className="text-2xl font-bold text-white tracking-tight">{visit.premise_name || 'Classified Location'}</p>
                             </div>
 
                             <div className="space-y-1">
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-black flex items-center"><User className="w-3 h-3 mr-2 text-primary" /> Security Context</p>
+                                <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-black flex items-center"><User className="w-3 h-3 mr-2 text-primary" /> Security Context</p>
                                 <p className="text-xl font-bold text-white flex items-center">
                                     <span className="opacity-50 text-sm mr-2 font-medium italic">Visiting:</span>
                                     {visit.host_name || 'General Access'}
@@ -98,11 +98,11 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
-                            <div className="bg-white/[0.02] p-6 space-y-1">
-                                <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-black flex items-center"><Clock className="w-3 h-3 mr-2 text-primary" /> Check-in Sequence</p>
+                            <div className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] p-6 space-y-1">
+                                <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-black flex items-center"><Clock className="w-3 h-3 mr-2 text-primary" /> Check-in Sequence</p>
                                 <p className="text-lg font-bold text-white">{visit.checkin_time.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
                             </div>
-                            <div className="bg-white/[0.02] p-6 space-y-1 border-l border-white/5 text-right">
+                            <div className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] p-6 space-y-1 border-l border-white/5 text-right">
                                 <p className="text-[10px] text-primary uppercase tracking-widest font-black inline-flex items-center">Operational Duration <Clock className="w-3 h-3 ml-2" /></p>
                                 <p className="text-4xl font-black text-white tracking-tighter tabular-nums text-glow">{timeInside}</p>
                             </div>

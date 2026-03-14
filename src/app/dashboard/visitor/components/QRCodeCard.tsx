@@ -218,7 +218,7 @@ export function QRCodeCard() {
         <div className="absolute inset-0 mesh-obsidian opacity-20" />
         <div className="flex flex-col items-center gap-4 relative z-10">
           <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
-          <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest animate-pulse">Loading...</p>
+          <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest animate-pulse">Loading...</p>
         </div>
       </Card>
     );
@@ -312,7 +312,7 @@ export function QRCodeCard() {
           <div className="flex flex-col items-center justify-center p-8 gap-6 border border-white/5 rounded-2xl bg-white/5 mt-4">
             {tokenData ? (
               <div
-                className="p-4 bg-white rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform animate-in fade-in zoom-in duration-500"
+                className="p-4 bg-[#020617]/95 backdrop-blur-3xl rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform animate-in fade-in zoom-in duration-500"
               >
                 <QRCode
                   value={tokenData.token}
@@ -325,12 +325,12 @@ export function QRCodeCard() {
             ) : (
               <div className="flex flex-col items-center justify-center h-[240px] gap-4">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                <p className="text-zinc-500 text-sm">Preparing QR code...</p>
+                <p className="text-zinc-400 text-sm">Preparing QR code...</p>
               </div>
             )}
             {tokenData && (
               <div className="w-full max-w-xs space-y-3 pt-4">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-500">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-400">
                   <span>Expires in</span>
                   <span className="text-primary">{Math.round(timeRemaining / 1000)}s</span>
                 </div>

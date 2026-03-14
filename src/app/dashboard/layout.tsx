@@ -55,7 +55,7 @@ function HeaderContent() {
 
         if (premiseId && premise && dashboardRole) {
             if (['owner', 'host', 'gatekeeper'].includes(dashboardRole)) {
-                return <span className="truncate text-sm text-zinc-500 font-medium capitalize">{premise.name} (as {dashboardRole})</span>;
+                return <span className="truncate text-sm text-zinc-400 font-medium capitalize">{premise.name} (as {dashboardRole})</span>;
             }
         }
 
@@ -72,7 +72,7 @@ function HeaderContent() {
         }
 
         if (pathname === '/dashboard') {
-            return <span className="text-sm text-zinc-500 font-medium">Select a Role</span>;
+            return <span className="text-sm text-zinc-400 font-medium">Select a Role</span>;
         }
 
         // A sensible fallback if none of the above match
@@ -204,7 +204,7 @@ export default function DashboardLayout({
 
     if (user) {
         return (
-            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-white"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
+            <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#020617]/95 backdrop-blur-3xl"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>}>
                 <div className="flex min-h-screen flex-col relative bg-[#020617] text-white selection:bg-primary/20 selection:text-white">
                     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#020617]/80 backdrop-blur-md">
                         <HeaderContent />
@@ -228,7 +228,7 @@ export default function DashboardLayout({
                                     if (section === 'owner') {
                                         // Owners and Hosts (who often acting on behalf of owners in this app's context)
                                         return (
-                                            <RoleGuard allowedRoles={['owner', 'host']}>
+                                            <RoleGuard allowedRoles={['owner', 'host', 'admin']}>
                                                 {children}
                                             </RoleGuard>
                                         );
@@ -240,7 +240,7 @@ export default function DashboardLayout({
 
                                     if (section === 'gatekeeper') {
                                         return (
-                                            <RoleGuard allowedRoles={['gatekeeper']}>
+                                            <RoleGuard allowedRoles={['gatekeeper', 'admin']}>
                                                 {children}
                                             </RoleGuard>
                                         );
@@ -248,7 +248,7 @@ export default function DashboardLayout({
 
                                     if (section === 'staff') {
                                         return (
-                                            <RoleGuard allowedRoles={['staff']}>
+                                            <RoleGuard allowedRoles={['staff', 'admin']}>
                                                 {children}
                                             </RoleGuard>
                                         );
@@ -256,7 +256,7 @@ export default function DashboardLayout({
 
                                     if (section === 'host') {
                                         return (
-                                            <RoleGuard allowedRoles={['host']}>
+                                            <RoleGuard allowedRoles={['host', 'admin']}>
                                                 {children}
                                             </RoleGuard>
                                         );

@@ -166,7 +166,7 @@ export default function GatekeepersPage() {
             </div>
         );
         if (!gatekeepers || gatekeepers.length === 0) return (
-            <div className="py-20 text-center text-zinc-600 border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.02]">
+            <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
                 <Plus className="mx-auto h-10 w-10 mb-4 opacity-20" />
                 <p className="font-bold uppercase tracking-widest text-[11px]">Sentinel Log Clear</p>
                 <p className="text-[10px] opacity-60 mt-1">Initialize gatekeeper records to secure the perimeter.</p>
@@ -176,27 +176,27 @@ export default function GatekeepersPage() {
         return (
             <div className="space-y-6">
                 <div className="relative group/search">
-                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within/search:text-primary transition-colors" />
                     <Input
                         placeholder="Scan sentinel files by name or neural mail..."
-                        className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all font-medium"
+                        className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-300 focus:border-primary/30 transition-all font-medium"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
                     <Table>
-                        <TableHeader className="bg-white/[0.03]">
+                        <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
                             <TableRow className="border-white/5 hover:bg-transparent">
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Sentinel Identity</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Neural Link</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Comm Channel</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8">Sentinel Identity</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Neural Link</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Comm Channel</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 text-right pr-8">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filteredGatekeepers.map((gatekeeper: any) => (
-                                <TableRow key={gatekeeper.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                                <TableRow key={gatekeeper.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                                     <TableCell className="pl-8 py-5">
                                         <div className="flex items-center gap-4">
                                             <Avatar className="h-10 w-10 border border-white/10 group-hover/row:border-primary/30 transition-colors">
@@ -205,7 +205,7 @@ export default function GatekeepersPage() {
                                             </Avatar>
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{gatekeeper.name}</span>
-                                                <span className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Sentinel Class V</span>
+                                                <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Sentinel Class V</span>
                                             </div>
                                         </div>
                                     </TableCell>
@@ -213,14 +213,14 @@ export default function GatekeepersPage() {
                                         <div className="text-[10px] font-medium text-zinc-400 group-hover/row:text-zinc-200 transition-colors">{gatekeeper.email}</div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="text-[11px] font-mono text-zinc-500 tracking-tight">{gatekeeper.phone || 'NO ANALOG'}</div>
+                                        <div className="text-[11px] font-mono text-zinc-400 tracking-tight">{gatekeeper.phone || 'NO ANALOG'}</div>
                                     </TableCell>
                                     <TableCell className='text-right pr-8'>
                                         <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" disabled className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-800 opacity-20">
+                                            <Button variant="ghost" size="icon" disabled className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-300 opacity-20">
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="ghost" size="icon" disabled className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-800 opacity-20">
+                                            <Button variant="ghost" size="icon" disabled className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-300 opacity-20">
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -232,7 +232,7 @@ export default function GatekeepersPage() {
                 </div>
                 {filteredGatekeepers.length === 0 && (
                     <div className="py-20 text-center">
-                        <p className="text-[11px] font-black text-zinc-800 uppercase tracking-[0.3em]">No sentinel artifact detected</p>
+                        <p className="text-[11px] font-black text-zinc-300 uppercase tracking-[0.3em]">No sentinel artifact detected</p>
                     </div>
                 )}
             </div>
@@ -242,7 +242,7 @@ export default function GatekeepersPage() {
     return (
         <div className="container py-10 max-w-7xl">
             <div className="mb-8 flex items-center justify-between">
-                <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+                <Button asChild variant="ghost" className="text-zinc-400 hover:text-primary hover:bg-white/5 group/back">
                     <Link href={`/dashboard/owner?premiseId=${premiseId}`} className="flex items-center">
                         <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Back to Command Hub</span>
@@ -262,7 +262,7 @@ export default function GatekeepersPage() {
                             </div>
                             <div>
                                 <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Sentinel Recruitment</DialogTitle>
-                                <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
+                                <DialogDescription className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest mt-1">
                                     Establish new perimeter link or authorize existing operative
                                 </DialogDescription>
                             </div>
@@ -291,27 +291,27 @@ export default function GatekeepersPage() {
                                     <form onSubmit={createForm.handleSubmit(handleCreateFormSubmit)} className="space-y-4">
                                         <FormField control={createForm.control} name="name" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Identity Name</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Identity Name</FormLabel>
                                                 <FormControl><Input placeholder="John Doe" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="email" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Neural Mail</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Neural Mail</FormLabel>
                                                 <FormControl><Input type="email" placeholder="gatekeeper@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="password" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Initial Cipher</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Initial Cipher</FormLabel>
                                                 <FormControl><Input type="password" placeholder="8+ character secure string" {...field} className="bg-black/40 border-white/10 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                 {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Execute Sequence'}
                                             </Button>
@@ -325,14 +325,14 @@ export default function GatekeepersPage() {
                                     <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-4">
                                         <FormField control={assignForm.control} name="email" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Operative Email</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Operative Email</FormLabel>
                                                 <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-600 font-medium text-center">Email of an existing verified network identity</FormDescription>
+                                                <FormDescription className="text-[9px] text-zinc-400 font-medium text-center">Email of an existing verified network identity</FormDescription>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                 {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Bind Sentinel'}
                                             </Button>
@@ -354,7 +354,7 @@ export default function GatekeepersPage() {
                         </div>
                         <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Sentinel <span className="text-primary/80">Command</span></CardTitle>
                     </div>
-                    <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
+                    <CardDescription className="text-zinc-400 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
                         A centralized register of tactical personnel authorized for perimeter gate oversight.
                     </CardDescription>
                 </CardHeader>

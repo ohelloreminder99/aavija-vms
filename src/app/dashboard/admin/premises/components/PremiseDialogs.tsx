@@ -110,14 +110,14 @@ export function PremiseDialogs({
             {/* Create Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogContent className="sm:max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden flex flex-col h-[90vh] max-h-[800px]">
-                    <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+                    <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
                         <DialogHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
                                     <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Add <span className="text-primary/80">New Property</span></DialogTitle>
                                 </div>
                             </div>
-                            <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                            <DialogDescription className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
                                 Create a new building or property in the Aavija system.
                             </DialogDescription>
                         </DialogHeader>
@@ -125,7 +125,7 @@ export function PremiseDialogs({
                             <RadioGroup value={creationMode} onValueChange={(v) => setCreationMode(v as any)} className="grid grid-cols-2 gap-4">
                                 <div className={cn(
                                     "relative flex items-center justify-center h-12 rounded-xl border transition-all cursor-pointer group",
-                                    creationMode === 'new' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                                    creationMode === 'new' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-400 hover:border-white/10"
                                 )} onClick={() => setCreationMode('new')}>
                                     <RadioGroupItem value="new" id="r1" className="sr-only" />
                                     <Label htmlFor="r1" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">New Owner</Label>
@@ -133,7 +133,7 @@ export function PremiseDialogs({
                                 </div>
                                 <div className={cn(
                                     "relative flex items-center justify-center h-12 rounded-xl border transition-all cursor-pointer group",
-                                    creationMode === 'existing' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                                    creationMode === 'existing' ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-400 hover:border-white/10"
                                 )} onClick={() => setCreationMode('existing')}>
                                     <RadioGroupItem value="existing" id="r2" className="sr-only" />
                                     <Label htmlFor="r2" className="font-black uppercase tracking-widest text-[9px] cursor-pointer">Existing User</Label>
@@ -150,21 +150,21 @@ export function PremiseDialogs({
                                     <div className="grid grid-cols-2 gap-6">
                                         <FormField control={createForm.control} name="premiseName" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Name</FormLabel>
-                                                <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" placeholder="e.g., Royal Society" /></FormControl>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Name</FormLabel>
+                                                <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-300" placeholder="e.g., Royal Society" /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="categoryId" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Type</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Type</FormLabel>
                                                 <Select onValueChange={field.onChange} value={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="bg-black/40 border-white/5 text-white h-11 rounded-xl">
                                                             <SelectValue placeholder="Select type..." />
                                                         </SelectTrigger>
                                                     </FormControl>
-                                                    <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                                                    <SelectContent className="bg-black border-white/10 text-white">
                                                         {categories?.map(c => <SelectItem key={c.id} value={c.id} className="focus:bg-primary focus:text-white">{c.name}</SelectItem>)}
                                                     </SelectContent>
                                                 </Select>
@@ -175,8 +175,8 @@ export function PremiseDialogs({
 
                                     <FormField control={createForm.control} name="premiseAddress" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Address</FormLabel>
-                                            <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" placeholder="Enter Full Address..." /></FormControl>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Address</FormLabel>
+                                            <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-300" placeholder="Enter Full Address..." /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
@@ -184,7 +184,7 @@ export function PremiseDialogs({
                                     <FormField control={createForm.control} name="cityId" render={({ field }) => (
                                         <FormItem>
                                             <div className="flex items-center justify-between mb-1">
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Select City</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Select City</FormLabel>
                                                 {field.value && (
                                                     <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
                                                         Selected: {cities.find(c => c.id === field.value)?.name}
@@ -193,8 +193,8 @@ export function PremiseDialogs({
                                             </div>
                                             <div className="space-y-4">
                                                 <div className="relative">
-                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-700" />
-                                                    <Input placeholder="Search city name..." className="pl-9 bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
+                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
+                                                    <Input placeholder="Search city name..." className="pl-9 bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-300" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
                                                 </div>
                                                 <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/40 p-2">
                                                     <FormControl>
@@ -202,7 +202,7 @@ export function PremiseDialogs({
                                                             {filteredCities.map(c => (
                                                                 <div key={c.id} className={cn(
                                                                     "flex items-center h-10 px-4 rounded-xl transition-all cursor-pointer group",
-                                                                    field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-500"
+                                                                    field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-400"
                                                                 )} onClick={() => field.onChange(c.id)}>
                                                                     <RadioGroupItem value={c.id} id={`c-${c.id}`} className="sr-only" />
                                                                     <Label htmlFor={`c-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">{c.name}, <span className="opacity-50">{c.stateName}</span></Label>
@@ -222,20 +222,20 @@ export function PremiseDialogs({
                                     12:                                    {creationMode === 'new' ? (
                                         <div className="space-y-6">
                                             <div className="flex items-center gap-3 mb-2">
-                                                <CheckCircle2 className="h-4 w-4 text-zinc-500" />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Owner Details</span>
+                                                <CheckCircle2 className="h-4 w-4 text-zinc-400" />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Owner Details</span>
                                             </div>
                                             <div className="grid grid-cols-2 gap-6">
                                                 <FormField control={createForm.control} name="ownerName" render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Owner Name</FormLabel>
+                                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Owner Name</FormLabel>
                                                         <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )} />
                                                 <FormField control={createForm.control} name="ownerEmail" render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Email ID</FormLabel>
+                                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Email ID</FormLabel>
                                                         <FormControl><Input type="email" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -243,7 +243,7 @@ export function PremiseDialogs({
                                             </div>
                                             <FormField control={createForm.control} name="ownerPassword" render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Password</FormLabel>
+                                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Password</FormLabel>
                                                     <FormControl><Input type="password" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -252,9 +252,9 @@ export function PremiseDialogs({
                                     ) : (
                                         <FormField control={createForm.control} name="ownerEmail" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Linked Email</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Linked Email</FormLabel>
                                                 <FormControl><Input type="email" {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" placeholder="owner@aavija.com" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-700 font-bold uppercase tracking-wider">Assign an existing user as the owner of this property.</FormDescription>
+                                                <FormDescription className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Assign an existing user as the owner of this property.</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
@@ -264,16 +264,16 @@ export function PremiseDialogs({
 
                                     <FormField control={createForm.control} name="agentId" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Sales Agent</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Sales Agent</FormLabel>
                                             <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                 </div>
                             </ScrollArea>
-                            <div className="p-8 border-t border-white/5 bg-white/[0.02] flex justify-end gap-4">
+                            <div className="p-8 border-t border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
                                 <DialogClose asChild>
-                                    <Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button>
+                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button>
                                 </DialogClose>
                                 <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
                                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Shield className="mr-2 h-4 w-4" />}
@@ -288,7 +288,7 @@ export function PremiseDialogs({
             {/* Edit Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="sm:max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden flex flex-col h-[90vh] max-h-[800px]">
-                    <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+                    <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
                         <DialogHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
@@ -296,7 +296,7 @@ export function PremiseDialogs({
                                 </div>
                                 <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Edit <span className="text-primary/80">Property</span></DialogTitle>
                             </div>
-                            <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                            <DialogDescription className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
                                 Update details for: <span className="text-white font-bold">{selectedPremise?.name}</span>
                             </DialogDescription>
                         </DialogHeader>
@@ -308,21 +308,21 @@ export function PremiseDialogs({
                                     <div className="grid grid-cols-2 gap-6">
                                         <FormField control={editForm.control} name="name" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Name</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Name</FormLabel>
                                                 <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
                                         <FormField control={editForm.control} name="categoryId" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Type</FormLabel>
+                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Type</FormLabel>
                                                 <Select onValueChange={field.onChange} value={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="bg-black/40 border-white/5 text-white h-11 rounded-xl">
                                                             <SelectValue placeholder="Property Type..." />
                                                         </SelectTrigger>
                                                     </FormControl>
-                                                    <SelectContent className="bg-zinc-900 border-white/10 text-white">
+                                                    <SelectContent className="bg-black border-white/10 text-white">
                                                         {categories?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                                                     </SelectContent>
                                                 </Select>
@@ -332,14 +332,14 @@ export function PremiseDialogs({
                                     </div>
                                     <FormField control={editForm.control} name="address" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Property Address</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Address</FormLabel>
                                             <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                     <FormField control={editForm.control} name="cityId" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
                                                 City {field.value && (
                                                     <span className="text-primary ml-2 border-l border-white/10 pl-2">
                                                         {cities.find(c => c.id === field.value)?.name}
@@ -348,7 +348,7 @@ export function PremiseDialogs({
                                             </FormLabel>
                                             <div className="space-y-4">
                                                 <div className="relative">
-                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700" />
+                                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                                                     <Input placeholder="Search city..." className="pl-10 bg-black/40 border-white/5 text-white h-11 rounded-xl" value={citySearch} onChange={(e) => setCitySearch(e.target.value)} />
                                                 </div>
                                                 <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/40 p-2">
@@ -357,7 +357,7 @@ export function PremiseDialogs({
                                                             {filteredCities.map(c => (
                                                                 <div key={c.id} className={cn(
                                                                     "flex items-center h-10 px-4 rounded-xl transition-all cursor-pointer",
-                                                                    field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-500"
+                                                                    field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-400"
                                                                 )} onClick={() => field.onChange(c.id)}>
                                                                     <RadioGroupItem value={c.id} id={`e-c-${c.id}`} className="sr-only" />
                                                                     <Label htmlFor={`e-c-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">{c.name}</Label>
@@ -376,7 +376,7 @@ export function PremiseDialogs({
 
                                     <FormField control={editForm.control} name="agentId" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Sales Agent</FormLabel>
+                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Sales Agent</FormLabel>
                                             <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
                                             <FormMessage />
                                         </FormItem>
@@ -386,16 +386,16 @@ export function PremiseDialogs({
                                         <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-white/5 bg-black/40 p-6">
                                             <div className="space-y-1">
                                                 <FormLabel className="text-sm font-bold text-white tracking-tight">Property Status</FormLabel>
-                                                <FormDescription className="text-[10px] text-zinc-600 font-medium uppercase tracking-tight">Toggle to temporarily deactivate this property.</FormDescription>
+                                                <FormDescription className="text-[10px] text-zinc-400 font-medium uppercase tracking-tight">Toggle to temporarily deactivate this property.</FormDescription>
                                             </div>
                                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-primary" /></FormControl>
                                         </FormItem>
                                     )} />
                                 </div>
                             </ScrollArea>
-                            <div className="p-8 border-t border-white/5 bg-white/[0.02] flex justify-end gap-4">
+                            <div className="p-8 border-t border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
                                 <DialogClose asChild>
-                                    <Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button>
+                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button>
                                 </DialogClose>
                                 <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
                                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
@@ -423,7 +423,7 @@ export function PremiseDialogs({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-8">
-                        <AlertDialogCancel disabled={isSubmitting} className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isSubmitting} className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
                             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
                             Delete Property
@@ -448,7 +448,7 @@ export function PremiseDialogs({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
-                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Close</AlertDialogAction>
+                        <AlertDialogAction onClick={() => setShowDuplicateUserDialog(false)} className="bg-amber-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-10 hover:bg-amber-600">Close</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -463,17 +463,17 @@ export function PremiseDialogs({
                             </div>
                             <DialogTitle className="text-2xl font-bold text-white tracking-tight">Ownership <span className="text-primary/80">Transfer</span></DialogTitle>
                         </div>
-                        <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+                        <DialogDescription className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
                             Transfer ownership control for property: <span className="text-white">{premiseToChangeOwner?.name}</span>
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleChangeOwnerSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">New Owner Email</Label>
-                            <Input type="email" required value={newOwnerEmail || ''} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="owner@aavija.com" className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800" />
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">New Owner Email</Label>
+                            <Input type="email" required value={newOwnerEmail || ''} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="owner@aavija.com" className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-300" />
                         </div>
                         <div className="flex justify-end gap-4 pt-4">
-                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
+                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
                                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Transfer Ownership'}
                             </Button>

@@ -74,14 +74,14 @@ export function VehicleManager({
     };
 
     return (
-        <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6">
+        <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
             <FormField control={form.control} name="vehicles" render={() => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-3 text-zinc-300 font-headline font-bold uppercase tracking-widest text-[10px]">
                         <Car className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
                         <span>Vehicle Management</span>
                     </FormLabel>
-                    <FormDescription className="text-zinc-500 text-[10px]">Add your vehicles for faster entry at gates.</FormDescription>
+                    <FormDescription className="text-zinc-400 text-[10px]">Add your vehicles for faster entry at gates.</FormDescription>
                     <div className="space-y-3 pt-4">
                         <FormField control={form.control} name="selected_vehicle_number" render={({ field }) => (
                             <RadioGroup onValueChange={field.onChange} value={field.value ?? ''} className="space-y-3">
@@ -94,7 +94,7 @@ export function VehicleManager({
                                                 <span className="font-mono text-lg font-bold text-white tracking-widest group-hover/vehicle:text-primary transition-colors">{vehicle.number}</span>
                                             </Label>
                                         </div>
-                                        <Button type="button" variant="ghost" size="icon" aria-label="Remove vehicle" className="text-zinc-700 hover:text-red-500 hover:bg-red-500/5" onClick={() => handleRemoveVehicle(index)}>
+                                        <Button type="button" variant="ghost" size="icon" aria-label="Remove vehicle" className="text-zinc-400 hover:text-red-500 hover:bg-red-500/5" onClick={() => handleRemoveVehicle(index)}>
                                             <X className="h-4 w-4" />
                                         </Button>
                                     </div>
@@ -102,7 +102,7 @@ export function VehicleManager({
                             </RadioGroup>
                         )}
                         />
-                        {vehicleFields.length === 0 && <p className="text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest py-8 border border-dashed border-white/5 rounded-2xl">No vehicles added.</p>}
+                        {vehicleFields.length === 0 && <p className="text-center text-[10px] font-bold text-zinc-400 uppercase tracking-widest py-8 border border-dashed border-white/5 rounded-2xl">No vehicles added.</p>}
                     </div>
                     <FormMessage className="text-red-500 text-[10px]" />
                 </FormItem>
@@ -110,7 +110,7 @@ export function VehicleManager({
             />
 
             <div className="space-y-4 pt-4 border-t border-white/5">
-                <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Add New Vehicle</FormLabel>
+                <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px]">Add New Vehicle</FormLabel>
                 <div className="flex flex-wrap items-center gap-3">
                     <Select value={newVehicleType} onValueChange={(value) => setNewVehicleType(value as any)}>
                         <SelectTrigger className="w-[140px] bg-black/20 border-white/10 text-white h-10">
@@ -124,7 +124,7 @@ export function VehicleManager({
                             <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Input placeholder="Vehicle Number" value={newVehicleNumber} onChange={(e) => setNewVehicleNumber(e.target.value.toUpperCase())} disabled={newVehicleType === 'walking'} className="flex-1 min-w-[150px] bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10 font-mono" />
+                    <Input placeholder="Vehicle Number" value={newVehicleNumber} onChange={(e) => setNewVehicleNumber(e.target.value.toUpperCase())} disabled={newVehicleType === 'walking'} className="flex-1 min-w-[150px] bg-black/20 border-white/10 text-white placeholder:text-zinc-400 h-10 font-mono" />
                     <Button type="button" variant="outline" onClick={handleAddVehicle} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6 ml-auto">
                         <Plus className="mr-2 h-4 w-4" /> Add
                     </Button>

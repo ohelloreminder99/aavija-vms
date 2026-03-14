@@ -179,7 +179,7 @@ export default function PremiseHistoryDialog({
         <DialogContent className="sm:max-w-6xl bg-black/95 border-white/5 backdrop-blur-3xl p-0 overflow-hidden shadow-2xl">
           <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
 
-          <div className="relative z-10 p-8 border-b border-white/5 bg-white/[0.02]">
+          <div className="relative z-10 p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
             <div className="flex items-start gap-6">
               <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-2xl relative overflow-hidden group">
                 <div className="absolute inset-0 bg-primary/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -192,7 +192,7 @@ export default function PremiseHistoryDialog({
                   </div>
                   <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Premise <span className="text-primary/80">Log</span></DialogTitle>
                 </div>
-                <DialogDescription className="text-zinc-500 font-medium uppercase tracking-[0.2em] text-[10px]">
+                <DialogDescription className="text-zinc-400 font-medium uppercase tracking-[0.2em] text-[10px]">
                   Full audit trail for {premise?.name}
                 </DialogDescription>
               </div>
@@ -201,7 +201,7 @@ export default function PremiseHistoryDialog({
 
           <ScrollArea className="max-h-[70vh]">
             <div className="p-8 space-y-8">
-              <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
                 <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6 justify-between">
                   <div className="flex flex-wrap items-end gap-4">
@@ -230,38 +230,38 @@ export default function PremiseHistoryDialog({
                 {isLoading ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4">
                     <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Scanning Records...</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Scanning Records...</span>
                   </div>
                 ) : error ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4 px-8 text-center">
                     <AlertTriangle className="h-10 w-10 text-red-500/50" />
-                    <p className="text-zinc-500 text-sm max-w-xs">{error}</p>
+                    <p className="text-zinc-400 text-sm max-w-xs">{error}</p>
                   </div>
                 ) : filteredVisits.length === 0 ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4">
                     <div className="p-4 rounded-full bg-white/5 border border-white/5">
-                      <History className="h-8 w-8 text-zinc-700" />
+                      <History className="h-8 w-8 text-zinc-400" />
                     </div>
-                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">No visit logs recorded</p>
+                    <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">No visit logs recorded</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <Table>
-                      <TableHeader className="bg-white/[0.03]">
+                      <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
                         <TableRow className="border-white/5 hover:bg-transparent">
-                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8 w-16">View</TableHead>
-                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Visitor</TableHead>
-                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Host Met</TableHead>
-                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
-                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
-                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">View</TableHead>
+                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Visitor</TableHead>
+                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Host Met</TableHead>
+                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-in</TableHead>
+                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-out</TableHead>
+                          <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredVisits.map((visit) => (
-                          <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                          <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                             <TableCell className="pl-8 py-4">
-                              <Button variant="ghost" size="icon" aria-label="View visitor snapshot" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all">
+                              <Button variant="ghost" size="icon" aria-label="View visitor snapshot" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all">
                                 <Eye className="h-4 w-4" />
                               </Button>
                             </TableCell>
@@ -272,11 +272,11 @@ export default function PremiseHistoryDialog({
                               <div className="text-[11px] font-medium text-zinc-400">{visit.host_name || 'Autonomous'}</div>
                             </TableCell>
                             <TableCell>
-                              <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkin_time), 'PPp')}</span>
+                              <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkin_time), 'PPp')}</span>
                             </TableCell>
                             <TableCell>
                               {visit.checkout_time ? (
-                                <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                                <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkout_time), 'PPp')}</span>
                               ) : (
                                 <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
                               )}
@@ -303,7 +303,7 @@ export default function PremiseHistoryDialog({
             </div>
           </ScrollArea>
 
-          <div className="p-4 bg-white/[0.01] border-t border-white/5 flex justify-end">
+          <div className="p-4 bg-[#020617]/95 backdrop-blur-3xl/[0.01] border-t border-white/5 flex justify-end">
             <DialogClose asChild>
               <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-black uppercase tracking-widest px-8 rounded-xl border border-white/5 transition-all">Close Audit</Button>
             </DialogClose>

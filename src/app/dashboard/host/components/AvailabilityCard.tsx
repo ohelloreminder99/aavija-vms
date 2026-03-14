@@ -88,7 +88,7 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
         {isPremiseLoading ? (
           <div className="flex h-32 flex-col items-center justify-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">Loading...</p>
+            <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest animate-pulse">Loading...</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -139,15 +139,15 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
               <div className="p-4 rounded-2xl bg-emerald-500/[0.03] border border-emerald-500/10 group/status">
                 <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] transition-all">Available</p>
-                <p className="text-[10px] text-zinc-500 leading-tight">Gatekeepers can authorize visitors for instant entry.</p>
+                <p className="text-[10px] text-zinc-400 leading-tight">Gatekeepers can authorize visitors for instant entry.</p>
               </div>
               <div className="p-4 rounded-2xl bg-amber-500/[0.03] border border-amber-500/10 group/status">
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(245,158,11,0.4)] transition-all">Busy</p>
-                <p className="text-[10px] text-zinc-500 leading-tight">You are busy but can still be contacted.</p>
+                <p className="text-[10px] text-zinc-400 leading-tight">You are busy but can still be contacted.</p>
               </div>
               <div className="p-4 rounded-2xl bg-red-500/[0.03] border border-red-500/10 group/status">
                 <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(239,68,68,0.4)] transition-all">DND</p>
-                <p className="text-[10px] text-zinc-500 leading-tight">Do not disturb. Gatekeeper will not send visitors.</p>
+                <p className="text-[10px] text-zinc-400 leading-tight">Do not disturb. Gatekeeper will not send visitors.</p>
               </div>
             </div>
           </div>

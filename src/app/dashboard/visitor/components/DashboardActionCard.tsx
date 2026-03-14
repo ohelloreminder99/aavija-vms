@@ -31,7 +31,7 @@ const DashboardActionCardComponent = ({
             <CardTitle className="text-white group-hover:text-glow transition-all">{title}</CardTitle>
             <CardDescription className="text-zinc-400 group-hover:text-zinc-200 transition-colors">{description}</CardDescription>
           </div>
-          <ChevronRight className="h-5 w-5 text-zinc-600 group-hover:text-primary ml-auto transition-all transform group-hover:translate-x-1" />
+          <ChevronRight className="h-5 w-5 text-zinc-400 group-hover:text-primary ml-auto transition-all transform group-hover:translate-x-1" />
         </CardHeader>
       </Card>
     </Link>

@@ -111,7 +111,7 @@ export function PhoneVerification({
 
     return (
         <>
-            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6">
+            <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                         <ShieldCheck className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
@@ -125,21 +125,21 @@ export function PhoneVerification({
                         </div>
                     </div>
                     {isPhoneLocked && (
-                        <Button type="button" variant="outline" onClick={() => setIsUpdateConfirmOpen(true)} className="h-9 border-white/10 text-zinc-500 hover:text-white hover:bg-white/5 text-[9px] font-bold uppercase tracking-widest px-4">Change</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsUpdateConfirmOpen(true)} className="h-9 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[9px] font-bold uppercase tracking-widest px-4">Change</Button>
                     )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
                     <FormField control={form.control} name="countryCode" render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px] ml-1">Protocol</FormLabel>
+                            <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px] ml-1">Protocol</FormLabel>
                             <FormControl><Input {...field} disabled={isPhoneLocked} className="bg-black/20 border-white/5 text-white h-11" /></FormControl>
                             <FormMessage className="text-red-500 text-[10px]" />
                         </FormItem>
                     )} />
                     <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px] ml-1">Neural ID (Phone)</FormLabel>
+                            <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px] ml-1">Neural ID (Phone)</FormLabel>
                             <FormControl>
                                 <div className="flex gap-2">
                                     <Input {...field} disabled={isPhoneLocked} className="bg-black/20 border-white/5 text-white h-11" />
@@ -169,7 +169,7 @@ export function PhoneVerification({
                                     {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm'}
                                 </Button>
                             </div>
-                            <FormDescription className="text-zinc-500 text-[10px]">Checking WhatsApp for OTP...</FormDescription>
+                            <FormDescription className="text-zinc-400 text-[10px]">Checking WhatsApp for OTP...</FormDescription>
                         </FormItem>
                     </div>
                 )}
@@ -185,7 +185,7 @@ export function PhoneVerification({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
-                        <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-white font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Change</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

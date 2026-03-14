@@ -28,7 +28,7 @@ export function VisitorTokenBalanceCard() {
   if (isLoading) {
     return (
       <Card className="glass-card border-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-white/[0.01]" />
+        <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-3xl/[0.01]" />
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
           <Skeleton className="h-5 w-1/2 bg-white/5" />
         </CardHeader>
@@ -53,7 +53,7 @@ export function VisitorTokenBalanceCard() {
       <Card className="glass-card overflow-hidden group border-white/5 hover:border-primary/30 transition-all duration-500 relative">
         <div className="absolute inset-0 bg-primary/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-          <CardTitle className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] opacity-80">
+          <CardTitle className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] opacity-80">
             Token Balance
           </CardTitle>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 border border-white/10 shadow-inner group-hover:border-primary/50 group-hover:bg-primary/20 transition-all duration-500">

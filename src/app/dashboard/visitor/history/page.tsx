@@ -278,7 +278,7 @@ export default function VisitorHistoryPage() {
       return (
         <div className="flex flex-col h-64 items-center justify-center space-y-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Retrieving Records...</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Retrieving Records...</span>
         </div>
       );
     }
@@ -287,19 +287,19 @@ export default function VisitorHistoryPage() {
       return (
         <div className="flex flex-col h-64 items-center justify-center space-y-4 px-8 text-center">
           <AlertTriangle className="h-10 w-10 text-red-500/50" />
-          <p className="text-zinc-500 text-sm max-w-xs">{error}</p>
+          <p className="text-zinc-400 text-sm max-w-xs">{error}</p>
         </div>
       );
     }
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-24 text-center bg-white/[0.01]">
+        <div className="py-24 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.01]">
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
-            <History className="h-8 w-8 text-zinc-700" />
+            <History className="h-8 w-8 text-zinc-400" />
           </div>
           <p className="mb-2 font-bold text-white uppercase tracking-widest text-sm">No History Found</p>
-          <p className="text-xs text-zinc-500 max-w-[200px] mx-auto leading-relaxed">
+          <p className="text-xs text-zinc-400 max-w-[200px] mx-auto leading-relaxed">
             You haven&apos;t visited any locations yet.
           </p>
         </div>
@@ -309,38 +309,38 @@ export default function VisitorHistoryPage() {
     return (
       <div className="space-y-8">
         <Table>
-          <TableHeader className="bg-white/[0.03]">
+          <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
             <TableRow className="border-white/5 hover:bg-transparent">
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Location</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Host</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-in</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Check-out</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8">Location</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Host</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-in</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-out</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+              <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                 <TableCell className="pl-8 py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-white/5 border border-white/5 group-hover/row:bg-primary/10 group-hover/row:border-primary/20 transition-all">
-                      <Building className="h-3 w-3 text-zinc-500 group-hover/row:text-primary transition-colors" />
+                      <Building className="h-3 w-3 text-zinc-400 group-hover/row:text-primary transition-colors" />
                     </div>
                     <span className="font-bold text-white group-hover/row:text-primary transition-colors">{premiseMap.get(visit.premise_id) || 'Unknown Location'}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <UserIcon className="h-3 w-3 text-zinc-500" />
+                    <UserIcon className="h-3 w-3 text-zinc-400" />
                     <span className="text-zinc-300 font-medium">{visit.host_name || 'Autonomous'}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-mono text-[11px] text-zinc-500">{visit.checkin_time ? format(new Date(visit.checkin_time), 'PPp') : 'N/A'}</span>
+                  <span className="font-mono text-[11px] text-zinc-400">{visit.checkin_time ? format(new Date(visit.checkin_time), 'PPp') : 'N/A'}</span>
                 </TableCell>
                 <TableCell>
                   {visit.checkout_time ? (
-                    <span className="font-mono text-[11px] text-zinc-500">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                    <span className="font-mono text-[11px] text-zinc-400">{format(new Date(visit.checkout_time), 'PPp')}</span>
                   ) : (
                     <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-400 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
                   )}
@@ -373,7 +373,7 @@ export default function VisitorHistoryPage() {
   return (
     <div className="container py-10 max-w-7xl">
       <div className="mb-8 flex items-center justify-between">
-        <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+        <Button asChild variant="ghost" className="text-zinc-400 hover:text-primary hover:bg-white/5 group/back">
           <Link href="/dashboard/visitor" className="flex items-center">
             <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
             <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
@@ -390,11 +390,11 @@ export default function VisitorHistoryPage() {
             </div>
             <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></CardTitle>
           </div>
-          <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-xl leading-relaxed mt-2">{description}</CardDescription>
+          <CardDescription className="text-zinc-400 text-[11px] font-medium uppercase tracking-widest max-w-xl leading-relaxed mt-2">{description}</CardDescription>
         </CardHeader>
         <CardContent className="relative z-10 pt-8">
           <div className="space-y-8">
-            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+            <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
               <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
               <div className="relative z-10 flex flex-wrap items-end gap-6">
                 <DateRangePicker
@@ -417,10 +417,10 @@ export default function VisitorHistoryPage() {
               </div>
 
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-700 transition-colors group-focus-within:text-primary" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 transition-colors group-focus-within:text-primary" />
                 <Input
                   placeholder="Search by location, host or status..."
-                  className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all focus:ring-primary/20"
+                  className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-300 focus:border-primary/30 transition-all focus:ring-primary/20"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -444,7 +444,7 @@ export default function VisitorHistoryPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-6">
-            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirm Download

@@ -122,7 +122,7 @@ export default function LogsPage() {
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Decrypting Ledger...</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Decrypting Ledger...</p>
         </div>
       );
     }
@@ -139,9 +139,9 @@ export default function LogsPage() {
     if (logs.length === 0) {
       return (
         <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
-          <BookText className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
-          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">No Recorded Anomalies</p>
-          <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">Adjust filters to scan different registry clusters.</p>
+          <BookText className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
+          <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.4em]">No Recorded Anomalies</p>
+          <p className="text-zinc-400 text-[9px] mt-2 font-medium uppercase tracking-widest">Adjust filters to scan different registry clusters.</p>
         </div>
       );
     }
@@ -153,9 +153,9 @@ export default function LogsPage() {
           const timestamp = new Date(log.timestamp);
 
           return (
-            <div key={log.id} className="group relative flex items-center gap-6 p-5 rounded-2xl transition-all hover:bg-white/[0.02] border border-transparent hover:border-white/5">
+            <div key={log.id} className="group relative flex items-center gap-6 p-5 rounded-2xl transition-all hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-transparent hover:border-white/5">
               <div className="relative flex-shrink-0">
-                <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 group-hover:text-primary group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
+                <div className="h-12 w-12 rounded-xl bg-black border border-white/5 flex items-center justify-center text-zinc-400 group-hover:text-primary group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
                   <Icon className="h-5 w-5" />
                 </div>
                 {/* Visual pulse for important events */}
@@ -169,7 +169,7 @@ export default function LogsPage() {
                   <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest bg-white/5 border-white/10 text-zinc-400 group-hover:text-white group-hover:border-white/20 transition-colors">
                     {log.action.replace(/_/g, ' ')}
                   </Badge>
-                  <span className="text-zinc-800">•</span>
+                  <span className="text-zinc-300">•</span>
                   <Badge className={cn(
                     "text-[9px] font-black uppercase tracking-[0.15em] px-2",
                     log.actorRole === 'admin' ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
@@ -182,11 +182,11 @@ export default function LogsPage() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="text-[10px] font-mono text-zinc-600 tabular-nums">
+                        <span className="text-[10px] font-mono text-zinc-400 tabular-nums">
                           {formatDistanceToNow(timestamp, { addSuffix: true })}
                         </span>
                       </TooltipTrigger>
-                      <TooltipContent className="bg-zinc-900 border-white/10 text-white text-[10px] font-mono">
+                      <TooltipContent className="bg-black border-white/10 text-white text-[10px] font-mono">
                         {timestamp.toLocaleString()}
                       </TooltipContent>
                     </Tooltip>
@@ -207,7 +207,7 @@ export default function LogsPage() {
     <div className="max-w-6xl mx-auto px-6 py-12 space-y-8 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-4">
-          <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
+          <Button asChild variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
             <Link href="/dashboard/admin">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retreat to Command
@@ -223,18 +223,18 @@ export default function LogsPage() {
                 Chronicle <span className="text-primary/80">Oversight</span>
               </h1>
             </div>
-            <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
+            <p className="text-zinc-400 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
               Deep ledger of global structural shifts and operative behavior.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 bg-white/[0.02] border border-white/5 p-2 rounded-2xl backdrop-blur-sm">
+        <div className="flex items-center gap-3 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 p-2 rounded-2xl backdrop-blur-sm">
           <Select value={roleFilter} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-[160px] bg-black/40 border-white/5 text-zinc-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:border-white/10 hover:text-white transition-all">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-white/10 text-white shadow-2xl">
+            <SelectContent className="bg-black border-white/10 text-white shadow-2xl">
               {availableRoles.map((role) => (
                 <SelectItem key={role} value={role} className="text-[10px] font-black uppercase tracking-widest focus:bg-primary focus:text-white py-3">
                   {role === 'all' ? 'Universal Roles' : role}
@@ -247,7 +247,7 @@ export default function LogsPage() {
             <SelectTrigger className="w-[180px] bg-black/40 border-white/5 text-zinc-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:border-white/10 hover:text-white transition-all">
               <SelectValue placeholder="All Actions" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-white/10 text-white shadow-2xl max-h-[400px]">
+            <SelectContent className="bg-black border-white/10 text-white shadow-2xl max-h-[400px]">
               {availableActions.map((action) => (
                 <SelectItem key={action} value={action} className="text-[10px] font-black uppercase tracking-widest focus:bg-primary focus:text-white py-3">
                   {action === 'all' ? 'All Protocols' : action.replace(/_/g, ' ')}
@@ -262,11 +262,11 @@ export default function LogsPage() {
         <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
         <CardContent className="relative z-10 p-4 sm:p-6">
           <div className="mb-6 flex items-center justify-between px-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600">
-              Registry <span className="text-zinc-800">Cluster 01</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">
+              Registry <span className="text-zinc-300">Cluster 01</span>
             </span>
             <div className="h-px flex-1 mx-6 bg-gradient-to-r from-white/0 via-white/5 to-white/0" />
-            <span className="text-[10px] font-mono text-zinc-800 uppercase tracking-tighter">
+            <span className="text-[10px] font-mono text-zinc-300 uppercase tracking-tighter">
               Aavija-Main.Ledger.v2
             </span>
           </div>
@@ -275,9 +275,9 @@ export default function LogsPage() {
       </Card>
 
       <div className="flex justify-center pt-8">
-        <div className="px-6 py-3 rounded-full bg-white/[0.01] border border-white/5 backdrop-blur-xl">
-          <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-[0.5em] leading-none">
-            End of Current <span className="text-zinc-800">Temporal Thread</span>
+        <div className="px-6 py-3 rounded-full bg-[#020617]/95 backdrop-blur-3xl/[0.01] border border-white/5 backdrop-blur-xl">
+          <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-[0.5em] leading-none">
+            End of Current <span className="text-zinc-300">Temporal Thread</span>
           </p>
         </div>
       </div>

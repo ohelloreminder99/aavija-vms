@@ -79,7 +79,7 @@ const SkeletonProfile = () => (
   <div className="space-y-6">
     <Skeleton className="h-10 w-48 bg-white/5" />
     <Card className="glass-card border-white/5 relative overflow-hidden">
-      <div className="absolute inset-0 bg-white/[0.01]" />
+      <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-3xl/[0.01]" />
       <CardHeader className="relative z-10 border-b border-white/5 pb-8">
         <Skeleton className="h-8 w-1/3 bg-white/5" />
         <Skeleton className="mt-4 h-4 w-2/3 bg-white/5" />
@@ -344,11 +344,11 @@ export default function ProfilePage() {
             <CardContent className="relative z-10 pt-8">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  <div className="mb-8 flex items-center gap-8 p-6 bg-white/[0.02] border border-white/5 rounded-3xl group/avatar">
+                  <div className="mb-8 flex items-center gap-8 p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl group/avatar">
                     <div className="relative">
                       <Avatar className="h-28 w-28 border-2 border-white/5 group-hover/avatar:border-primary/50 transition-all duration-500 shadow-2xl">
                         <AvatarImage src={userProfile?.photo_url} alt={userProfile?.name} className="object-cover" />
-                        <AvatarFallback className="bg-white/5 text-4xl text-zinc-500 font-bold">
+                        <AvatarFallback className="bg-white/5 text-4xl text-zinc-400 font-bold">
                           {isUploading ? <Loader2 className="h-10 w-10 animate-spin text-primary/40" /> : userProfile?.name ? userProfile.name.charAt(0) : <User className="h-10 w-10" />}
                         </AvatarFallback>
                       </Avatar>
@@ -360,7 +360,7 @@ export default function ProfilePage() {
                         <Input id="photo-upload" type="file" accept="image/png, image,jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} aria-label="Upload profile photo" className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
                         {isUploading && <span className="text-xs text-primary animate-pulse font-bold tracking-widest uppercase">Uploading...</span>}
                       </div>
-                      <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-tight">Support: WEBP, PNG, JPG (5MB Max)</p>
+                      <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-tight">Support: WEBP, PNG, JPG (5MB Max)</p>
                     </div>
                   </div>
 
@@ -369,7 +369,7 @@ export default function ProfilePage() {
                       <FormItem>
                         <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your Full Name" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
+                          <Input placeholder="Your Full Name" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-400 h-11" />
                         </FormControl>
                         <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                       <FormItem>
                         <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Company Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your Company" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 h-11" />
+                          <Input placeholder="Your Company" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-zinc-400 h-11" />
                         </FormControl>
                         <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
@@ -393,7 +393,7 @@ export default function ProfilePage() {
                     />
 
                     <FormField control={form.control} name="cityId" render={({ field }) => (
-                      <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                      <FormItem className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
                         <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">
                           City {field.value && (
                             <span className="text-primary ml-2 border-l border-white/10 pl-2">
@@ -402,8 +402,8 @@ export default function ProfilePage() {
                           )}
                         </FormLabel>
                         <div className="relative group/search mb-4">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-600 group-focus-within/search:text-primary transition-colors" />
-                          <Input placeholder="Search city..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} aria-label="Search cities" className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-700 h-10 text-sm" />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 group-focus-within/search:text-primary transition-colors" />
+                          <Input placeholder="Search city..." value={citySearch} onChange={(e) => setCitySearch(e.target.value)} aria-label="Search cities" className="pl-10 bg-black/20 border-white/5 text-white placeholder:text-zinc-400 h-10 text-sm" />
                         </div>
                         <ScrollArea className="h-40 w-full rounded-2xl border border-white/5 bg-black/20">
                           <FormControl>
@@ -412,13 +412,13 @@ export default function ProfilePage() {
                                 <div key={city.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group/item">
                                   <RadioGroupItem value={city.id} id={`city-${city.id}`} className="border-white/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
                                   <Label htmlFor={`city-${city.id}`} className="font-medium text-zinc-400 group-hover/item:text-white transition-colors capitalize text-sm flex-1 cursor-pointer">
-                                    {city.name} <span className="text-[10px] text-zinc-600 uppercase tracking-tighter ml-2">{city.stateName}</span>
+                                    {city.name} <span className="text-[10px] text-zinc-400 uppercase tracking-tighter ml-2">{city.stateName}</span>
                                   </Label>
                                 </div>
                               ))}
                             </RadioGroup>
                           </FormControl>
-                          {(filteredCities ?? []).length === 0 && <p className="py-12 text-center text-[10px] font-bold text-zinc-700 uppercase tracking-widest">City Not Found</p>}
+                          {(filteredCities ?? []).length === 0 && <p className="py-12 text-center text-[10px] font-bold text-zinc-400 uppercase tracking-widest">City Not Found</p>}
                         </ScrollArea>
                         <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
@@ -429,14 +429,14 @@ export default function ProfilePage() {
                   <Separator className="bg-white/5 h-[1px]" />
 
                   <FormField control={form.control} name="products" render={({ field }) => (
-                    <FormItem className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                    <FormItem className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
                       <FormLabel className="flex items-center gap-2 text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4">
                         <Package className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
                         <span>Specialization</span>
                       </FormLabel>
-                      <FormDescription className="text-zinc-500 text-[10px] mb-4">Add items or services you offer to help people find you.</FormDescription>
+                      <FormDescription className="text-zinc-400 text-[10px] mb-4">Add items or services you offer to help people find you.</FormDescription>
                       <div className="flex items-center gap-2">
-                        <Input placeholder="e.g., Industrial Machinery" value={newProduct} onChange={(e) => setNewProduct(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddProduct(); } }} className="bg-black/20 border-white/10 text-white placeholder:text-zinc-700 h-10" />
+                        <Input placeholder="e.g., Industrial Machinery" value={newProduct} onChange={(e) => setNewProduct(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddProduct(); } }} className="bg-black/20 border-white/10 text-white placeholder:text-zinc-400 h-10" />
                         <Button type="button" variant="outline" onClick={handleAddProduct} disabled={!newProduct.trim() || (field.value?.length ?? 0) >= 10} className="h-10 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest px-6">Add</Button>
                       </div>
                       <div className="space-y-4 pt-4">
@@ -445,13 +445,13 @@ export default function ProfilePage() {
                             {field.value.map((product) => (
                               <Badge key={product} variant="secondary" className="pl-3 py-1.5 bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 transition-colors">
                                 {product}
-                                <button type="button" onClick={() => handleRemoveProduct(product)} className="ml-2 rounded-full p-0.5 text-zinc-500 hover:text-red-500 transition-colors">
+                                <button type="button" onClick={() => handleRemoveProduct(product)} className="ml-2 rounded-full p-0.5 text-zinc-400 hover:text-red-500 transition-colors">
                                   <X className="h-3 w-3" />
                                 </button>
                               </Badge>
                             ))}
                           </div>
-                        ) : <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-[0.2em] text-center py-6 border border-dashed border-white/5 rounded-2xl">No items added.</p>}
+                        ) : <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-[0.2em] text-center py-6 border border-dashed border-white/5 rounded-2xl">No items added.</p>}
                       </div>
                       <FormMessage className="text-red-500 text-[10px]" />
                     </FormItem>
@@ -462,7 +462,7 @@ export default function ProfilePage() {
 
                   {userProfile?.is_agent && (
                     <>
-                      <div className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-6">
+                      <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                             <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
@@ -476,19 +476,19 @@ export default function ProfilePage() {
                             </div>
                           </div>
                         </div>
-                        <p className="text-[10px] text-zinc-500 font-medium uppercase leading-relaxed max-w-md">Add your UPI and PAN for commission payments. Manual verification by admin is required.</p>
+                        <p className="text-[10px] text-zinc-400 font-medium uppercase leading-relaxed max-w-md">Add your UPI and PAN for commission payments. Manual verification by admin is required.</p>
 
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
                           <FormField control={form.control} name="agent_payout_upi" render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">UPI ID</FormLabel>
+                              <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px]">UPI ID</FormLabel>
                               <FormControl><Input placeholder="yourname@upi" {...field} disabled={userProfile.kyc_verified} className="bg-black/20 border-white/5 text-white h-11" /></FormControl>
                               <FormMessage className="text-red-500 text-[10px]" />
                             </FormItem>
                           )} />
                           <FormField control={form.control} name="pan_number" render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">PAN Number</FormLabel>
+                              <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px]">PAN Number</FormLabel>
                               <FormControl><Input placeholder="ABCDE1234F" {...field} className="uppercase bg-black/20 border-white/5 text-white h-11" disabled={userProfile.kyc_verified} /></FormControl>
                               <FormMessage className="text-red-500 text-[10px]" />
                             </FormItem>

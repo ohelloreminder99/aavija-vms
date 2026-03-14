@@ -170,16 +170,16 @@ export default function VisitorHistoryDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-5xl bg-white border-zinc-200 p-0 overflow-hidden shadow-2xl">
-          <div className="absolute inset-0 mesh-porcelain opacity-20 pointer-events-none" />
+        <DialogContent className="sm:max-w-5xl bg-[#020617]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-2xl">
+          <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
 
-          <div className="relative z-10 p-8 border-b border-zinc-100 bg-zinc-50/30">
+          <div className="relative z-10 p-8 border-b border-white/5 bg-white/[0.01]">
             <div className="flex items-start gap-6">
               <div className="relative group">
                 <div className="absolute -inset-1 rounded-2xl bg-primary/20 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-700" />
-                <Avatar className="h-20 w-20 border-2 border-zinc-200 relative z-10 shadow-lg">
+                <Avatar className="h-20 w-20 border-2 border-white/10 relative z-10 shadow-lg">
                   {visitor?.photo_url && <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />}
-                  <AvatarFallback className="bg-zinc-100 text-zinc-500 font-bold text-2xl uppercase">{visitor?.name?.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-white/10 text-zinc-400 font-bold text-2xl uppercase">{visitor?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
               </div>
               <div className="flex-1">
@@ -187,9 +187,9 @@ export default function VisitorHistoryDialog({
                   <div className="p-1.5 rounded-lg bg-primary/10 border border-primary/20">
                     <History className="h-4 w-4 text-primary" />
                   </div>
-                  <DialogTitle className="text-3xl font-headline font-bold text-zinc-900 tracking-tight">Visit <span className="text-primary/80">History</span></DialogTitle>
+                  <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Visit <span className="text-primary/80">History</span></DialogTitle>
                 </div>
-                <DialogDescription className="text-zinc-600 font-semibold uppercase tracking-[0.2em] text-[10px]">
+                <DialogDescription className="text-zinc-400 font-semibold uppercase tracking-[0.2em] text-[10px]">
                   Global check-in audit for {visitor?.name}
                 </DialogDescription>
               </div>
@@ -198,8 +198,8 @@ export default function VisitorHistoryDialog({
 
           <ScrollArea className="max-h-[70vh]">
             <div className="p-8 space-y-8">
-              <div className="p-6 bg-white/40 border border-zinc-200 rounded-3xl space-y-6 relative overflow-hidden shadow-sm">
-                <div className="absolute inset-0 mesh-porcelain opacity-10 pointer-events-none" />
+              <div className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-6 relative overflow-hidden shadow-sm">
+                <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6 justify-between">
                   <div className="flex flex-wrap items-end gap-4">
                     <DateRangePicker
@@ -211,11 +211,11 @@ export default function VisitorHistoryDialog({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-zinc-50 border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
+                    <Button variant="outline" onClick={handleExportCSV} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-white/5 border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
                       <Download className="mr-2 h-4 w-4" />
                       Export CSV
                     </Button>
-                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-zinc-50 border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
+                    <Button variant="outline" onClick={handleExportPDF} disabled={filteredVisits.length === 0 || isLoading} className="h-11 bg-white/5 border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase tracking-widest px-6 transition-all shadow-sm">
                       <Download className="mr-2 h-4 w-4" />
                       Export PDF
                     </Button>
@@ -223,62 +223,62 @@ export default function VisitorHistoryDialog({
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-zinc-200 bg-white/40 overflow-hidden shadow-xl min-h-[300px]">
+              <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden shadow-xl min-h-[300px]">
                 {isLoading ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4">
                     <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Retrieving Records...</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Retrieving Records...</span>
                   </div>
                 ) : error ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4 px-8 text-center">
                     <AlertTriangle className="h-10 w-10 text-red-600/50" />
-                    <p className="text-zinc-600 font-medium text-sm max-w-xs">{error}</p>
+                    <p className="text-zinc-400 font-medium text-sm max-w-xs">{error}</p>
                   </div>
                 ) : filteredVisits.length === 0 ? (
                   <div className="flex flex-col h-64 items-center justify-center space-y-4">
-                    <div className="p-4 rounded-full bg-zinc-50 border border-zinc-100 shadow-inner">
+                    <div className="p-4 rounded-full bg-white/5 border border-white/5 shadow-inner">
                       <History className="h-8 w-8 text-zinc-400" />
                     </div>
-                    <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest">No visit logs found</p>
+                    <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">No visit logs found</p>
                   </div>
                 ) : (
                   <Table>
-                    <TableHeader className="bg-zinc-50/50">
-                      <TableRow className="border-zinc-100 hover:bg-transparent">
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6 pl-8 w-16">Snapshot</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Premise</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Host Met</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Check-in</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Check-out</TableHead>
-                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-600 py-6">Status</TableHead>
+                    <TableHeader className="bg-white/[0.02]">
+                      <TableRow className="border-white/5 hover:bg-transparent">
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">Snapshot</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Premise</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Host Met</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-in</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-out</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredVisits.map((visit) => (
-                        <TableRow key={visit.id} className="border-zinc-100 hover:bg-zinc-50 transition-colors group/row">
+                        <TableRow key={visit.id} className="border-white/5 hover:bg-white/5 transition-colors group/row">
                           <TableCell className="pl-8 py-4">
-                            <Button variant="ghost" size="icon" aria-label="View visitor snapshot" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-zinc-50 border border-zinc-200 text-zinc-400 hover:text-primary hover:bg-primary/5 disabled:opacity-20 transition-all">
+                            <Button variant="ghost" size="icon" aria-label="View visitor snapshot" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-primary hover:bg-primary/5 disabled:opacity-20 transition-all">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </TableCell>
                           <TableCell>
-                            <div className="font-bold text-zinc-900 tracking-tight group-hover/row:text-primary transition-colors">{premiseMap.get(visit.premise_id) || 'Unknown'}</div>
+                            <div className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{premiseMap.get(visit.premise_id) || 'Unknown'}</div>
                           </TableCell>
                           <TableCell>
-                            <div className="text-[11px] font-semibold text-zinc-600">{visit.host_name || 'Autonomous'}</div>
+                            <div className="text-[11px] font-semibold text-zinc-400">{visit.host_name || 'Autonomous'}</div>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono text-[11px] text-zinc-600 font-semibold">{format(new Date(visit.checkin_time), 'PPp')}</span>
+                            <span className="font-mono text-[11px] text-zinc-400 font-semibold">{format(new Date(visit.checkin_time), 'PPp')}</span>
                           </TableCell>
                           <TableCell>
                             {visit.checkout_time ? (
-                              <span className="font-mono text-[11px] text-zinc-600 font-semibold">{format(new Date(visit.checkout_time), 'PPp')}</span>
+                              <span className="font-mono text-[11px] text-zinc-400 font-semibold">{format(new Date(visit.checkout_time), 'PPp')}</span>
                             ) : (
                               <Badge variant="outline" className="text-[8px] bg-sky-500/5 text-sky-600 border-sky-500/20 font-black uppercase tracking-widest">Active Link</Badge>
                             )}
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest bg-zinc-500/10 text-zinc-600 border-zinc-500/20 font-bold">
+                            <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest bg-zinc-500/10 text-zinc-400 border-zinc-500/20 font-bold">
                               {visit.status.replace('_', ' ')}
                             </Badge>
                           </TableCell>
@@ -291,16 +291,16 @@ export default function VisitorHistoryDialog({
             </div>
           </ScrollArea>
 
-          <div className="p-4 bg-zinc-50/50 border-t border-zinc-100 flex justify-end">
+          <div className="p-4 bg-white/[0.02] border-t border-white/5 flex justify-end">
             <DialogClose asChild>
-              <Button className="bg-zinc-900 text-white hover:bg-zinc-800 h-9 text-[10px] font-black uppercase tracking-widest px-8 rounded-xl transition-all shadow-lg">Close History</Button>
+              <Button className="bg-black text-white hover:bg-zinc-800 h-9 text-[10px] font-black uppercase tracking-widest px-8 rounded-xl transition-all shadow-lg">Close History</Button>
             </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl bg-white border-zinc-200 p-0 overflow-hidden shadow-2xl z-[70]">
+        <DialogContent className="max-w-xl bg-[#020617]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-2xl z-[70]">
           <div className="absolute top-4 left-4 z-20">
             <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Visitor Snapshot</Badge>
           </div>
@@ -310,9 +310,9 @@ export default function VisitorHistoryDialog({
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
             </div>
           )}
-          <div className="p-4 bg-zinc-50 border-t border-zinc-100 flex justify-end">
+          <div className="p-4 bg-white/5 border-t border-white/5 flex justify-end">
             <DialogClose asChild>
-              <Button className="bg-zinc-900 text-white hover:bg-zinc-800 h-9 text-[10px] font-bold uppercase tracking-widest px-6 rounded-lg transition-all shadow-md">Dismiss</Button>
+              <Button className="bg-black text-white hover:bg-zinc-800 h-9 text-[10px] font-bold uppercase tracking-widest px-6 rounded-lg transition-all shadow-md">Dismiss</Button>
             </DialogClose>
           </div>
         </DialogContent>

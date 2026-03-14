@@ -42,7 +42,7 @@ export function AgentEmailLookup({ value, onChange }: AgentEmailLookupProps) {
                 <Input
                     type="email"
                     placeholder="Scan via neural mail..."
-                    className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-800"
+                    className="bg-black/40 border-white/5 text-white h-11 rounded-xl placeholder:text-zinc-300"
                     value={email}
                     aria-label="Agent email lookup"
                     onChange={(e) => {
@@ -89,7 +89,7 @@ export function AgentEmailLookup({ value, onChange }: AgentEmailLookupProps) {
                 </div>
             )}
             {!lookupResult && !lookupError && (
-                <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-[0.2em] ml-1">
+                <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-[0.2em] ml-1">
                     Enter email to find a registered user.
                 </p>
             )}

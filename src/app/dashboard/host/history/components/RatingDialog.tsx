@@ -36,15 +36,15 @@ const StarRatingInput = ({
 }) => {
     const [hoverRating, setHoverRating] = React.useState(0);
     return (
-        <div className="flex items-center gap-1.5 p-4 rounded-2xl bg-white/[0.03] border border-white/5 shadow-inner">
+        <div className="flex items-center gap-1.5 p-4 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.03] border border-white/5 shadow-inner">
             {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                     key={star}
                     className={cn(
-                        'h-10 w-10 cursor-pointer text-zinc-800 transition-all duration-300 transform hover:scale-110',
+                        'h-10 w-10 cursor-pointer text-zinc-300 transition-all duration-300 transform hover:scale-110',
                         (hoverRating || rating) >= star
                             ? 'text-amber-400 fill-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]'
-                            : 'hover:text-zinc-600'
+                            : 'hover:text-zinc-400'
                     )}
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(0)}
@@ -128,7 +128,7 @@ export function RatingDialog({
                     </div>
                     <div>
                         <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Rate Your Visitor</DialogTitle>
-                        <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
+                        <DialogDescription className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest mt-1">
                             Rating visit for <span className="text-primary">{visit?.visitor_name}</span>
                         </DialogDescription>
                     </div>
@@ -141,7 +141,7 @@ export function RatingDialog({
                 </div>
                 <DialogFooter className="gap-3">
                     <DialogClose asChild>
-                        <Button variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 border-white/5">Cancel</Button>
+                        <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 border-white/5">Cancel</Button>
                     </DialogClose>
                     <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
                         {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Submit Rating'}

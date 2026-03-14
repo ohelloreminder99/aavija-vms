@@ -193,7 +193,7 @@ export default function AnnouncementsPage() {
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
             <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Syncing Broadcast Frequency...</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Syncing Broadcast Frequency...</p>
         </div>
       );
     }
@@ -210,9 +210,9 @@ export default function AnnouncementsPage() {
     if (!announcements || announcements.length === 0) {
       return (
         <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-3xl bg-black/20">
-          <Megaphone className="h-12 w-12 text-zinc-800 mx-auto mb-4" />
-          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Zero Active Broadcasts</p>
-          <p className="text-zinc-700 text-[9px] mt-2 font-medium uppercase tracking-widest">Broadcast a new signal to the network nodes.</p>
+          <Megaphone className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
+          <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.4em]">Zero Active Broadcasts</p>
+          <p className="text-zinc-400 text-[9px] mt-2 font-medium uppercase tracking-widest">Broadcast a new signal to the network nodes.</p>
         </div>
       );
     }
@@ -226,11 +226,11 @@ export default function AnnouncementsPage() {
               <div className="flex justify-between items-start gap-4">
                 <CardTitle className="text-lg font-bold text-white tracking-tight group-hover:text-primary transition-colors">{ann.title}</CardTitle>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => { setAnnouncementToEdit(ann); setIsFormOpen(true); }} className="h-8 w-8 rounded-lg hover:bg-white/5 text-zinc-600 hover:text-white transition-all"><Edit className="h-3.5 w-3.5" /></Button>
-                  <Button variant="ghost" size="icon" onClick={() => { setAnnouncementToDelete(ann.id); setIsAlertOpen(true); }} className="h-8 w-8 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-500 transition-all"><Trash2 className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => { setAnnouncementToEdit(ann); setIsFormOpen(true); }} className="h-8 w-8 rounded-lg hover:bg-white/5 text-zinc-400 hover:text-white transition-all"><Edit className="h-3.5 w-3.5" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => { setAnnouncementToDelete(ann.id); setIsAlertOpen(true); }} className="h-8 w-8 rounded-lg hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-all"><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </div>
-              <CardDescription className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-600 pt-1.5">
+              <CardDescription className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 pt-1.5">
                 <Calendar className="h-3 w-3" />
                 {ann.createdAt ? format(ann.createdAt.toDate(), 'PPP') : 'Active Now'}
               </CardDescription>
@@ -245,7 +245,7 @@ export default function AnnouncementsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className={cn("h-1.5 w-1.5 rounded-full", (!ann.targetStates?.length && !ann.targetDistricts?.length && !ann.targetCities?.length) ? "bg-emerald-500" : "bg-primary/50")} />
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-700">
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">
                     {(!ann.targetStates?.length && !ann.targetDistricts?.length && !ann.targetCities?.length) ? 'Global Wide-Target' : 'Sector Deep-Target'}
                   </span>
                 </div>
@@ -262,7 +262,7 @@ export default function AnnouncementsPage() {
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-10 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-4">
-          <Button asChild variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
+          <Button asChild variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 -ml-4 px-4 h-10 text-[10px] font-black uppercase tracking-widest transition-all">
             <Link href="/dashboard/admin">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retreat to Command
@@ -278,7 +278,7 @@ export default function AnnouncementsPage() {
                 Broadcast <span className="text-primary/80">Intelligence</span>
               </h1>
             </div>
-            <p className="text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
+            <p className="text-zinc-400 text-[11px] font-medium uppercase tracking-[0.2em] ml-1">
               Global announcement uplink. Dispatch priority signals and targeted updates across the mesh network.
             </p>
           </div>
@@ -291,10 +291,10 @@ export default function AnnouncementsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-2xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden h-[90vh] flex flex-col">
-            <div className="p-8 border-b border-white/5 bg-white/[0.02]">
+            <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
               <DialogHeader>
                 <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Signal <span className="text-primary/80">Configuration</span></DialogTitle>
-                <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                <DialogDescription className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
                   Compose broadcast payload and calibrate targeting vectors.
                 </DialogDescription>
               </DialogHeader>
@@ -306,28 +306,28 @@ export default function AnnouncementsPage() {
                   <div className="space-y-8 pb-8">
                     <FormField control={form.control} name="title" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Signal Title</FormLabel>
-                        <FormControl><Input placeholder="EMERGENCY_UPDATE_V2" {...field} className="bg-black/40 border-white/5 text-white h-12 rounded-xl placeholder:text-zinc-800" /></FormControl>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Signal Title</FormLabel>
+                        <FormControl><Input placeholder="EMERGENCY_UPDATE_V2" {...field} className="bg-black/40 border-white/5 text-white h-12 rounded-xl placeholder:text-zinc-300" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="message" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Payload Content</FormLabel>
-                        <FormControl><Textarea rows={4} placeholder="Decoded message string..." {...field} className="bg-black/40 border-white/5 text-white rounded-xl placeholder:text-zinc-800 resize-none" /></FormControl>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Payload Content</FormLabel>
+                        <FormControl><Textarea rows={4} placeholder="Decoded message string..." {...field} className="bg-black/40 border-white/5 text-white rounded-xl placeholder:text-zinc-300 resize-none" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
 
                     <FormField control={form.control} name="targetRoles" render={() => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Neural Directives (Target Roles)</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Neural Directives (Target Roles)</FormLabel>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-2">
                           {availableRoles.map(r => (
                             <FormField key={r.id} control={form.control} name="targetRoles" render={({ field }) => (
                               <div className={cn(
                                 "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer group",
-                                field.value?.includes(r.id) ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/10"
+                                field.value?.includes(r.id) ? "bg-primary/10 border-primary/30 text-white" : "bg-white/5 border-white/5 text-zinc-400 hover:border-white/10"
                               )} onClick={() => field.onChange(field.value?.includes(r.id) ? field.value.filter(v => v !== r.id) : [...(field.value || []), r.id])}>
                                 <FormControl><Checkbox checked={field.value?.includes(r.id)} className="sr-only" /></FormControl>
                                 <Label className="text-[9px] font-black uppercase tracking-widest cursor-pointer group-hover:text-white transition-colors">{r.label}</Label>
@@ -342,14 +342,14 @@ export default function AnnouncementsPage() {
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 px-1">
                         <Separator className="flex-1 bg-white/5" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-700">Geospatial Vectors</span>
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">Geospatial Vectors</span>
                         <Separator className="flex-1 bg-white/5" />
                       </div>
 
-                      <Alert className="bg-white/[0.02] border-primary/20 rounded-2xl p-4">
+                      <Alert className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] border-primary/20 rounded-2xl p-4">
                         <Info className="h-4 w-4 text-primary" />
                         <AlertTitle className="text-xs font-bold text-white mb-1">Targeting Logic</AlertTitle>
-                        <AlertDescription className="text-[10px] text-zinc-500 uppercase tracking-wider leading-relaxed">
+                        <AlertDescription className="text-[10px] text-zinc-400 uppercase tracking-wider leading-relaxed">
                           Enabling a Sector Node (State/District) captures all subordinate nodes. Deep-target individual sectors for precision signal injection.
                         </AlertDescription>
                       </Alert>
@@ -358,18 +358,18 @@ export default function AnnouncementsPage() {
                       <FormField control={form.control} name="targetStates" render={({ field }) => (
                         <FormItem className="space-y-4">
                           <div className="flex items-end justify-between px-1">
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500">State Sectors</FormLabel>
-                            <span className="text-[8px] font-bold text-zinc-700 uppercase tracking-widest">Toggle deep capture</span>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400">State Sectors</FormLabel>
+                            <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Toggle deep capture</span>
                           </div>
                           <div className="relative group/search">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 group-focus-within/search:text-primary transition-colors" />
                             <Input placeholder="Search states..." value={stateSearch} onChange={e => setStateSearch(e.target.value)} className="pl-9 bg-black/40 border-white/5 h-10 text-xs rounded-lg" />
                           </div>
                           <div className="border border-white/5 rounded-2xl bg-black/20 overflow-hidden">
                             <ScrollArea className="h-40">
                               <div className="divide-y divide-white/5">
                                 {filteredStates.map(s => (
-                                  <div key={s.id} className="flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors group/row">
+                                  <div key={s.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
                                     <div className="flex items-center gap-3">
                                       <Checkbox
                                         id={`s-${s.id}`}
@@ -379,7 +379,7 @@ export default function AnnouncementsPage() {
                                       />
                                       <Label htmlFor={`s-${s.id}`} className="text-xs font-bold text-zinc-400 group-hover/row:text-white transition-colors">{s.name}</Label>
                                     </div>
-                                    <Button type="button" variant="ghost" size="sm" className="h-7 px-3 text-[9px] font-black uppercase tracking-widest text-zinc-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" onClick={() => setBrowseStateId(s.id)}>Browse Districts</Button>
+                                    <Button type="button" variant="ghost" size="sm" className="h-7 px-3 text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" onClick={() => setBrowseStateId(s.id)}>Browse Districts</Button>
                                   </div>
                                 ))}
                               </div>
@@ -392,13 +392,13 @@ export default function AnnouncementsPage() {
                       <FormField control={form.control} name="targetDistricts" render={({ field }) => (
                         <FormItem className="space-y-4">
                           <div className="flex items-end justify-between px-1">
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500">District Sectors</FormLabel>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400">District Sectors</FormLabel>
                             {browseStateId && (
                               <button onClick={() => setBrowseStateId('')} className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline transition-all">Reset Sector Node</button>
                             )}
                           </div>
                           <div className="relative group/search">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 group-focus-within/search:text-primary transition-colors" />
                             <Input placeholder="Search districts..." value={districtSearch} onChange={e => setDistrictSearch(e.target.value)} className="pl-9 bg-black/40 border-white/5 h-10 text-xs rounded-lg" />
                           </div>
                           <div className="border border-white/5 rounded-2xl bg-black/20 overflow-hidden">
@@ -406,7 +406,7 @@ export default function AnnouncementsPage() {
                               <div className="divide-y divide-white/5">
                                 {filteredDistricts.length > 0 ? (
                                   filteredDistricts.map(d => (
-                                    <div key={d.id} className="flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors group/row">
+                                    <div key={d.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
                                       <div className="flex items-center gap-3">
                                         <Checkbox
                                           id={`d-${d.id}`}
@@ -416,11 +416,11 @@ export default function AnnouncementsPage() {
                                         />
                                         <Label htmlFor={`d-${d.id}`} className="text-xs font-bold text-zinc-400 group-hover/row:text-white transition-colors">{d.name}</Label>
                                       </div>
-                                      <Button type="button" variant="ghost" size="sm" className="h-7 px-3 text-[9px] font-black uppercase tracking-widest text-zinc-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" onClick={() => setBrowseDistrictId(d.id)}>Browse Cities</Button>
+                                      <Button type="button" variant="ghost" size="sm" className="h-7 px-3 text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all" onClick={() => setBrowseDistrictId(d.id)}>Browse Cities</Button>
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="py-10 text-center"><p className="text-[9px] font-black text-zinc-800 uppercase tracking-widest">No sector match</p></div>
+                                  <div className="py-10 text-center"><p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest">No sector match</p></div>
                                 )}
                               </div>
                             </ScrollArea>
@@ -432,13 +432,13 @@ export default function AnnouncementsPage() {
                       <FormField control={form.control} name="targetCities" render={({ field }) => (
                         <FormItem className="space-y-4">
                           <div className="flex items-end justify-between px-1">
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-500">City Sectors</FormLabel>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400">City Sectors</FormLabel>
                             {browseDistrictId && (
                               <button onClick={() => setBrowseDistrictId('')} className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline transition-all">Reset District Node</button>
                             )}
                           </div>
                           <div className="relative group/search">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 group-focus-within/search:text-primary transition-colors" />
                             <Input placeholder="Search cities..." value={citySearch} onChange={e => setCitySearch(e.target.value)} className="pl-9 bg-black/40 border-white/5 h-10 text-xs rounded-lg" />
                           </div>
                           <div className="border border-white/5 rounded-2xl bg-black/20 overflow-hidden">
@@ -446,7 +446,7 @@ export default function AnnouncementsPage() {
                               <div className="divide-y divide-white/5">
                                 {filteredCities.length > 0 ? (
                                   filteredCities.map(c => (
-                                    <div key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.02] transition-colors group/row">
+                                    <div key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
                                       <Checkbox
                                         id={`ci-${c.id}`}
                                         checked={field.value?.includes(c.id)}
@@ -457,7 +457,7 @@ export default function AnnouncementsPage() {
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="py-10 text-center"><p className="text-[9px] font-black text-zinc-800 uppercase tracking-widest">No terminal sector match</p></div>
+                                  <div className="py-10 text-center"><p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest">No terminal sector match</p></div>
                                 )}
                               </div>
                             </ScrollArea>
@@ -467,8 +467,8 @@ export default function AnnouncementsPage() {
                     </div>
                   </div>
                 </ScrollArea>
-                <div className="p-8 border-t border-white/5 bg-white/[0.02] flex justify-end gap-4">
-                  <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-8">Cancel</Button></DialogClose>
+                <div className="p-8 border-t border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
+                  <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-8">Cancel</Button></DialogClose>
                   <Button type="submit" className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-12 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">Inject Signal</Button>
                 </div>
               </form>
@@ -493,7 +493,7 @@ export default function AnnouncementsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-8">
-            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel Purge</AlertDialogCancel>
+            <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel Purge</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">Execute Purge</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

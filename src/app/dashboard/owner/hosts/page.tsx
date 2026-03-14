@@ -241,7 +241,7 @@ export default function HostsPage() {
             </div>
         );
         if (!hosts || hosts.length === 0) return (
-            <div className="py-20 text-center text-zinc-600 border-2 border-dashed border-white/5 rounded-3xl bg-white/[0.02]">
+            <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
                 <Plus className="mx-auto h-10 w-10 mb-4 opacity-20" />
                 <p className="font-bold uppercase tracking-widest text-[11px]">No Hosts Found</p>
                 <p className="text-[10px] opacity-60 mt-1">Add a host to get started.</p>
@@ -250,29 +250,29 @@ export default function HostsPage() {
         return (
             <div className="space-y-6">
                 <div className="relative group/search">
-                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-700 group-focus-within/search:text-primary transition-colors" />
+                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within/search:text-primary transition-colors" />
                     <Input
                         placeholder="Search by name or email..."
-                        className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-800 focus:border-primary/30 transition-all font-medium"
+                        className="pl-12 bg-black/40 border-white/5 text-white h-12 rounded-2xl placeholder:text-zinc-300 focus:border-primary/30 transition-all font-medium"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
                     <Table>
-                        <TableHeader className="bg-white/[0.03]">
+                        <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
                             <TableRow className="border-white/5 hover:bg-transparent">
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 pl-8">Host Name</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6">Address</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-center">Status</TableHead>
-                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 py-6 text-right pr-8">Actions</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8">Host Name</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Address</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 text-center">Status</TableHead>
+                                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 text-right pr-8">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filteredHosts.map((host) => {
                                 const isActive = host.is_active ?? true;
                                 return (
-                                    <TableRow key={host.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
+                                    <TableRow key={host.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                                         <TableCell className="pl-8 py-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="relative">
@@ -284,12 +284,12 @@ export default function HostsPage() {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{host.name}</span>
-                                                    <span className="text-[10px] text-zinc-600 font-medium tracking-tight uppercase">{host.email}</span>
+                                                    <span className="text-[10px] text-zinc-400 font-medium tracking-tight uppercase">{host.email}</span>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="text-[11px] font-black text-zinc-500 tracking-widest uppercase bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 inline-block group-hover/row:border-white/10 transition-colors">
+                                            <div className="text-[11px] font-black text-zinc-400 tracking-widest uppercase bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 inline-block group-hover/row:border-white/10 transition-colors">
                                                 {host.identity}
                                             </div>
                                         </TableCell>
@@ -303,10 +303,10 @@ export default function HostsPage() {
                                         </TableCell>
                                         <TableCell className='text-right pr-8'>
                                             <div className="flex items-center justify-end gap-2">
-                                                <Button variant="ghost" size="icon" title={isActive ? 'Deactivate' : 'Activate'} onClick={() => setHostToToggle(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 transition-all">
+                                                <Button variant="ghost" size="icon" title={isActive ? 'Deactivate' : 'Activate'} onClick={() => setHostToToggle(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition-all">
                                                     <Power className={cn("h-4 w-4", isActive ? "text-red-500/50 group-hover/row:text-red-500" : "text-emerald-500/50 group-hover/row:text-emerald-500")} />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" title="Remove" onClick={() => setHostToRemove(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 transition-all">
+                                                <Button variant="ghost" size="icon" title="Remove" onClick={() => setHostToRemove(host)} className="h-9 w-9 rounded-lg bg-white/5 border border-white/5 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-all">
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </div>
@@ -319,7 +319,7 @@ export default function HostsPage() {
                 </div>
                 {filteredHosts.length === 0 && (
                     <div className="py-20 text-center">
-                        <p className="text-[11px] font-black text-zinc-800 uppercase tracking-[0.3em]">No matching host found</p>
+                        <p className="text-[11px] font-black text-zinc-300 uppercase tracking-[0.3em]">No matching host found</p>
                     </div>
                 )}
             </div>
@@ -329,7 +329,7 @@ export default function HostsPage() {
     return (
         <div className="container py-10 max-w-7xl">
             <div className="mb-8 flex items-center justify-between">
-                <Button asChild variant="ghost" className="text-zinc-500 hover:text-primary hover:bg-white/5 group/back">
+                <Button asChild variant="ghost" className="text-zinc-400 hover:text-primary hover:bg-white/5 group/back">
                     <Link href={`/dashboard/owner?premiseId=${premiseId}`} className="flex items-center">
                         <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Back to Dashboard</span>
@@ -349,7 +349,7 @@ export default function HostsPage() {
                             </div>
                             <div>
                                 <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Add New Host</DialogTitle>
-                                <DialogDescription className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mt-1">
+                                <DialogDescription className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest mt-1">
                                     Add a new host or link an existing user to your premise
                                 </DialogDescription>
                             </div>
@@ -379,14 +379,14 @@ export default function HostsPage() {
                                         <div className="grid grid-cols-2 gap-4">
                                             <FormField control={createForm.control} name="name" render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Full Name</FormLabel>
+                                                    <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Full Name</FormLabel>
                                                     <FormControl><Input placeholder="John Doe" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                     <FormMessage className="text-[9px] uppercase font-bold" />
                                                 </FormItem>
                                             )} />
                                             <FormField control={createForm.control} name="email" render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Email Address</FormLabel>
+                                                    <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Email Address</FormLabel>
                                                     <FormControl><Input type="email" placeholder="host@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                     <FormMessage className="text-[9px] uppercase font-bold" />
                                                 </FormItem>
@@ -394,21 +394,21 @@ export default function HostsPage() {
                                         </div>
                                         <FormField control={createForm.control} name="identity" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Address / Unit No.</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Address / Unit No.</FormLabel>
                                                 <FormControl><Input placeholder="e.g. Unit 402, Block B" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-600 font-medium">Specific address for the host (e.g. Flat 102)</FormDescription>
+                                                <FormDescription className="text-[9px] text-zinc-400 font-medium">Specific address for the host (e.g. Flat 102)</FormDescription>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <FormField control={createForm.control} name="password" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Password</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Password</FormLabel>
                                                 <FormControl><Input type="password" placeholder="Minimum 8 characters" {...field} className="bg-black/40 border-white/10 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                 {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Create Host'}
                                             </Button>
@@ -422,21 +422,21 @@ export default function HostsPage() {
                                     <form onSubmit={assignForm.handleSubmit(handleAssignFormSubmit)} className="space-y-4">
                                         <FormField control={assignForm.control} name="email" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Email Address</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Email Address</FormLabel>
                                                 <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
-                                                <FormDescription className="text-[9px] text-zinc-600 font-medium">The email address of the existing user you want to add</FormDescription>
+                                                <FormDescription className="text-[9px] text-zinc-400 font-medium">The email address of the existing user you want to add</FormDescription>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <FormField control={assignForm.control} name="identity" render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Address / Unit No.</FormLabel>
+                                                <FormLabel className="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Address / Unit No.</FormLabel>
                                                 <FormControl><Input placeholder="e.g. Unit 402, Block B" {...field} className="bg-black/40 border-white/5 text-white h-11" /></FormControl>
                                                 <FormMessage className="text-[9px] uppercase font-bold" />
                                             </FormItem>
                                         )} />
                                         <DialogFooter className="pt-4">
-                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-500 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
+                                            <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
                                             <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                 {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Link User'}
                                             </Button>
@@ -458,7 +458,7 @@ export default function HostsPage() {
                         </div>
                         <CardTitle className="text-4xl font-headline font-bold text-white tracking-tight">Host <span className="text-primary/80">List</span></CardTitle>
                     </div>
-                    <CardDescription className="text-zinc-500 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
+                    <CardDescription className="text-zinc-400 text-[11px] font-medium uppercase tracking-widest max-w-2xl leading-relaxed">
                         A list of all users assigned as hosts for your premise.
                     </CardDescription>
                 </CardHeader>
@@ -477,7 +477,7 @@ export default function HostsPage() {
                                     </AlertDescription>
                                 </div>
                             </div>
-                            <Button onClick={handleBackfill} disabled={isMigrating} size="sm" className="relative z-10 bg-amber-500 text-black font-black uppercase tracking-widest text-[9px] h-10 px-6 rounded-lg hover:bg-amber-400">
+                            <Button onClick={handleBackfill} disabled={isMigrating} size="sm" className="relative z-10 bg-amber-500 text-white font-black uppercase tracking-widest text-[9px] h-10 px-6 rounded-lg hover:bg-amber-400">
                                 {isMigrating ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : "Update Now"}
                             </Button>
                         </Alert>
@@ -496,7 +496,7 @@ export default function HostsPage() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-6">
-                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleToggleStatusConfirm} disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Confirm
@@ -515,7 +515,7 @@ export default function HostsPage() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-6">
-                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-500 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleRemoveConfirm} disabled={isSubmitting} className="bg-red-500 text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Remove

@@ -1,4 +1,4 @@
-﻿
+
 'use client';
 
 import * as React from 'react';
@@ -105,21 +105,24 @@ function ScannerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Scan QR Code</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="bg-[#020617]/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden max-w-lg">
+        <DialogHeader className="p-8 border-b border-white/10 bg-white/5">
+          <DialogTitle className="text-2xl font-bold text-white tracking-tight">Scan <span className="text-primary/80">QR Code</span></DialogTitle>
+          <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-2">
             Position the visitor's QR code in front of the camera.
           </DialogDescription>
         </DialogHeader>
-        <div className="relative min-h-[300px]">
+        <div className="relative min-h-[400px] p-8">
           {isProcessing && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <p className="mt-2 text-sm text-muted-foreground">Processing...</p>
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white">Processing Data...</p>
             </div>
           )}
-          <div id={scannerRegionId} className="w-full" />
+          <div id={scannerRegionId} className="w-full rounded-2xl overflow-hidden border border-white/10 shadow-inner" />
+        </div>
+        <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="bg-white/5 border-white/10 text-zinc-400 hover:text-white">Close Scanner</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -199,35 +202,49 @@ export default function GatekeeperDashboardPage() {
       />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Visitor Check-in</CardTitle>
-            <CardDescription>Scan a visitor's QR code to begin the check-in process.</CardDescription>
+        <Card className="glass-card border-white/5 overflow-hidden group">
+          <CardHeader className="border-b border-white/5 pb-8">
+            <CardTitle className="flex items-center gap-3 text-white">
+                <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:border-primary transition-all">
+                    <QrCode className="h-5 w-5 text-primary" />
+                </div>
+                <span className="text-2xl font-headline tracking-tight">Visitor Check-in</span>
+            </CardTitle>
+            <CardDescription className="text-zinc-500 font-medium ml-13">Scan a visitor's QR code to begin the check-in process.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Button className="h-24 w-full text-lg" onClick={() => setIsScannerOpen(true)} disabled={isScanDisabled}>
+          <CardContent className="p-8 space-y-6">
+            <Button
+              className="h-32 w-full text-xl font-bold rounded-3xl bg-primary hover:bg-primary/90 shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-all hover:scale-[1.01]"
+              onClick={() => setIsScannerOpen(true)}
+              disabled={isScanDisabled}
+            >
               {isLoading ? (
-                <Loader2 className="mr-4 h-8 w-8 animate-spin" />
+                <Loader2 className="mr-6 h-10 w-10 animate-spin text-white/50" />
               ) : (
-                <QrCode className="mr-4 h-8 w-8" />
+                <QrCode className="mr-6 h-12 w-12" />
               )}
-              Scan Visitor QR Code
+              <div className="text-left">
+                <p>Scan Visitor QR</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-1">Initialize Protocol</p>
+              </div>
             </Button>
 
-            <Button asChild variant="link" className="w-full">
+            <Button asChild variant="ghost" className="w-full text-zinc-500 hover:text-white hover:bg-white/5 rounded-2xl h-12">
               <Link href={`/dashboard/gatekeeper/scan?premiseId=${premiseId}`}>
-                <Video className="mr-2 h-4 w-4" />
-                Camera issues? Try alternative scanner.
+                <Video className="mr-3 h-4 w-4" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Camera issues? Try alternative scanner.</span>
               </Link>
             </Button>
 
             {!isLoading && !hasSufficientPremiseTokens && (
-              <Alert variant="destructive">
-                <ShieldAlert className="h-4 w-4" />
-                <AlertTitle>Premise Balance Low</AlertTitle>
-                <AlertDescription>
-                  This premise has insufficient tokens for a new check-in. Please ask the premise owner to recharge the account.
-                </AlertDescription>
+              <Alert variant="destructive" className="bg-red-500/10 border-red-500/20 text-red-500 rounded-2xl p-6">
+                <ShieldAlert className="h-6 w-6 mr-4" />
+                <div className="space-y-1">
+                    <AlertTitle className="text-lg font-black uppercase tracking-tight">Premise Balance Low</AlertTitle>
+                    <AlertDescription className="text-sm font-medium opacity-80 leading-relaxed">
+                        This premise has insufficient tokens for a new check-in. Please ask the premise owner to recharge the account.
+                    </AlertDescription>
+                </div>
               </Alert>
             )}
           </CardContent>
@@ -241,10 +258,11 @@ export default function GatekeeperDashboardPage() {
         />
 
       </div>
-      <div className="mt-8 text-center">
-        <Button asChild size="lg">
+      <div className="mt-12 text-center pb-20">
+        <Button asChild size="lg" className="h-16 px-12 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary transition-all group/hist shadow-2xl">
           <Link href={`/dashboard/gatekeeper/history?premiseId=${premiseId}`}>
-            <History className="mr-2" /> View Visit History
+            <History className="mr-4 h-6 w-6 text-zinc-500 group-hover/hist:text-primary transition-colors" />
+            <span className="text-[12px] font-black uppercase tracking-[0.3em] text-zinc-300 group-hover/hist:text-white transition-colors">View Visit History</span>
           </Link>
         </Button>
       </div>
