@@ -55,50 +55,30 @@ const defaultFeatures = [
     }
 ];
 
-const testimonials = [
-    {
-        quote: "Aavija has completely transformed how we manage visitors at our tech park. The WhatsApp notifications are a game changer.",
-        author: "Vikram S.",
-        role: "Estate Manager",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100&h=100"
-    },
-    {
-        quote: "The QR-based entry is so fast. No more long queues at the gate. Highly recommend for any gated community!",
-        author: "Anjali R.",
-        role: "Resident Secretary",
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100&h=100"
-    },
-    {
-        quote: "Finally, a VMS that actually works and looks great. The token system is simple and the analytics are deep.",
-        author: "Rajesh K.",
-        role: "Business Owner",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100&h=100"
-    }
-];
 
 const pricingTiers = [
     {
         name: "Micro",
-        price: "₹0",
-        description: "Zero upfront cost. Perfect for individual homeowners or small shops.",
-        features: ["Pay-as-you-use tokens", "1 Gatekeeper", "Basic WhatsApp Alerts", "Community Support"],
-        cta: "Start Scaling",
+        price: "Pay-As-You-Go",
+        description: "Professional usage-based model. You only pay for what you use. Zero usage means zero charges, every single month.",
+        features: ["Billed per token used", "1 Gatekeeper", "Full WhatsApp Alerts", "Standard Analytics", "No Monthly Commitment"],
+        cta: "Start Free",
         highlight: false
     },
     {
         name: "Economical",
         price: "₹999",
         period: "/mo",
-        description: "Optimized for apartment complexes and small offices.",
-        features: ["500 Free Tokens/mo", "Unlimited Gatekeepers", "Priority WhatsApp Alerts", "CSV History Export", "Dashboard Analytics"],
-        cta: "Go Pro",
+        description: "Optimized for active apartment complexes. Includes a generous baseline of monthly usage tokens.",
+        features: ["500 Free Tokens/mo", "Unlimited Gatekeepers", "Priority WhatsApp Alerts", "CSV History Export", "Advanced Analytics", "Fixed Monthly Cost"],
+        cta: "Get Started",
         highlight: true
     },
     {
         name: "Enterprise",
-        price: "Flexible",
-        description: "Custom volume for industrial parks & massive tech hubs.",
-        features: ["Bulk Token Rates", "API Access", "Custom Security Rules", "Priority 24/7 Support", "Multi-premise Admin"],
+        price: "Volume Based",
+        description: "Custom rates for high-frequency industrial hubs and corporate parks with massive traffic.",
+        features: ["Lower Tiered Token Rates", "Dedicated API Access", "Custom Security Protocols", "Priority 24/7 Support", "Multi-premise Management"],
         cta: "Contact Sales",
         highlight: false
     }
@@ -149,7 +129,6 @@ export function RegionalHomepageV2() {
                     <AavijaLogo />
                     <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
                         <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-                        <Link href="#security" className="hover:text-white transition-colors">Security</Link>
                         <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
                     </div>
                     <div className="flex items-center gap-4">
@@ -271,40 +250,13 @@ export function RegionalHomepageV2() {
                     </div>
                 </section>
 
-                {/* Testimonials */}
-                <section id="testimonials" className="container max-w-7xl px-6 py-20">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {testimonials.map((t, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className="p-8 rounded-3xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent flex flex-col justify-between"
-                            >
-                                <div className="flex gap-1 mb-6">
-                                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 text-blue-400 fill-blue-400" />)}
-                                </div>
-                                <p className="text-gray-300 text-lg italic mb-8 font-light leading-relaxed">"{t.quote}"</p>
-                                <div className="flex items-center gap-4">
-                                    <Image src={t.avatar} alt={t.author} width={40} height={40} className="rounded-full grayscale group-hover:grayscale-0 transition-all" />
-                                    <div>
-                                        <p className="font-bold text-sm">{t.author}</p>
-                                        <p className="text-xs text-gray-500">{t.role}</p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </section>
 
                 {/* Pricing Grid */}
                 <section id="pricing" className="container max-w-7xl px-6 py-40">
                     <div className="text-center mb-20">
-                        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Pay-As-You-Use Economy</h2>
+                        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Pay Only For Use</h2>
                         <p className="text-gray-400 text-lg max-w-2xl mx-auto font-light">
-                            From 1 visit a month to 1 million. Aavija scales with your business size. No wastage, just efficiency.
+                            Aavija operates on a professional token economy. You pay for what you use. If you don't use it for the whole month, there are zero charges. Seamless scaling for any premise.
                         </p>
                     </div>
 
