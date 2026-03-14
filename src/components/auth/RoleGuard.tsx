@@ -60,7 +60,7 @@ export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
         <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
           <div className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
         </div>
-        <h2 className="text-xl font-bold text-white tracking-tight">Access Restricted</h2>
+        <h2 className="text-xl font-bold text-foreground tracking-tight">Access Restricted</h2>
         <p className="text-zinc-500 text-xs max-w-sm px-6">
           Your current neural signature lacks the necessary authority level to access this sector.
           Redirecting to your authorized dashboard...

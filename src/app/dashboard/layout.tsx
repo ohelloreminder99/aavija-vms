@@ -235,11 +235,7 @@ export default function DashboardLayout({
                                     }
 
                                     if (section === 'visitor') {
-                                        return (
-                                            <RoleGuard allowedRoles={['visitor']}>
-                                                {children}
-                                            </RoleGuard>
-                                        );
+                                        return children;
                                     }
 
                                     if (section === 'gatekeeper') {
