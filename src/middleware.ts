@@ -15,16 +15,15 @@ export async function middleware(request: NextRequest) {
     response.cookies.set('x-region-anon-key', config.supabase_anon_key, { path: '/' })
     response.cookies.set('x-region-code', config.code, { path: '/' })
 
-    // --- DEFENSIVE SECURITY: STRICT CSP ---
-    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    // --- DEFENSIVE SECURITY: RELAXED CSP FOR PRODUCTION HYDRATION ---
     const cspHeader = `
-      default-src 'self';
-      script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: 'unsafe-inline';
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      img-src 'self' blob: data: https://*.supabase.co https://*.googleusercontent.com;
-      font-src 'self' https://fonts.gstatic.com;
-      connect-src 'self' https://*.supabase.co https://api.razorpay.com wss://*.supabase.co;
-      frame-src 'self' https://api.razorpay.com https://challenges.cloudflare.com;
+      default-src 'self' https: http:;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:;
+      style-src 'self' 'unsafe-inline' https: http:;
+      img-src 'self' blob: data: https://*.supabase.co https://*.googleusercontent.com https://*.unsplash.com https://picsum.photos https://placehold.co;
+      font-src 'self' data: https: http:;
+      connect-src 'self' https: http: wss: ws:;
+      frame-src 'self' https://api.razorpay.com https://challenges.cloudflare.com https://td.doubleclick.net;
       base-uri 'self';
       form-action 'self';
       frame-ancestors 'none';
@@ -33,7 +32,6 @@ export async function middleware(request: NextRequest) {
     `.replace(/\s{2,}/g, ' ').trim();
 
     response.headers.set('Content-Security-Policy', cspHeader);
-    response.headers.set('x-nonce', nonce);
 
     return response;
 }

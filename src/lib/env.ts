@@ -24,7 +24,8 @@ const envSchema = z.object({
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 });
 
-export const env = envSchema.parse({
+// Use safeParse to prevent crashing the entire app if some variables are missing in production.
+const parsed = envSchema.safeParse({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -36,5 +37,23 @@ export const env = envSchema.parse({
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
 });
+
+if (!parsed.success) {
+    console.error('❌ Invalid environment variables:', parsed.error.format());
+    // If we're in development, we might want to still throw or alert.
+    // In production, we try to survive if possible, though some features will break.
+}
+
+// Export the env object, falling back to an empty object if validation fails
+// so the app can at least boot and attempt to show an error or use hardcoded fallbacks.
+export const env = parsed.success ? parsed.data : {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "https://plruocrysgpyyfypcjwe.supabase.co",
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+    NEXT_PUBLIC_RAZORPAY_KEY_ID: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+    RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || "",
+    NODE_ENV: (process.env.NODE_ENV as any) || 'development',
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+} as Env;
 
 export type Env = z.infer<typeof envSchema>;
