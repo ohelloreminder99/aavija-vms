@@ -1,0 +1,48 @@
+{
+  "colors": {
+    "primary": "#0ea5e9",
+    "primaryForeground": "#f8fafc",
+    "background": "#020617",
+    "foreground": "#f8fafc",
+    "card": "#0f172a",
+    "cardForeground": "#f8fafc",
+    "popover": "#0f172a",
+    "popoverForeground": "#f8fafc",
+    "border": "#1e293b",
+    "input": "#1e293b",
+    "ring": "#0ea5e9",
+    "accent": "#1e293b",
+    "accentForeground": "#f8fafc",
+    "destructive": "#ef4444",
+    "destructiveForeground": "#f8fafc",
+    "muted": "#1e293b",
+    "mutedForeground": "#94a3b8"
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "xxl": 48
+  },
+  "borderRadius": {
+    "sm": 4,
+    "md": 8,
+    "lg": 12,
+    "full": 9999
+  },
+  "typography": {
+    "fontFamily": "Inter, sans-serif",
+    "baseSize": 16,
+    "scale": 1.25
+  },
+  "branding": {
+    "name": "Aavija VMS",
+    "glassmorphism": {
+      "opacity": 0.1,
+      "blur": 10,
+      "borderWhite": 0.05
+    }
+  }
+}

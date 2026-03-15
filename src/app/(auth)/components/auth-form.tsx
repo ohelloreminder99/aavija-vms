@@ -91,6 +91,12 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     setIsLoading(true);
     try {
+      const { checkAuthRateLimit } = await import('@/app/auth/actions');
+      const rateCheck = await checkAuthRateLimit();
+      if (!rateCheck.success) {
+        throw new Error(rateCheck.error);
+      }
+
       if (mode === 'signup') {
         const { data: authData, error } = await supabase.auth.signUp({
           email: data.email,
@@ -333,8 +339,8 @@ export function AuthForm({ mode }: AuthFormProps) {
     <>
       <div className="flex flex-col space-y-2 text-center">
         <ShieldIcon className="mx-auto h-8 w-8 text-primary" />
-        <h1 className="text-2xl font-semibold tracking-tight">{pageTitle}</h1>
-        <p className="text-sm text-muted-foreground">{pageDescription}</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-white">{pageTitle}</h1>
+        <p className="text-sm text-gray-400">{pageDescription}</p>
       </div>
       <div className="grid gap-6 pt-6">
         {referralBanner}
@@ -349,7 +355,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel className="text-white">Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Your Name"
@@ -367,7 +373,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-white">Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -385,7 +391,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-white">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -419,7 +425,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel className="text-white">Confirm Password</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
@@ -474,7 +480,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           type="button"
           disabled={isLoading}
           onClick={handleGoogleSignIn}
-          className="w-full"
+          className="w-full text-white"
         >
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -484,7 +490,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           Google
         </Button>
 
-        <p className="px-8 text-center text-sm text-muted-foreground">
+        <p className="px-8 text-center text-sm text-gray-400">
           {alternativeActionText}
         </p>
       </div>

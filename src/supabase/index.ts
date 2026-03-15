@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 // Export the new Supabase-backed hooks
 export * from './firestore/use-collection';
 export * from './firestore/use-static-collection';
+export * from './firestore/use-rpc';
 // WithId is exported primarily from use-collection now to avoid conflicts
 export * from './firestore/use-doc';
 

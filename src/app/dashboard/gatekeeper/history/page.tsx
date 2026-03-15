@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import {
@@ -220,8 +220,8 @@ export default function GatekeeperHistoryPage() {
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">Snapshot</TableHead>
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Visitor Name</TableHead>
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Host Met</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-in</TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-out</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-in / Gate</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Check-out / Gate</TableHead>
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -247,10 +247,16 @@ export default function GatekeeperHistoryPage() {
                   <div className="text-zinc-400 font-medium">{visit.host_name || 'N/A'}</div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-mono text-[11px] text-zinc-400">{visit.checkin_time ? format(new Date(visit.checkin_time), 'PPp') : 'N/A'}</span>
+                  <div className="flex flex-col">
+                    <span className="font-mono text-[11px] text-zinc-400">{visit.checkin_time ? format(new Date(visit.checkin_time), 'PPp') : 'N/A'}</span>
+                    <span className="text-[9px] font-black uppercase tracking-tighter text-primary/60 mt-0.5">{visit.checkin_gate_name || 'Main Gate'}</span>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-mono text-[11px] text-zinc-400">{visit.checkout_time ? format(new Date(visit.checkout_time), 'PPp') : 'N/A'}</span>
+                  <div className="flex flex-col">
+                    <span className="font-mono text-[11px] text-zinc-400">{visit.checkout_time ? format(new Date(visit.checkout_time), 'PPp') : 'N/A'}</span>
+                    <span className="text-[9px] font-black uppercase tracking-tighter text-emerald-500/60 mt-0.5">{visit.checkout_gate_name || (visit.status === 'completed' ? 'Main Gate' : '-')}</span>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-widest bg-zinc-500/10 text-zinc-400 border-zinc-500/20">

@@ -1,0 +1,85 @@
+aavija_phone_verify · English (US)
+
+123456 is your verification code. For your security, do not share this code.
+
+
+
+
+
+
+aavija_host_notified · English (US)
+
+Hi {{1}},
+
+You have a new Visitor at {{2}}.
+
+Visitor Details :
+Name : {{3}}
+Star Rating : {{4}} out of 5
+
+You can give Star rating to your Visitor from your Aavija Host Dashboard.
+
+
+
+
+
+
+aavija_payout_approved · English (US)
+
+Hi {{1}}, your payout of ₹{{2}} has been processed successfully. UTR Reference: {{3}}. Thank you!
+
+
+
+
+
+
+aavija_payout_rejected · English (US)
+
+Hi {{1}}, your payout of ₹{{2}} could not be approved. Reason: {{3}}. Please contact support if needed.
+
+
+
+
+
+
+aavija_kyc_verified · English (US)
+
+Hi {{1}}, your KYC has been verified successfully! You can now request payouts from your dashboard.
+
+
+
+
+
+
+aavija_tokens_converted · English (US)
+
+Hi {{1}}, a total of {{2}} tokens have been credited to your account from your commission conversion!
+
+
+
+
+
+
+aavija_referral_commission · English (US)
+
+Hi {{1}}, you earned ₹{{2}} in referral commission! Your updated balance is ₹{{3}}. Keep sharing!
+
+
+
+
+
+
+
+aavija_threshold_reached · English (US)
+
+Hi {{1}}, your balance of ₹{{2}} has reached the payout threshold. Visit your dashboard to claim it!
+
+
+
+
+
+
+
+aavija_agent_assigned · English (US)
+
+Hi {{1}}, you have been assigned as the sales agent for {{2}}. Log in to your Aavija dashboard to view your commission details.

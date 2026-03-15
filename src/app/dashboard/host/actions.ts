@@ -259,3 +259,44 @@ export async function setHostAvailability(payload: { hostId: string; premiseId: 
     return { success: false, error: msg };
   }
 }
+
+export async function verifyVisitByHost(payload: { visitId: string; premiseId: string; hostId: string }): Promise<{ success: boolean; error?: string }> {
+  const { visitId, premiseId, hostId } = payload;
+  const adminDb = await getAdminDb();
+  if (!adminDb) return { success: false, error: 'Server database connection failed.' };
+
+  try {
+    const { user } = await requireAuth();
+    if (user.id !== hostId) throw new Error('Unauthorized: Only the assigned host can verify this visit.');
+
+    const now = new Date().toISOString();
+    const { error: updateError } = await adminDb
+      .from('visits')
+      .update({ 
+        host_verified_at: now, 
+        host_verified: true,
+        host_verified_by: hostId 
+      })
+      .eq('id', visitId)
+      .eq('host_id', hostId) // Extra safety
+      .eq('status', 'active');
+
+    if (updateError) throw updateError;
+
+    await createLogEntry({
+      actorId: hostId,
+      actorName: 'Host', 
+      actorRole: 'host',
+      action: LogAction.VISIT_VERIFIED_BY_HOST,
+      description: `Verified meeting with visitor for visit ${visitId}.`,
+      context: { premiseId, visitId }
+    });
+
+    revalidatePath('/dashboard/host/active-visits');
+    revalidatePath('/dashboard/gatekeeper/active-visits');
+    return { success: true };
+  } catch (e: any) {
+    console.error("Error verifying visit:", e);
+    return { success: false, error: e.message || "An unknown error occurred." };
+  }
+}

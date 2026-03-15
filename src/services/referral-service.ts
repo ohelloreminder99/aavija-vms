@@ -21,6 +21,7 @@
 
 import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { notifyReferralCommission, notifyThresholdReached } from './whatsapp-service';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -165,14 +166,44 @@ export async function fireReferralCommission(
 
         const minTokens = settings.referral_min_purchase_tokens || 0;
 
-        await adminDb.rpc('rpc_fire_referral_commission', {
+        const { data: result } = await adminDb.rpc('rpc_fire_referral_commission', {
             p_referee_id: refereeId,
             p_tokens_purchased: tokensBought,
             p_purchase_amount_inr: purchaseAmountInr,
             p_commission_rate: settings.referral_commission_rate,
             p_min_tokens: minTokens,
         });
-        // Result is intentionally ignored — skipped commissions are normal (below threshold).
+
+        // Trigger notifications if commission was credited
+        if (result?.success && result?.referrerId) {
+            const { data: referrer } = await adminDb
+                .from('users')
+                .select('name, phone, referral_commission_balance')
+                .eq('id', result.referrerId)
+                .single();
+
+            if (referrer?.phone) {
+                // 1. Notify about the new commission
+                notifyReferralCommission({
+                    phone: referrer.phone,
+                    name: referrer.name || 'Referrer',
+                    earned: String(result.commissionAmount),
+                    newBalance: String(referrer.referral_commission_balance),
+                });
+
+                // 2. Check threshold (default ₹500 if not in settings, but we should check settings)
+                const { data: thresholdData } = await adminDb.from('settings').select('referral_min_payout_amount').eq('id', 'global').single();
+                const threshold = thresholdData?.referral_min_payout_amount || 500;
+                
+                if (referrer.referral_commission_balance >= threshold && (referrer.referral_commission_balance - result.commissionAmount) < threshold) {
+                    notifyThresholdReached({
+                        phone: referrer.phone,
+                        name: referrer.name || 'Referrer',
+                        balance: String(referrer.referral_commission_balance),
+                    });
+                }
+            }
+        }
     } catch (e: any) {
         // Log but never crash — purchase already succeeded
         console.error('[Referral] Commission fire failed (non-fatal):', e.message);

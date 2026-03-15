@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDoc } from '@/supabase';
 import { Premise } from '@/services/premise-service';
 import { TokenBalanceCard } from './components/TokenBalanceCard';
-import { History, Users, ShieldCheck, UserX, Coins, FileText } from 'lucide-react';
+import { History, Users, ShieldCheck, UserX, Coins, FileText, DoorOpen, Settings } from 'lucide-react';
 import { DashboardCard } from '@/components/shared/DashboardCard';
 import { AnnouncementsCard } from '../visitor/components/AnnouncementsCard';
 import { createClient } from '@/lib/supabase/client';
@@ -83,6 +83,15 @@ export default function OwnerDashboardPage() {
                             value={premise?.gatekeeper_count ?? 0}
                             isLoading={isLoadingPremise}
                         />
+                        <DashboardCard
+                            variant="stat"
+                            title="Gate Management"
+                            description="Configure premise entry nodes"
+                            href={`/dashboard/owner/gates?premiseId=${premiseId}`}
+                            icon={DoorOpen}
+                            value={premise?.gate_count ?? 0}
+                            isLoading={isLoadingPremise}
+                        />
                     </div>
 
                     <AnnouncementsCard role="owner" premiseId={premiseId} />
@@ -109,13 +118,22 @@ export default function OwnerDashboardPage() {
 
                 {/* GST and side column */}
                 <div className="space-y-6">
-                    <DashboardCard
-                        variant="default"
-                        title="GST & Billing Details"
-                        description="Update legal name and premise tax info"
-                        href={`/dashboard/owner/gst-details?premiseId=${premiseId}`}
-                        icon={FileText}
-                    />
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1">
+                        <DashboardCard
+                            variant="stat"
+                            title="GST & Billing Details"
+                            description="Update legal and tax info"
+                            href={`/dashboard/owner/gst-details?premiseId=${premiseId}`}
+                            icon={FileText}
+                        />
+                        <DashboardCard
+                            variant="stat"
+                            title="Premise Settings"
+                            description="Configure verification and options"
+                            href={`/dashboard/owner/settings?premiseId=${premiseId}`}
+                            icon={Settings}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

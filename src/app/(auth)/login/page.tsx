@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { AuthForm } from '../components/auth-form';
 import { useUser } from '@/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -52,34 +52,34 @@ function LoginContent() {
       <div className="mt-8">
         <Separator />
         <div className="space-y-4 text-center mt-8">
-          <h2 className="text-lg font-semibold">Get the Full Aavija Experience</h2>
-          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+          <h2 className="text-lg font-semibold text-white">Get the Full Aavija Experience</h2>
+          <p className="text-sm text-gray-400 max-w-sm mx-auto">
             Install the Aavija app for the best experience. Enjoy faster access, offline capabilities, and a seamless native feel, just like a regular app.
           </p>
           <div className="text-left text-sm p-4 border rounded-lg bg-muted/50 space-y-4">
 
-            <p className="font-semibold text-foreground text-center">
+            <p className="font-semibold text-white text-center">
               How to Install
             </p>
 
             <div className="flex items-start gap-3">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs mt-0.5 shrink-0">1</div>
-              <div>
-                <strong>Windows, Mac, &amp; Linux Desktop:</strong> Click the "Install App" button located in the header at the top-right of this page. You may also see an install icon in your browser's address bar.
+              <div className="text-gray-300">
+                <strong className="text-white">Windows, Mac, &amp; Linux Desktop:</strong> Click the "Install App" button located in the header at the top-right of this page. You may also see an install icon in your browser's address bar.
               </div>
             </div>
 
             <div className="flex items-start gap-3">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs mt-0.5 shrink-0">2</div>
-              <div>
-                <strong>Android:</strong> Tap the "Install App" button in the header or select "Add to Home Screen" from your browser's menu.
+              <div className="text-gray-300">
+                <strong className="text-white">Android:</strong> Tap the "Install App" button in the header or select "Add to Home Screen" from your browser's menu.
               </div>
             </div>
 
             <div className="flex items-start gap-3">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs mt-0.5 shrink-0">3</div>
-              <div>
-                <strong>iOS (iPhone/iPad):</strong> Tap the "Share" icon <ArrowUpRightFromSquare className="inline-block h-4 w-4 text-muted-foreground" /> in Safari's toolbar, then find and tap "Add to Home Screen".
+              <div className="text-gray-300">
+                <strong className="text-white">iOS (iPhone/iPad):</strong> Tap the "Share" icon <ArrowUpRightFromSquare className="inline-block h-4 w-4 text-gray-400" /> in Safari's toolbar, then find and tap "Add to Home Screen".
               </div>
             </div>
           </div>

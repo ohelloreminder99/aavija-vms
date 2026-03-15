@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import Script from 'next/script';
@@ -35,7 +35,10 @@ import {
   ShieldCheck,
   AlertCircle,
   FileText,
+  ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useSettings } from '@/services/settings-service';
 import { useUserProfile } from '@/services/user-service';
 import { useUser, useDoc } from '@/supabase';
@@ -96,7 +99,14 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
   const { data: premise, isLoading: isPremiseLoading } = useDoc<Premise>(docRef);
 
   const { toast } = useToast();
+  const [step, setStep] = React.useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!open) {
+      setStep(1);
+    }
+  }, [open]);
 
   const form = useForm<BuyTokensFormValues>({
     resolver: zodResolver(buyTokensSchema),
@@ -133,6 +143,12 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
       toast({ variant: 'destructive', title: 'Error', description: 'Premise ID is missing for owner token purchase.' });
       return;
     }
+    // Step 1 gating - transition to Step 2 instead of payment
+    if (step === 1) {
+      setStep(2);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -233,108 +249,177 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
     <>
       <Script id="razorpay-checkout-js" src="https://checkout.razorpay.com/v1/checkout.js" />
       <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} >
-          <DialogHeader>
-            <DialogTitle>Buy More Tokens</DialogTitle>
-            <DialogDescription>
-              Enter the number of tokens you wish to purchase for your {role} balance.
+        <DialogContent 
+           onOpenAutoFocus={(e) => e.preventDefault()} 
+           className="bg-[#020617]/95 border-white/10 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
+        >
+          <DialogHeader className="p-6 border-b border-white/5 bg-[#020617]/40 relative">
+            <div className="flex items-center gap-2">
+              {step === 2 && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 -ml-2 text-zinc-400 hover:text-white"
+                  onClick={() => setStep(1)}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              )}
+              <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">
+                {step === 1 ? 'Select' : 'Review'} <span className="text-primary/60">Tokens</span>
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-zinc-400 text-xs uppercase font-bold tracking-widest mt-1">
+              {step === 1 ? 'How many tokens would you like to buy?' : 'Review your order details before payment.'}
             </DialogDescription>
           </DialogHeader>
 
           {isGstMissing && !settingsLoading && !isPremiseLoading ? (
-            <div className="space-y-4">
-              <Alert variant="destructive">
+            <div className="space-y-4 p-6">
+              <Alert variant="destructive" className="bg-red-500/10 border-red-500/20 text-red-400">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Billing Details Required</AlertTitle>
-                <AlertDescription>
-                  Per our Terms and Conditions, you must provide your Legal Name and Billing Address before purchasing tokens. This is required for tax invoice generation.
+                <AlertTitle className="font-bold tracking-tight text-sm">Billing Details Required</AlertTitle>
+                <AlertDescription className="text-sm opacity-90">
+                  Per our Terms and Conditions, you must provide your Legal Name and Billing Address before purchasing tokens.
                 </AlertDescription>
               </Alert>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full bg-primary hover:opacity-90 transition-opacity rounded-xl h-11 text-xs font-black uppercase tracking-widest">
                 <Link href={gstUpdateHref}>
                   <FileText className="mr-2 h-4 w-4" />
-                  Update GST & Billing Details
+                  Update Billing Details
                 </Link>
               </Button>
-              <DialogFooter>
+              <DialogFooter className="pt-2">
                 <DialogClose asChild>
-                  <Button type="button" variant="ghost" className="w-full">Cancel</Button>
+                  <Button type="button" variant="ghost" className="w-full text-zinc-500 hover:text-white hover:bg-white/5 text-xs font-bold uppercase tracking-widest">Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handlePayment)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Token Quantity</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="e.g., 1000"
-                          {...field}
-                          disabled={isSubmitting}
-                        />
-                      </FormControl>
-                      <p className="pt-1 text-xs text-muted-foreground">
+              <form onSubmit={form.handleSubmit(handlePayment)} className="p-0">
+                <div className="p-6 space-y-6">
+                  {step === 1 ? (
+                    <div className="space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1">Token Quantity</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  placeholder="e.g., 1000"
+                                  {...field}
+                                  disabled={isSubmitting}
+                                  className="bg-black/40 border-white/5 text-white h-12 text-lg font-bold focus:ring-primary/50 pl-4"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      if (quantity > 0) setStep(2);
+                                    }
+                                  }}
+                                />
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold text-xs uppercase tracking-widest">Tokens</div>
+                              </div>
+                            </FormControl>
+                            <FormMessage className="text-xs text-red-500/80 font-bold uppercase tracking-tight ml-1" />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-3">
+                        <p className="text-xs font-black text-zinc-500 uppercase tracking-widest ml-1">Quick Select</p>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[100, 200, 500, 1000].map((val) => (
+                            <Button
+                              key={val}
+                              type="button"
+                              variant="outline"
+                              className={cn(
+                                "h-10 border-white/5 bg-white/5 hover:bg-primary/20 hover:border-primary/50 text-xs font-bold transition-all text-white",
+                                quantity === val ? "border-primary bg-primary/20 text-white shadow-[0_0_15px_rgba(59,130,246,0.2)]" : "text-white/70"
+                              )}
+                              onClick={() => form.setValue('quantity', val)}
+                            >
+                              {val}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-zinc-500 italic leading-relaxed">
                         {guidanceText}
                       </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {settingsLoading ? (
-                  <div className="flex justify-center"><Loader2 className="h-5 w-5 animate-spin" /></div>
-                ) : (
-                  quantity > 0 && (
-                    <div className="space-y-3 rounded-lg border p-4 text-sm bg-muted/20">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                        Price Summary
-                      </h4>
-                      <Separator />
-                      <div className="flex justify-between">
-                        <span>
-                          {quantity.toLocaleString()} Tokens x{' '}
-                          {exchangeRate.toFixed(2)} {currency}
-                        </span>
-                        <span>{subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>GST ({(gstRate * 100).toFixed(1)}%)</span>
-                        <span>+ {gstAmount.toFixed(2)}</span>
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between font-bold text-base">
-                        <span>Total Payable</span>
-                        <span className="flex items-center gap-1">
-                          <CurrencyIcon className="h-4 w-4" />{' '}
-                          {totalPayable.toFixed(2)} {currency}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-[10px] text-muted-foreground text-center italic">
-                        Note: Final payment processing and any applicable convenience fees are handled securely by the Razorpay Payment Gateway.
-                      </p>
                     </div>
-                  )
-                )}
+                  ) : (
+                    <div className="space-y-4">
+                      {settingsLoading ? (
+                        <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+                      ) : (
+                        <div className="space-y-4 rounded-2xl border border-white/5 p-5 bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                          <h4 className="font-bold text-white text-xs uppercase tracking-widest flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-primary" />
+                            Price Summary
+                          </h4>
+                          <Separator className="bg-white/5" />
+                          <div className="space-y-3">
+                            <div className="flex justify-between text-sm text-zinc-400 font-medium">
+                              <span>{quantity.toLocaleString()} Tokens x {exchangeRate.toFixed(2)} {currency}</span>
+                              <span className="text-white font-bold">{subtotal.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-zinc-400 font-medium">
+                              <span>GST ({(gstRate * 100).toFixed(1)}%)</span>
+                              <span className="text-zinc-500 font-bold">+ {gstAmount.toFixed(2)}</span>
+                            </div>
+                          </div>
+                          <Separator className="bg-white/5" />
+                          <div className="flex justify-between items-center bg-primary/5 p-4 rounded-xl border border-primary/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]">
+                            <span className="text-xs font-black uppercase tracking-widest text-primary/80">Total Payable</span>
+                            <span className="flex items-center gap-1.5 text-2xl font-headline font-black text-white tracking-tighter">
+                              <CurrencyIcon className="h-6 w-6 text-primary" />{' '}
+                              {totalPayable.toFixed(2)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-zinc-500 text-center italic leading-relaxed px-4 pt-2">
+                            Securely processed via Razorpay. Convenience fees may apply.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-                <DialogFooter>
+                <DialogFooter className="bg-[#020617]/40 p-6 border-t border-white/5 gap-3">
                   <DialogClose asChild>
-                    <Button type="button" variant="outline" disabled={isSubmitting}>
+                    <Button type="button" variant="ghost" disabled={isSubmitting} className="flex-1 text-zinc-400 hover:text-white hover:bg-white/5 text-xs font-black uppercase h-12">
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button type="submit" disabled={isSubmitting || quantity <= 0}>
-                    {isSubmitting && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Proceed to Pay
-                  </Button>
+                  
+                  {step === 1 ? (
+                    <Button 
+                      type="submit" 
+                      disabled={quantity <= 0}
+                      className="flex-[2] bg-primary hover:opacity-90 transition-opacity text-white font-black uppercase tracking-widest text-xs h-12 rounded-xl"
+                    >
+                      Continue
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting || quantity <= 0} 
+                      className="flex-[2] bg-primary hover:opacity-90 transition-opacity text-white font-black uppercase tracking-widest text-xs h-12 rounded-xl shadow-[0_5px_20px_rgba(59,130,246,0.3)]"
+                    >
+                      {isSubmitting && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
+                      )}
+                      Pay Now
+                    </Button>
+                  )}
                 </DialogFooter>
               </form>
             </Form>

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useCollection, useDoc } from '@/supabase';
@@ -24,6 +24,9 @@ export interface Visit {
     };
     visitor_snapshot_url?: string;
     status: 'active' | 'completed' | 'declined' | 'force_closed';
+    checkin_gate_id?: string;
+    checkout_gate_id?: string;
+    host_verified_at?: string;
 }
 
 

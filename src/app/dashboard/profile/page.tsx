@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
@@ -146,6 +146,7 @@ export default function ProfilePage() {
       // Agent KYC
       agent_payout_upi: z.string().optional(),
       pan_number: z.string().optional(),
+      pan_card_url: z.string().optional(),
     });
   }, [settings?.phone_number_length]);
 
@@ -164,6 +165,7 @@ export default function ProfilePage() {
       selected_vehicle_number: null,
       agent_payout_upi: '',
       pan_number: '',
+      pan_card_url: '',
     },
   });
 
@@ -195,6 +197,7 @@ export default function ProfilePage() {
         selected_vehicle_number: userProfile.selected_vehicle_number || null,
         agent_payout_upi: userProfile.agent_payout_upi || '',
         pan_number: userProfile.pan_number || '',
+        pan_card_url: userProfile.pan_card_url || '',
       });
       setIsPhoneLocked(userProfile.is_verified);
     }
@@ -222,7 +225,7 @@ export default function ProfilePage() {
 
 
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'pancard') => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
@@ -242,12 +245,12 @@ export default function ProfilePage() {
           img.src = e.target?.result as string;
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 400;
-            const MAX_HEIGHT = 400;
+            // Higher quality for PAN Card
+            const maxSize = type === 'avatar' ? 600 : 1200;
             let width = img.width;
             let height = img.height;
-            if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
-            else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+            if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } }
+            else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
             canvas.width = width; canvas.height = height;
             const ctx = canvas.getContext('2d');
             if (!ctx) return reject(new Error('Could not get canvas context'));
@@ -256,7 +259,7 @@ export default function ProfilePage() {
               if (!blob) return reject(new Error('Canvas to Blob conversion failed'));
               const resizedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: 'image/webp', lastModified: Date.now() });
               resolve(resizedFile);
-            }, 'image/webp', 0.8);
+            }, 'image/webp', 0.85);
           };
           img.onerror = (err) => reject(err);
         };
@@ -266,20 +269,26 @@ export default function ProfilePage() {
 
     try {
       const resizedFile = await resizeImage(file);
-      const uniqueFilename = `${user.id}-${Date.now()}.webp`;
-      const filePath = `${user.id}/profile/${uniqueFilename}`;
+      const uniqueFilename = `${user.id}-${type}-${Date.now()}.webp`;
+      const bucket = type === 'avatar' ? 'users' : 'kyc-documents';
+      const filePath = `${user.id}/${type}/${uniqueFilename}`;
 
       const supabase = createClient();
-      const { error: uploadError } = await supabase.storage.from('users').upload(filePath, resizedFile, { upsert: true });
+      const { error: uploadError } = await supabase.storage.from(bucket).upload(filePath, resizedFile, { upsert: true });
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage.from('users').getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(filePath);
 
-      await updateUserProfile(user.id, { photo_url: publicUrl });
-      toast({ title: 'Photo updated!', description: 'Your new profile photo has been saved.' });
+      if (type === 'avatar') {
+        await updateUserProfile(user.id, { photo_url: publicUrl });
+        toast({ title: 'Photo updated!', description: 'Your profile photo has been saved.' });
+      } else {
+        form.setValue('pan_card_url', publicUrl);
+        toast({ title: 'PAN Card Uploaded', description: 'Photo captured and converted to WebP. Click Save to finalize.' });
+      }
     } catch (error: unknown) {
       console.error('Upload failed:', error);
-      toast({ variant: 'destructive', title: 'Upload Failed', description: error instanceof Error ? error.message : 'An unexpected error occurred while resizing or uploading.' });
+      toast({ variant: 'destructive', title: 'Upload Failed', description: error instanceof Error ? error.message : 'An error occurred during upload.' });
     } finally { setIsUploading(false); }
   };
 
@@ -314,6 +323,7 @@ export default function ProfilePage() {
         await updatePayoutDetails({
           agent_payout_upi: data.agent_payout_upi,
           pan_number: data.pan_number,
+          pan_card_url: data.pan_card_url,
         });
       }
       toast({ title: phoneChanged ? 'Profile Updated & Phone Changed' : 'Profile Updated', description: 'Your changes have been saved successfully.' });
@@ -357,7 +367,7 @@ export default function ProfilePage() {
                     <div className="space-y-3 flex-1">
                       <Label htmlFor="photo-upload" className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Profile Photo</Label>
                       <div className="flex items-center gap-4">
-                        <Input id="photo-upload" type="file" accept="image/png, image,jpeg, image/gif" onChange={handleFileChange} disabled={isUploading} aria-label="Upload profile photo" className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
+                        <Input id="photo-upload" type="file" accept="image/webp, image/png, image/jpeg" onChange={(e) => handleFileUpload(e, 'avatar')} disabled={isUploading} aria-label="Upload profile photo" className="max-w-[240px] bg-white/5 border-white/10 text-white text-xs h-9 cursor-pointer hover:bg-white/10 transition-colors" />
                         {isUploading && <span className="text-xs text-primary animate-pulse font-bold tracking-widest uppercase">Uploading...</span>}
                       </div>
                       <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-tight">Support: WEBP, PNG, JPG (5MB Max)</p>
@@ -494,6 +504,32 @@ export default function ProfilePage() {
                             </FormItem>
                           )} />
                         </div>
+
+                        <FormField control={form.control} name="pan_card_url" render={({ field }) => (
+                          <FormItem className="pt-4">
+                            <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px]">PAN Card Photo (WebP)</FormLabel>
+                            <div className="flex items-center gap-4 mt-2">
+                              {field.value && (
+                                <div className="h-16 w-24 rounded-lg border border-white/10 overflow-hidden bg-black/20">
+                                  <img src={field.value} alt="PAN Card Preview" className="h-full w-full object-cover" />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <FormControl>
+                                  <Input 
+                                    type="file" 
+                                    accept="image/webp, image/png, image/jpeg" 
+                                    disabled={userProfile.kyc_verified || isUploading}
+                                    onChange={(e) => handleFileUpload(e, 'pancard')}
+                                    className="bg-black/20 border-white/5 text-white h-10 text-xs" 
+                                  />
+                                </FormControl>
+                                <p className="text-[9px] text-zinc-500 mt-1 uppercase tracking-tighter">Automatic WebP conversion enabled</p>
+                              </div>
+                            </div>
+                            <FormMessage className="text-red-500 text-[10px]" />
+                          </FormItem>
+                        )} />
                         {userProfile.kyc_verified && (
                           <div className="rounded-2xl bg-emerald-500/5 border border-emerald-500/10 p-4">
                             <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-tighter text-center">

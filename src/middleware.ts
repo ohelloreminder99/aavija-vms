@@ -15,7 +15,27 @@ export async function middleware(request: NextRequest) {
     response.cookies.set('x-region-anon-key', config.supabase_anon_key, { path: '/' })
     response.cookies.set('x-region-code', config.code, { path: '/' })
 
-    return response
+    // --- DEFENSIVE SECURITY: STRICT CSP ---
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' blob: data: https://*.supabase.co https://*.googleusercontent.com;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://*.supabase.co https://api.razorpay.com wss://*.supabase.co;
+      frame-src 'self' https://api.razorpay.com https://challenges.cloudflare.com;
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+      block-all-mixed-content;
+      upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
+    response.headers.set('Content-Security-Policy', cspHeader);
+    response.headers.set('x-nonce', nonce);
+
+    return response;
 }
 
 export const config = {

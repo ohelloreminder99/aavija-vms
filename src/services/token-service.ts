@@ -4,6 +4,7 @@ import { getAdminDb } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { LogAction } from './log-actions';
 import { fireReferralCommission } from './referral-service';
+import { notifyThresholdReached } from './whatsapp-service';
 
 interface PurchaseTokensPayload {
   userId: string;
@@ -42,6 +43,9 @@ export async function purchaseTokens(
   console.log(`Starting token purchase fulfillment for user: ${userId}, amount: ${tokenAmount}, order: ${razorpay_order_id}`);
 
   try {
+    const { ensureNotMaintenanceMode } = await import('./settings-server');
+    await ensureNotMaintenanceMode();
+
     // --- STEP 0: SECURITY IDENTIFICATION (IDOR PROTECTION) ---
     const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
@@ -190,6 +194,23 @@ export async function purchaseTokens(
           description: `Commission from ${targetPremiseName}'s purchase of ${tokenAmount.toLocaleString()} tokens.`,
           context: { premiseId, premiseName: targetPremiseName, purchaseAmount: tokenAmount, invoiceId },
         });
+        // Check if new balance reaches threshold (₹500 for agents too by default)
+        const { data: updatedAgent } = await adminDb
+          .from('users')
+          .select('name, phone, agent_commission_balance')
+          .eq('id', agentData.id)
+          .single();
+
+        if (updatedAgent?.phone) {
+          const threshold = settingsData?.referral_min_payout_amount || 500; // Reuse same threshold for simplicity or check if there's agent specific one
+          if (updatedAgent.agent_commission_balance >= threshold && (updatedAgent.agent_commission_balance - commissionAmount) < threshold) {
+            void notifyThresholdReached({
+              phone: updatedAgent.phone,
+              name: updatedAgent.name || 'Agent',
+              balance: String(updatedAgent.agent_commission_balance),
+            });
+          }
+        }
       } catch (commErr: any) {
         console.error('[Agent Commission] Credit failed (non-fatal):', commErr.message);
       }

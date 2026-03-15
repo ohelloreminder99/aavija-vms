@@ -39,6 +39,7 @@ export function useStaticCollection<T = any>(
 
     const fetchData = async () => {
       setIsLoading(true);
+      // We don't reset data to null here to avoid UI blinking (keepPreviousData pattern)
       setError(null);
 
       const supabase = createClient();

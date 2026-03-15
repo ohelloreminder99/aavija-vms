@@ -5,7 +5,7 @@ import type { HostBlock } from '@/services/user-service';
 
 export type SerializableHostBlock = Omit<HostBlock, 'blockedAt'> & { id: string; blockedAt: string };
 
-export async function getBlockedVisitorsForHost(hostId: string): Promise<{
+export async function getBlockedVisitorsForHost(hostId: string, premiseId?: string): Promise<{
     success: boolean;
     blocks?: SerializableHostBlock[];
     error?: string;
@@ -21,10 +21,10 @@ export async function getBlockedVisitorsForHost(hostId: string): Promise<{
 
     try {
         const { data: blocksSnapshot, error } = await adminDb
-            .from('host_blocked_visitors')
-            .select('*')
-            .eq('host_id', hostId)
-            .order('blockedAt', { ascending: false });
+            .rpc('get_host_blocked_list', {
+                p_host_id: hostId,
+                p_premise_id: premiseId
+            });
 
         if (error) throw error;
 
@@ -34,9 +34,14 @@ export async function getBlockedVisitorsForHost(hostId: string): Promise<{
 
         const blocks = (blocksSnapshot || []).map((data: any) => {
             return {
-                ...data,
                 id: data.id,
-                blockedAt: data.blockedAt,
+                visitorId: data.visitor_id,
+                hostId: data.host_id,
+                premiseId: data.premise_id,
+                visitorName: data.visitor_name,
+                visitorPhotoUrl: data.visitor_photo_url,
+                blockedAt: data.blocked_at,
+                blockedBy: data.blocked_by,
             }
         });
 
@@ -44,10 +49,10 @@ export async function getBlockedVisitorsForHost(hostId: string): Promise<{
 
     } catch (e: any) {
         console.error('Error fetching host block list:', e);
-        const msg = e.message;
+        const msg = e.message || String(e);
         if (msg && (msg.includes('Could not refresh access token') || msg.includes('credential'))) {
             return { success: false, error: 'The server could not authenticate.' };
         }
-        return { success: false, error: 'An unknown server error occurred.' };
+        return { success: false, error: `Server error: ${msg}` };
     }
 }

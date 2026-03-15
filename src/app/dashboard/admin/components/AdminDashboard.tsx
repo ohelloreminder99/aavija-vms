@@ -16,6 +16,9 @@ import {
   FileSpreadsheet,
   QrCode,
   Scale,
+  ShieldAlert,
+  Palette,
+  Box,
 } from 'lucide-react';
 import * as React from 'react';
 import { DashboardCard } from '@/components/shared/DashboardCard';
@@ -123,6 +126,11 @@ export function AdminDashboard() {
       icon: Coins,
     },
     {
+      title: 'Production & Security',
+      href: '/dashboard/admin/production-settings',
+      icon: ShieldAlert,
+    },
+    {
       title: 'All Properties',
       href: '/dashboard/admin/premises',
       icon: Building,
@@ -136,6 +144,16 @@ export function AdminDashboard() {
       title: `Visitor Balance ${settings?.hide_token_economy ? '(Hidden)' : ''}`,
       href: '/dashboard/admin/visitor-tokens',
       icon: Coins,
+    },
+    {
+      title: 'Brand Identity',
+      href: '/dashboard/admin/branding-settings',
+      icon: Palette,
+    },
+    {
+      title: 'Service Config',
+      href: '/dashboard/admin/service-settings',
+      icon: Box,
     },
   ].sort((a, b) => a.title.localeCompare(b.title));
 

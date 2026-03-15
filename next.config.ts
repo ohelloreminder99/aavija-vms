@@ -87,8 +87,6 @@ export default withSentryConfig(nextConfig, {
   tunnelRoute: "/monitoring",
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-
-  // Enables automatic instrumentation of Vercel Cron Monitors.
-  automaticVercelMonitors: true,
+  // Note: These webpack-specific options are not supported with Turbopack
+  // but are the non-deprecated way to configure Sentry in v8+
 });

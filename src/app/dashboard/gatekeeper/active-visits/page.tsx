@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { ArrowLeft, Loader2, Search, Users, ShieldAlert } from 'lucide-react';
@@ -35,8 +35,12 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { checkoutVisitor, getEmergencyContactInfo } from '../actions';
 import { useTransition } from 'react';
-import { useCollection, WithId, useUser } from '@/supabase';
+import { useCollection, WithId, useUser, useDoc } from '@/supabase';
 import { Visit } from '@/services/visit-service';
+import { Premise } from '@/services/premise-service';
+import { CheckCircle2, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ActiveVisitsPage() {
   const searchParams = useSearchParams();
@@ -74,6 +78,9 @@ export default function ActiveVisitsPage() {
   const { data: visits, isLoading, error } = useCollection<Visit>(
     activeVisitsQuery
   );
+
+  const premiseDocRef = React.useMemo(() => premiseId ? { table: 'premises', id: premiseId } : null, [premiseId]);
+  const { data: premise } = useDoc<Premise>(premiseDocRef as any);
 
   const handleCheckoutRequest = (visit: WithId<Visit>) => {
     setVisitToCheckout(visit);
@@ -184,47 +191,76 @@ export default function ActiveVisitsPage() {
           />
         </div>
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Visitor</TableHead>
-              <TableHead>Host</TableHead>
-              <TableHead>Checked In</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
+          <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+          <TableRow className="border-white/5 hover:bg-transparent">
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Visitor</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Host</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Checked In</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Verification</TableHead>
+            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 text-right pr-8">Action</TableHead>
+          </TableRow>
+        </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id}>
-                <TableCell className="font-medium">
+              <TableRow key={visit.id} className="border-white/5 hover:bg-white/5">
+                <TableCell className="font-bold text-white tracking-tight pl-8">
                   {visit.visitor_name}
                 </TableCell>
-                <TableCell>{visit.host_name || 'N/A'}</TableCell>
-                <TableCell>
-                  {formatDistanceToNow(visit.checkin_time.toDate(), {
+                <TableCell className="text-zinc-400 text-[11px] font-medium">{visit.host_name || 'N/A'}</TableCell>
+                <TableCell className="text-zinc-400 text-[11px] font-medium">
+                  {formatDistanceToNow(new Date(visit.checkin_time), {
                     addSuffix: true,
                   })}
                 </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleEmergencyRequest(visit)}
-                    disabled={isCheckingOut || isFetchingEmergency}
-                    title="Emergency Contact Access (Audited)"
-                  >
-                    <ShieldAlert className="h-4 w-4" />
-                  </Button>
+                <TableCell>
+                  {visit.host_verified_at ? (
+                    <Badge className="bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20 gap-1">
+                      <CheckCircle2 className="h-3 w-3" /> Verified
+                    </Badge>
+                  ) : premise?.require_host_verification ? (
+                    <Badge variant="outline" className="text-amber-500 border-amber-500/20 gap-1">
+                      <Clock className="h-3 w-3" /> Pending Host
+                    </Badge>
+                  ) : (
+                    <span className="text-xs text-zinc-500 italic">Not Required</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right pr-8 space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleCheckoutRequest(visit)}
-                    disabled={isCheckingOut && checkingOutVisitId === visit.id}
+                    onClick={() => handleEmergencyRequest(visit)}
+                    disabled={isCheckingOut || isFetchingEmergency}
+                    title="Emergency Contact Access (Audited)"
+                    className="h-8 bg-red-500/5 border-red-500/20 text-red-500 hover:bg-red-500/10"
                   >
-                    {isCheckingOut && checkingOutVisitId === visit.id && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Checkout
+                    <ShieldAlert className="h-4 w-4" />
                   </Button>
+                  <TooltipProvider>
+                    <Tooltip delayDuration={0}>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleCheckoutRequest(visit)}
+                            disabled={(isCheckingOut && checkingOutVisitId === visit.id) || (premise?.require_host_verification && !visit.host_verified_at)}
+                            className="h-8 bg-primary text-white font-black uppercase tracking-widest text-[9px] px-6 rounded-xl shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-[1.02] transition-all disabled:opacity-30"
+                          >
+                            {isCheckingOut && checkingOutVisitId === visit.id && (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Checkout
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      {premise?.require_host_verification && !visit.host_verified_at && (
+                        <TooltipContent className="bg-zinc-900 border-white/10 text-[10px] font-bold uppercase tracking-widest p-3">
+                          <p>Host verification required</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
               </TableRow>
             ))}
@@ -255,21 +291,26 @@ export default function ActiveVisitsPage() {
   return (
     <div className="container py-10">
       <div className="mb-6">
-        <Button asChild variant="outline">
-          <Link href={`/dashboard/gatekeeper?premiseId=${premiseId}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Gatekeeper Dashboard
+        <Button asChild variant="ghost" className="text-zinc-400 hover:text-primary hover:bg-white/5 group/back">
+          <Link href={`/dashboard/gatekeeper?premiseId=${premiseId}`} className="flex items-center">
+            <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Dashboard</span>
           </Link>
         </Button>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Visits & Checkout</CardTitle>
-          <CardDescription>
-            A list of all visitors currently checked in at your premise.
+      <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
+        <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#020617]/40">
+            <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                    <Users className="h-5 w-5 text-primary" />
+                </div>
+                <CardTitle className="text-2xl font-headline font-bold text-white tracking-tight">Active <span className="text-primary/60">Visits</span></CardTitle>
+            </div>
+          <CardDescription className="text-zinc-400 text-[10px] font-medium uppercase tracking-[0.2em] max-w-2xl leading-relaxed">
+            Manage visitors currently inside the premise perimeter.
           </CardDescription>
         </CardHeader>
-        <CardContent>{renderContent()}</CardContent>
+        <CardContent className="relative z-10 pt-8">{renderContent()}</CardContent>
       </Card>
 
       <AlertDialog

@@ -206,6 +206,9 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
   }
 
   try {
+    const { ensureNotMaintenanceMode } = await import('@/services/settings-server');
+    await ensureNotMaintenanceMode();
+
     const { profile } = await requireAuth();
     const isOwner = profile.role === 'owner';
     const premiseRoles = profile.premise_roles?.[premiseId] || [];
@@ -234,6 +237,18 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     if (!hostData) throw new Error("Host not found.");
 
     const { data: settingsData } = await adminDb.from('settings').select('*').eq('id', 'global').single();
+
+    // --- RATE LIMITING ---
+    const { data: checkinCount } = await adminDb
+      .from('visits')
+      .select('id', { count: 'exact', head: true })
+      .eq('premise_id', premiseId)
+      .gte('checkin_time', new Date(Date.now() - 3600000).toISOString());
+
+    const rateLimit = settingsData?.checkin_rate_limit || 100;
+    if (checkinCount !== null && checkinCount >= rateLimit) {
+      throw new Error(`Gate traffic limit reached (${rateLimit}/hour). Please try again later or contact admin.`);
+    }
 
     if (visitorData.active_checkin_id) {
       throw new Error("This visitor is already checked in somewhere else.");
@@ -283,6 +298,15 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
       expiresAt = new Date(now + visitTtlDays * 24 * 60 * 60 * 1000).toISOString();
     }
 
+    // Auto-detect gatekeeper's assigned gate
+    const { data: memberData } = await adminDb
+      .from('premise_members')
+      .select('gate_id')
+      .eq('premise_id', premiseId)
+      .eq('user_id', gatekeeperId)
+      .eq('role', 'gatekeeper')
+      .single();
+
     const { data: visitInsertData, error: visitError } = await adminDb.from('visits').insert({
       visitor_id: resolvedVisitorId,
       visitor_name: visitorData.name,
@@ -294,6 +318,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
       status: 'active',
       visitor_snapshot_url: visitorData.photo_url || '',
       vehicle_details: visitorData.vehicles?.find((v: any) => v.number === visitorData.selected_vehicle_number) || null,
+      checkin_gate_id: memberData?.gate_id,
       ...(expiresAt && { expiresAt }),
     }).select('id').single();
 
@@ -442,7 +467,20 @@ export async function checkoutVisitor(payload: CheckoutPayload): Promise<{ succe
 
     const now = new Date().toISOString();
 
-    await adminDb.from('visits').update({ status: 'completed', checkout_time: now }).eq('id', visitId);
+    // Auto-detect gatekeeper's assigned gate
+    const { data: memberData } = await adminDb
+      .from('premise_members')
+      .select('gate_id')
+      .eq('premise_id', premiseId)
+      .eq('user_id', profile.id)
+      .eq('role', 'gatekeeper')
+      .single();
+
+    await adminDb.from('visits').update({ 
+      status: 'completed', 
+      checkout_time: now,
+      checkout_gate_id: memberData?.gate_id 
+    }).eq('id', visitId);
     await adminDb.from('users').update({ active_checkin_id: null }).eq('id', visitorId);
 
     revalidatePath('/dashboard/gatekeeper/active-visits');
@@ -547,10 +585,14 @@ export async function getEmergencyContactInfo(payload: EmergencyContactPayload):
       context: { premiseId, visitId }
     });
 
+    const { decryptPII } = await import('@/services/encryption-service');
+    const decryptedVisitorPhone = await decryptPII(visitorData?.phone || '');
+    const decryptedHostPhone = await decryptPII(hostData?.phone || '');
+
     return {
       success: true,
-      visitorPhone: visitorData?.phone || 'Not provided',
-      hostPhone: hostData?.phone || 'Not provided'
+      visitorPhone: decryptedVisitorPhone || 'Not provided',
+      hostPhone: decryptedHostPhone || 'Not provided'
     };
 
   } catch (e: any) {

@@ -234,7 +234,7 @@ export function usePremiseBlocks(premiseId: string | undefined, userId: string |
       table: 'premise_blocked_visitors',
       filters: [
         { column: 'premise_id', operator: 'eq' as const, value: premiseId },
-        { column: 'blockedBy', operator: 'eq' as const, value: userId }
+        { column: 'blocked_by', operator: 'eq' as const, value: userId }
       ],
       __memo: true
     };

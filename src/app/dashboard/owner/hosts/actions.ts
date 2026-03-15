@@ -89,25 +89,19 @@ export async function createHost(
       await adminDb.from('users').insert(userPayload);
     }
 
-    const newStaffMember: StaffMember = {
-      uid: hostUid,
-      name: name,
-      email: email,
+    // 3. Add to Premise Members (Relational)
+    const { error: memberError } = await adminDb.from('premise_members').insert({
+      premise_id: premiseId,
+      user_id: hostUid,
       role: 'host',
-      is_active: true,
-      photo_url: '',
       identity: identity,
-      availability: 'available',
-    };
+      is_active: true
+    });
 
-    const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
-    if (premiseDoc) {
-      const staff = (premiseDoc.staff || []) as StaffMember[];
-      staff.push(newStaffMember);
-      const hostCount = (premiseDoc.host_count || 0) + 1;
+    if (memberError) throw memberError;
 
-      await adminDb.from('premises').update({ staff, host_count: hostCount }).eq('id', premiseId);
-    }
+    // 4. Update Premise Counter
+    await adminDb.rpc('increment_host_count', { premise_id_param: premiseId });
 
     await createLogEntry({
       actorId: actor.id,
@@ -179,25 +173,19 @@ export async function assignHostRoleByEmail(payload: AssignHostByEmailPayload): 
 
     await adminDb.from('users').update({ premise_roles: currentRoles }).eq('id', userDoc.id);
 
-    const newStaffMember: StaffMember = {
-      uid: userDoc.id,
-      name: userDoc.name,
-      email: userDoc.email,
+    // 3. Add to Premise Members (Relational)
+    const { error: memberError } = await adminDb.from('premise_members').upsert({
+      premise_id: premiseId,
+      user_id: userDoc.id,
       role: 'host',
-      is_active: userDoc.is_active ?? true,
-      photo_url: userDoc.photo_url || '',
       identity: identity,
-      availability: 'available',
-    };
+      is_active: true
+    }, { onConflict: 'premise_id, user_id, role' });
 
-    const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
-    if (premiseDoc) {
-      const staff = (premiseDoc.staff || []) as StaffMember[];
-      staff.push(newStaffMember);
-      const hostCount = (premiseDoc.host_count || 0) + 1;
+    if (memberError) throw memberError;
 
-      await adminDb.from('premises').update({ staff, host_count: hostCount }).eq('id', premiseId);
-    }
+    // 4. Update Premise Counter
+    await adminDb.rpc('increment_host_count', { premise_id_param: premiseId });
 
     await createLogEntry({
       actorId: actor.id,
@@ -245,18 +233,9 @@ export async function toggleHostStatus(payload: ToggleStatusPayload): Promise<{ 
       if (!permCheck || permCheck.owner_id !== user.id) throw new Error('Unauthorized: You do not own this premise.');
     }
 
-    const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
-
-    if (!premiseDoc) {
-      throw new Error("Premise not found.");
-    }
-    const staff = (premiseDoc.staff || []) as StaffMember[];
-    const hostIndex = staff.findIndex(s => s.uid === hostId);
-
-    if (hostIndex !== -1) {
-      staff[hostIndex].is_active = newStatus;
-      await adminDb.from('premises').update({ staff }).eq('id', premiseId);
-    }
+    await adminDb.from('premise_members')
+      .update({ is_active: newStatus })
+      .match({ premise_id: premiseId, user_id: hostId, role: 'host' });
 
     await adminDb.from('users').update({ is_active: newStatus }).eq('id', hostId);
 
@@ -306,18 +285,13 @@ export async function removeHostFromPremise(payload: RemoveHostPayload): Promise
       if (!permCheck || permCheck.owner_id !== user.id) throw new Error('Unauthorized: You do not own this premise.');
     }
 
-    const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
+    const { error } = await adminDb.from('premise_members')
+      .delete()
+      .match({ premise_id: premiseId, user_id: hostId, role: 'host' });
+    
+    if (error) throw error;
 
-    if (!premiseDoc) throw new Error("Premise not found.");
-
-    const staff = (premiseDoc.staff || []) as StaffMember[];
-    const updatedStaff = staff.filter(s => s.uid !== hostId);
-    const newCount = (premiseDoc.host_count || 1) - 1;
-
-    await adminDb.from('premises').update({
-      staff: updatedStaff,
-      host_count: newCount
-    }).eq('id', premiseId);
+    await adminDb.rpc('decrement_host_count', { premise_id_param: premiseId });
 
     const { data: userDoc } = await adminDb.from('users').select('*').eq('id', hostId).single();
     if (userDoc) {

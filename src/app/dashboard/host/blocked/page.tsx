@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -38,6 +38,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { useSettings } from '@/services/settings-service';
 import { useUserProfile } from '@/services/user-service';
+import { useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 
 export default function HostBlockedPage() {
@@ -45,6 +47,8 @@ export default function HostBlockedPage() {
     const { data: userProfile } = useUserProfile(user?.id);
     const { toast } = useToast();
     const { data: settings } = useSettings();
+    const searchParams = useSearchParams();
+    const premiseId = searchParams.get('premiseId');
 
     const [blocks, setBlocks] = React.useState<SerializableHostBlock[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -65,7 +69,7 @@ export default function HostBlockedPage() {
         const fetchBlocks = async () => {
             setIsLoading(true);
             setError(null);
-            const result = await getBlockedVisitorsForHost(user.id);
+            const result = await getBlockedVisitorsForHost(user.id, premiseId || undefined);
             if (result.success && result.blocks) {
                 setBlocks(result.blocks);
             } else {
@@ -84,6 +88,7 @@ export default function HostBlockedPage() {
         setIsUnblocking(true);
         const result = await unblockVisitorFromHost({
             hostId: user.id,
+            premiseId: premiseId || '', // Pass premiseId
             visitorId: visitorToUnblock.id,
             actorId: user.id,
             actorName: userProfile.name,
@@ -138,33 +143,33 @@ export default function HostBlockedPage() {
 
         return (
             <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Visitor</TableHead>
-                        <TableHead>Blocked On</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
+                <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                    <TableRow className="border-white/5 hover:bg-transparent">
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Visitor</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Blocked On</TableHead>
+                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 text-right pr-8">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {blocks.map((block) => {
                         return (
-                            <TableRow key={block.id}>
-                                <TableCell>
+                            <TableRow key={block.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                                <TableCell className="pl-8 py-4">
                                     <div className="flex items-center gap-3">
-                                        <Avatar>
+                                        <Avatar className="h-9 w-9 border border-white/10">
                                             <AvatarImage src={block.visitorPhotoUrl} alt={block.visitorName} />
-                                            <AvatarFallback>{block.visitorName.charAt(0)}</AvatarFallback>
+                                            <AvatarFallback className="bg-white/5 text-zinc-400 text-xs font-bold">{block.visitorName.charAt(0)}</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <div className="font-medium">{block.visitorName}</div>
+                                            <div className="font-bold text-white tracking-tight">{block.visitorName}</div>
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="text-zinc-400 text-[11px] font-medium">
                                     {formatDistanceToNow(new Date(block.blockedAt), { addSuffix: true })}
                                 </TableCell>
-                                <TableCell className="text-right">
-                                    <Button variant="outline" size="sm" onClick={() => setVisitorToUnblock({ id: block.id, name: block.visitorName })}>
+                                <TableCell className="text-right pr-8">
+                                    <Button variant="outline" size="sm" onClick={() => setVisitorToUnblock({ id: block.id, name: block.visitorName })} className="h-8 bg-white/5 border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all">
                                         Unblock
                                     </Button>
                                 </TableCell>
@@ -179,21 +184,21 @@ export default function HostBlockedPage() {
     return (
         <div className="container py-10">
             <div className="mb-4">
-                <Button asChild variant="outline">
-                    <Link href="/dashboard">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Dashboard
+                <Button asChild variant="ghost" className="text-zinc-400 hover:text-primary hover:bg-white/5 group/back">
+                    <Link href={`/dashboard/host?premiseId=${premiseId}`} className="flex items-center">
+                        <ArrowLeft className="mr-3 h-4 w-4 group-hover/back:-translate-x-1 transition-transform" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Dashboard</span>
                     </Link>
                 </Button>
             </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Your Global Blocklist</CardTitle>
-                    <CardDescription>
-                        Visitors on this list are blocked from checking in to see you at any of your assigned premises.
+            <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#020617]/40">
+                    <CardTitle className="text-2xl font-headline font-bold text-white tracking-tight">Blocked <span className="text-red-500/60">Visitors</span></CardTitle>
+                    <CardDescription className="text-zinc-400 text-[10px] font-medium uppercase tracking-[0.2em] mt-1">
+                        You have restricted these individuals from visiting you at this premise.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative z-10 pt-8">
                     {renderContent()}
                 </CardContent>
             </Card>

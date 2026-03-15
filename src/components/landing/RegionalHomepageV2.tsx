@@ -58,29 +58,20 @@ const defaultFeatures = [
 
 const pricingTiers = [
     {
-        name: "Micro",
-        price: "Pay-As-You-Go",
-        description: "Professional usage-based model. You only pay for what you use. Zero usage means zero charges, every single month.",
-        features: ["Billed per token used", "1 Gatekeeper", "Full WhatsApp Alerts", "Standard Analytics", "No Monthly Commitment"],
-        cta: "Start Free",
-        highlight: false
-    },
-    {
-        name: "Economical",
-        price: "₹999",
-        period: "/mo",
-        description: "Optimized for active apartment complexes. Includes a generous baseline of monthly usage tokens.",
-        features: ["500 Free Tokens/mo", "Unlimited Gatekeepers", "Priority WhatsApp Alerts", "CSV History Export", "Advanced Analytics", "Fixed Monthly Cost"],
-        cta: "Get Started",
+        name: "Professional",
+        price: "Pay as you use",
+        description: "Zero monthly commitment. Everything unlimited. Only pay for what you actually use.",
+        features: [
+            "Unlimited QR Generations",
+            "Unlimited Gatekeepers",
+            "Unlimited Resident Profiles",
+            "Everything Unlimited",
+            "WhatsApp Alerts Included",
+            "Advanced Analytics & Exports",
+            "Military-grade Security"
+        ],
+        cta: "Start Your Free Setup",
         highlight: true
-    },
-    {
-        name: "Enterprise",
-        price: "Volume Based",
-        description: "Custom rates for high-frequency industrial hubs and corporate parks with massive traffic.",
-        features: ["Lower Tiered Token Rates", "Dedicated API Access", "Custom Security Protocols", "Priority 24/7 Support", "Multi-premise Management"],
-        cta: "Contact Sales",
-        highlight: false
     }
 ];
 
@@ -260,7 +251,8 @@ export function RegionalHomepageV2() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="flex justify-center">
+                        <div className="grid grid-cols-1 md:grid-cols-1 max-w-md w-full gap-8">
                         {pricingTiers.map((tier, i) => (
                             <motion.div
                                 key={i}
@@ -282,6 +274,7 @@ export function RegionalHomepageV2() {
                                     <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
                                     <div className="flex items-baseline gap-1">
                                         <span className="text-4xl font-bold tracking-tight">{tier.price}</span>
+                                        {/* @ts-ignore */}
                                         {tier.period && <span className="text-gray-500 text-sm">{tier.period}</span>}
                                     </div>
                                     <p className="text-gray-500 text-sm mt-4 font-light">{tier.description}</p>
@@ -304,6 +297,7 @@ export function RegionalHomepageV2() {
                                 </Button>
                             </motion.div>
                         ))}
+                    </div>
                     </div>
                 </section>
 

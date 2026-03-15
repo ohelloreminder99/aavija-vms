@@ -3,7 +3,7 @@
 import { getAdminDb, createClient } from '@/lib/supabase/server';
 import { LogAction } from '@/services/log-actions';
 import { createLogEntry } from '@/services/log-service';
-// import { verifyAppCheck } from '@/lib/app-check-verification';
+import { sendOtpVerification } from '@/services/whatsapp-service';
 
 // --- WhatsApp OTP Actions ---
 
@@ -13,16 +13,6 @@ export async function sendWhatsAppOtp(payload: {
   countryCode: string;
 }): Promise<{ success: boolean; error?: string }> {
   const { userId, phone, countryCode } = payload;
-
-  const { WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID } = process.env;
-
-  if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
-    return {
-      success: false,
-      error:
-        'WhatsApp API credentials are not configured on the server. Please add them to your environment variables.',
-    };
-  }
 
   const adminDb = await getAdminDb();
   if (!adminDb) {
@@ -96,68 +86,14 @@ export async function sendWhatsAppOtp(payload: {
       await adminDb.from('whatsapp_otps').insert({ id: userId, otp, expiresAt });
     }
 
-    const cleanPhone = `${countryCode.replace(/\D/g, '')}${phone.replace(/\D/g, '')}`;
-
-    const response = await fetch(
-      `https://graph.facebook.com/v22.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messaging_product: 'whatsapp',
-          to: cleanPhone,
-          type: 'template',
-          template: {
-            name: 'aavija_phone_verify',
-            language: { code: 'en_US' },
-            components: [
-              {
-                type: 'body',
-                parameters: [{ type: 'text', text: otp }],
-              },
-              {
-                type: 'button',
-                sub_type: 'url',
-                index: 0,
-                parameters: [{ type: 'text', text: otp }],
-              },
-            ],
-          },
-        }),
-      }
-    );
-
-    const responseData = await response.json();
-
-    if (!response.ok) {
-      const fbtraceId = responseData?.error?.fbtrace_id;
-      let userFacingError = responseData?.error?.message || 'Failed to send OTP.';
-
-      console.error('WhatsApp API Error:', {
-        message: userFacingError,
-        type: responseData?.error?.type,
-        code: responseData?.error?.code,
-        error_subcode: responseData?.error?.error_subcode,
-        fbtrace_id: fbtraceId,
-      });
-
-      if (responseData?.error?.code === 133010) {
-        userFacingError = "The recipient's number is not reachable. In a development environment, this often indicates a configuration issue in your Meta Business Account (e.g., the sending number isn't fully connected). Please verify your settings in the WhatsApp Business Manager.";
-      } else if (responseData?.error?.code === 132001) {
-        userFacingError = "Template configuration mismatch. This could be due to a language mismatch (e.g., 'en' vs 'en_US') or the template name not existing for the selected language. Please check your template settings in Meta Business Manager.";
-      } else if (responseData?.error?.code === 132018) {
-        userFacingError = "There's an issue with the parameters in your template. Please check if the number and type of parameters match the template exactly.";
-      }
-
-      if (fbtraceId) {
-        userFacingError += ` (Trace ID: ${fbtraceId})`;
-      }
-
-      throw new Error(userFacingError);
-    }
+    const result = await sendOtpVerification({
+      phone: `${countryCode}${phone}`,
+      otp,
+    });
+ 
+     if (!result.success) {
+       throw new Error(result.error || 'Failed to send OTP.');
+     }
 
     return { success: true };
 

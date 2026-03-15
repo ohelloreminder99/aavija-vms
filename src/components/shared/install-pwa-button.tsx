@@ -12,7 +12,7 @@ export function InstallPwaButton() {
   }
 
   return (
-    <Button variant="outline" onClick={installPwa}>
+    <Button variant="outline" className="text-white border-white/10 hover:bg-white/5" onClick={installPwa}>
       <Download className="mr-2 h-4 w-4" />
       Install App
     </Button>

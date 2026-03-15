@@ -47,16 +47,21 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.line(0, 45, pageWidth, 45);
 
   // --- 2. Brand & Header ---
+  // Fetch dynamic branding from settings if possible (client-side uses useSettings usually, but jspdf is often procedural)
+  // For now we assume the caller can pass these or we fetch them. 
+  // Since generateInvoicePdf is 'use client' and called from UI, better to pass settings in.
+  // But to minimize breaking changes, I'll add optional parameters.
+
   // Aavija Logo Text (White)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(26);
   doc.setTextColor(255, 255, 255);
-  doc.text('AAVIJA', 14, 28);
+  doc.text(invoice.companyName.toUpperCase(), 14, 28); // Using Legal Name or Brand
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(219, 234, 254);
-  doc.text('Visitor Management Ecosystem', 14, 34);
+  doc.text('Authorized Visitor Management Ecosystem', 14, 34);
 
   // Invoice Title (Right aligned in header)
   doc.setFontSize(22);

@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useUser, WithId } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import { useSearchParams } from 'next/navigation';
-import { History, UserX, Coins } from 'lucide-react';
+import { History, UserX, Coins, Users } from 'lucide-react';
 
 import { DashboardCard } from '@/components/shared/DashboardCard';
 import { AnnouncementsCard } from '../visitor/components/AnnouncementsCard';
@@ -20,33 +20,45 @@ export default function HostDashboardPage() {
     return (
         <div className="container py-10">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-1 space-y-6">
                     <AvailabilityCard hostProfile={hostProfile} premiseId={premiseId} />
                     <AnnouncementsCard role="host" premiseId={premiseId} />
                 </div>
 
-                <div className="space-y-6">
-                    <VisitorTokenBalanceCard />
-                    <DashboardActionCard
-                        title="My Token History & Invoices"
-                        description="View your personal token logs"
-                        href="/dashboard/visitor/token-history"
-                        icon={Coins}
-                    />
-                    <DashboardCard
-                        variant="default"
-                        title="Your Visit History"
-                        description="View past visits and rate your visitors"
-                        href={`/dashboard/host/history?premiseId=${premiseId}`}
-                        icon={History}
-                    />
-                    <DashboardCard
-                        variant="default"
-                        title="Your Global Blocklist"
-                        description="Manage visitors you've personally blocked"
-                        href="/dashboard/host/blocked"
-                        icon={UserX}
-                    />
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <DashboardCard
+                            variant="stat"
+                            title="Active Visitors"
+                            description="Verify current visitors"
+                            href={`/dashboard/host/active-visits?premiseId=${premiseId}`}
+                            icon={Users}
+                        />
+                        <DashboardCard
+                            variant="stat"
+                            title="Your Visit History"
+                            description="View and rate visitors"
+                            href={`/dashboard/host/history?premiseId=${premiseId}`}
+                            icon={History}
+                        />
+                        <DashboardCard
+                            variant="stat"
+                            title="Global Blocklist"
+                            description="Visitors you blocked"
+                            href={`/dashboard/host/blocked?premiseId=${premiseId}`}
+                            icon={UserX}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
+                        <VisitorTokenBalanceCard />
+                        <DashboardActionCard
+                            title="My History & Invoices"
+                            description="Personal token logs"
+                            href="/dashboard/visitor/token-history"
+                            icon={Coins}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

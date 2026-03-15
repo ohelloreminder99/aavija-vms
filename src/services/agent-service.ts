@@ -1,4 +1,4 @@
-﻿'use server';
+'use server';
 
 /**
  * AAVIJA VMS — Agent Service (Phase 2B Redesign)
@@ -502,7 +502,16 @@ export async function adminApproveKyc(
     const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
+    const { data: user } = await adminDb.from('users').select('name, phone').eq('id', userId).single();
     await adminDb.from('users').update({ kyc_verified: true }).eq('id', userId);
+    
+    if (user?.phone) {
+      notifyKycVerified({
+        phone: user.phone,
+        name: user.name || 'Agent',
+      });
+    }
+
     revalidatePath('/dashboard/admin/agents');
     return { success: true };
   } catch (e: unknown) {

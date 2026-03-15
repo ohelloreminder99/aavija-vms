@@ -25,8 +25,14 @@ export async function createRazorpayOrder(payload: CreateOrderPayload): Promise<
       };
     }
 
+    const { createClient } = await import('@/lib/supabase/server');
+    const supabase = await createClient();
+    const { data: settings } = await supabase.from('settings').select('razorpay_key_id').eq('id', 'global').single();
+
+    const key_id = settings?.razorpay_key_id || NEXT_PUBLIC_RAZORPAY_KEY_ID;
+
     const razorpay = new Razorpay({
-      key_id: NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      key_id,
       key_secret: RAZORPAY_KEY_SECRET,
     });
 

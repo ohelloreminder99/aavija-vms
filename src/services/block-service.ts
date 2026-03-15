@@ -49,6 +49,7 @@ interface PremiseBlockPayload extends BlockActionPayload {
 
 interface HostBlockPayload extends BlockActionPayload {
   hostId: string;
+  premiseId: string; // Added premiseId
   visitorName: string;
   visitorPhotoUrl: string;
 }
@@ -58,7 +59,7 @@ interface HostBlockPayload extends BlockActionPayload {
  * Returns null for expiresAt if TTL is not configured.
  */
 async function getLogExpiry(adminDb: NonNullable<Awaited<ReturnType<typeof getAdminDb>>>): Promise<{
-  settings: Record<string, any> | null;
+  settings: Record<string, any>;
   expiresAt: string | null;
 }> {
   const { data: settings } = await adminDb
@@ -100,7 +101,7 @@ export async function blockVisitorFromPremise(
     const { data, error } = await adminDb.rpc('rpc_block_visitor_premise', {
       p_premise_id: premiseId,
       p_visitor_id: visitorId,
-      p_block_cost: blockCost,
+      p_block_cost: settings?.block_visitor_cost ?? 0,
       p_actor_id: actorId,
       p_actor_name: actorName,
       p_actor_role: actorRole,
@@ -137,7 +138,7 @@ export async function unblockVisitorFromPremise(
     const { data, error } = await adminDb.rpc('rpc_unblock_visitor_premise', {
       p_premise_id: premiseId,
       p_visitor_id: visitorId,
-      p_unblock_cost: unblockCost,
+      p_unblock_cost: settings?.unblock_visitor_cost ?? 0,
       p_actor_id: actorId,
       p_actor_name: actorName,
       p_actor_role: actorRole,
@@ -171,12 +172,13 @@ export async function blockVisitorFromHost(
     const { data, error } = await adminDb.rpc('rpc_block_visitor_host', {
       p_host_id: hostId,
       p_visitor_id: visitorId,
-      p_block_cost: blockCost,
+      p_block_cost: settings?.block_visitor_cost_host ?? 0,
       p_actor_id: actorId,
       p_actor_name: actorName,
       p_actor_role: actorRole,
       p_visitor_name: visitorName,
       p_visitor_photo: visitorPhotoUrl,
+      p_premise_id: payload.premiseId, // Pass premiseId
       p_expires_at: expiresAt,
     });
 
@@ -207,7 +209,8 @@ export async function unblockVisitorFromHost(
     const { data, error } = await adminDb.rpc('rpc_unblock_visitor_host', {
       p_host_id: hostId,
       p_visitor_id: visitorId,
-      p_unblock_cost: unblockCost,
+      p_premise_id: payload.premiseId, // Pass premiseId
+      p_unblock_cost: settings?.unblock_visitor_cost_host ?? 0,
       p_actor_id: actorId,
       p_actor_name: actorName,
       p_actor_role: actorRole,

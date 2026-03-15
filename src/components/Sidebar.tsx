@@ -121,11 +121,11 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     )}
                 </div>
 
-                {/* Premise Contexts */}
+                {/* Premise Contexts (Shown for everyone with assigned roles, including Admins) */}
                 {userProfile.premise_roles && Object.keys(userProfile.premise_roles).length > 0 && (
                     <div className="space-y-4 pt-4 border-t border-border/40">
                         <h4 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 mb-4">
-                            My Properties
+                            My Properties & roles
                         </h4>
                         {Object.entries(userProfile.premise_roles).map(([premiseId, roles]) => {
                             const name = premiseNames[premiseId] || 'Loading...';

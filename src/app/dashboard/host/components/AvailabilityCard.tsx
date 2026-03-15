@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,17 +78,19 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
   return (
     <Card className="glass-card border-white/5 shadow-2xl overflow-hidden relative">
       <div className="absolute inset-0 mesh-obsidian opacity-10 pointer-events-none" />
-      <CardHeader className="relative z-10 border-b border-white/5 pb-8">
-        <CardTitle className="text-3xl font-headline font-bold text-white tracking-tight">Availability <span className="text-primary/80">Status</span></CardTitle>
-        <CardDescription className="text-zinc-400 mt-2">
-          Update your availability status for the entry gate.
+      <CardHeader className="relative z-10 border-b border-white/10 pb-5 px-5 pt-5">
+        <CardTitle className="text-base font-bold text-white group-hover:text-glow transition-all">
+          Availability <span className="text-primary">Status</span>
+        </CardTitle>
+        <CardDescription className="text-sm text-zinc-400 mt-1">
+          Update your entry gate authorization status.
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative z-10 pt-8">
+      <CardContent className="relative z-10 pt-4 px-4 pb-4">
         {isPremiseLoading ? (
           <div className="flex h-32 flex-col items-center justify-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
-            <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest animate-pulse">Loading...</p>
+            <p className="text-zinc-400 text-sm font-medium animate-pulse">Loading status...</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -99,19 +101,19 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
                   onValueChange={(val) => setSelectedAvailability(val as any)}
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white h-12">
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white h-10">
                     <SelectValue>
                       <div className="flex items-center gap-3">
                         {isSubmitting ? (
                           <Loader2 className="h-4 w-4 animate-spin text-primary" />
                         ) : (
-                          <span className={cn("h-3 w-3 rounded-full ring-2 ring-white/5", selectedOption?.color, {
+                          <span className={cn("h-3 w-3 rounded-full ring-2 ring-white/10", selectedOption?.color, {
                             "shadow-[0_0_12px_rgba(16,185,129,0.5)]": selectedAvailability === 'available',
                             "shadow-[0_0_12px_rgba(245,158,11,0.5)]": selectedAvailability === 'busy',
                             "shadow-[0_0_12px_rgba(239,68,68,0.5)]": selectedAvailability === 'do-not-disturb',
                           })}></span>
                         )}
-                        <span className="font-bold uppercase tracking-widest text-xs">{selectedOption?.label}</span>
+                        <span className="font-bold tracking-wide text-sm">{selectedOption?.label}</span>
                       </div>
                     </SelectValue>
                   </SelectTrigger>
@@ -120,34 +122,34 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
                       <SelectItem key={option.value} value={option.value} className="focus:bg-white/5 cursor-pointer">
                         <div className="flex items-center gap-3 py-1">
                           <span className={cn("h-2.5 w-2.5 rounded-full ring-1 ring-white/10", option.color)}></span>
-                          <span className="font-bold uppercase tracking-widest text-[10px]">{option.label}</span>
+                          <span className="font-bold tracking-wide text-sm">{option.label}</span>
                         </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <Button
-                onClick={handleSave}
-                disabled={isSubmitting || selectedAvailability === currentDbAvailability}
-                className="h-12 px-8 bg-primary text-white font-black uppercase tracking-widest text-[10px] hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
-              >
+                <Button
+                  onClick={handleSave}
+                  disabled={isSubmitting || selectedAvailability === currentDbAvailability}
+                  className="h-10 px-8 bg-primary hover:bg-primary/90 text-white font-bold tracking-wide shadow-sm rounded-xl transition-all"
+                >
                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Update Status'}
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-              <div className="p-4 rounded-2xl bg-emerald-500/[0.03] border border-emerald-500/10 group/status">
-                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] transition-all">Available</p>
-                <p className="text-[10px] text-zinc-400 leading-tight">Gatekeepers can authorize visitors for instant entry.</p>
+            <div className="grid grid-cols-3 gap-3 pt-4">
+              <div className="p-3 rounded-2xl bg-emerald-500/[0.05] border border-emerald-500/10">
+                <p className="text-xs font-bold text-emerald-500 mb-1">Available</p>
+                <p className="text-[11px] text-zinc-400 leading-normal">Instant authorization for visitors.</p>
               </div>
-              <div className="p-4 rounded-2xl bg-amber-500/[0.03] border border-amber-500/10 group/status">
-                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(245,158,11,0.4)] transition-all">Busy</p>
-                <p className="text-[10px] text-zinc-400 leading-tight">You are busy but can still be contacted.</p>
+              <div className="p-3 rounded-2xl bg-amber-500/[0.05] border border-amber-500/10">
+                <p className="text-xs font-bold text-amber-500 mb-1">Busy</p>
+                <p className="text-[11px] text-zinc-400 leading-normal">Still contactable via gatekeeper.</p>
               </div>
-              <div className="p-4 rounded-2xl bg-red-500/[0.03] border border-red-500/10 group/status">
-                <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-1 group-hover/status:drop-shadow-[0_0_8px_rgba(239,68,68,0.4)] transition-all">DND</p>
-                <p className="text-[10px] text-zinc-400 leading-tight">Do not disturb. Gatekeeper will not send visitors.</p>
+              <div className="p-3 rounded-2xl bg-red-500/[0.05] border border-red-500/10">
+                <p className="text-xs font-bold text-red-500 mb-1">DND</p>
+                <p className="text-[11px] text-zinc-400 leading-normal">No visitor requests will be sent.</p>
               </div>
             </div>
           </div>

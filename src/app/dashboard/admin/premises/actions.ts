@@ -10,7 +10,6 @@ import { Agent } from '@/services/agent-service';
 import { PremiseCategory } from '@/services/premise-category-service';
 import { Premise } from '@/services/premise-service';
 import { createLogEntry } from '@/services/log-service';
-import { v4 as uuidv4 } from 'uuid';
 
 interface NewOwnerPremiseData {
   premiseName: string;
@@ -54,6 +53,8 @@ export type SerializableVisit = {
   };
   visitor_snapshot_url?: string;
   status: 'active' | 'completed' | 'declined' | 'force_closed';
+  checkin_gate_name?: string;
+  checkout_gate_name?: string;
 };
 
 export type SerializablePremiseWithDetails = {
@@ -170,7 +171,7 @@ export async function createPremiseAndNewOwner(
     if (!userRecord || !userRecord.user) throw new Error("Failed to create owner user.");
 
     const ownerUid = userRecord.user.id;
-    const premiseId = uuidv4();
+    const premiseId = crypto.randomUUID();
 
     const { data: settingsData } = await adminDb.from('settings').select('*').eq('id', 'global').single();
 
@@ -275,7 +276,7 @@ export async function createPremiseForExistingUser(
     const { data: settingsData } = await adminDb.from('settings').select('starting_token_owner').eq('id', 'global').single();
     const startingOwnerTokens = settingsData?.starting_token_owner || 0;
 
-    const premiseId = uuidv4();
+    const premiseId = crypto.randomUUID();
 
     // 2. Ensure Agent exists in shadow table
     if (agentId && agentId.trim()) {
@@ -387,7 +388,11 @@ export async function getVisitsForPremise(
   if (!adminDb) return { success: false, error: 'Server is not configured for admin access.' };
 
   try {
-    let query = adminDb.from('visits').select('*').eq('premise_id', premiseId).order('checkin_time', { ascending: false }).limit(limit);
+    let query = adminDb.from('visits').select(`
+      *,
+      checkin_gate:checkin_gate_id(name),
+      checkout_gate:checkout_gate_id(name)
+    `).eq('premise_id', premiseId).order('checkin_time', { ascending: false }).limit(limit);
     if (startDate) query = query.gte('checkin_time', new Date(startDate).toISOString());
     if (startAfter) query = query.lt('checkin_time', startAfter);
 
@@ -408,6 +413,8 @@ export async function getVisitsForPremise(
         vehicle_details: data.vehicle_details,
         visitor_snapshot_url: data.visitor_snapshot_url,
         status: data.status,
+        checkin_gate_name: data.checkin_gate?.name,
+        checkout_gate_name: data.checkout_gate?.name,
       };
     });
     return { success: true, visits, lastVisible: visitsSnapshot[visitsSnapshot.length - 1]?.checkin_time };

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useDoc } from '@/supabase';
 import React from 'react';
@@ -83,6 +83,32 @@ export interface Settings {
   landing_cta_primary?: string;
   landing_cta_secondary?: string;
   landing_features?: any[];
+  // Production & Security Settings
+  auth_rate_limit?: number;
+  checkin_rate_limit?: number;
+  whatsapp_rate_limit?: number;
+  max_daily_token_purchase?: number;
+  emergency_access_timeout_mins?: number;
+  is_maintenance_mode?: boolean;
+  maintenance_message?: string;
+  // Branding & Identity
+  brand_name?: string;
+  brand_tagline?: string;
+  support_email?: string;
+  support_phone?: string;
+  whatsapp_phone_number_id?: string;
+  // WhatsApp Template Names
+  wa_template_host_notified?: string;
+  wa_template_payout_approved?: string;
+  wa_template_payout_rejected?: string;
+  wa_template_kyc_verified?: string;
+  wa_template_tokens_converted?: string;
+  wa_template_referral_commission?: string;
+  wa_template_threshold_reached?: string;
+  wa_template_phone_verify?: string;
+  wa_template_agent_assigned?: string;
+  // Security & Keys
+  razorpay_key_id?: string;
 }
 
 // === REPOSITORY FUNCTIONS (HOOKS & ASYNC) ===
