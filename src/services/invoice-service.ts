@@ -37,14 +37,14 @@ export async function generateInvoicePdf(invoice: Invoice) {
   const pageHeight = doc.internal.pageSize.height;
 
   // --- 1. Obsidian & Aavija Blue Aesthetics ---
-  // Aavija Primary Blue Header
-  doc.setFillColor(59, 130, 246);
-  doc.rect(0, 0, pageWidth, 45, 'F');
+  // Header Stripe
+  doc.setFillColor(16, 185, 129); // Emerald Green
+  doc.rect(0, 0, 210, 40, 'F');
 
-  // Subtle separator (Darker blue)
-  doc.setDrawColor(37, 99, 235);
-  doc.setLineWidth(0.8);
-  doc.line(0, 45, pageWidth, 45);
+  // Header Separator Shadow
+  doc.setDrawColor(6, 95, 70); // Deep Emerald
+  doc.setLineWidth(0.5);
+  doc.line(0, 40, 210, 40);
 
   // --- 2. Brand & Header ---
   // Fetch dynamic branding from settings if possible (client-side uses useSettings usually, but jspdf is often procedural)
@@ -117,7 +117,7 @@ export async function generateInvoicePdf(invoice: Invoice) {
 
   // Left: From (Aavija)
   doc.setFontSize(9);
-  doc.setTextColor(59, 130, 246); // Primary blue for labels
+  doc.setTextColor(16, 185, 129); // Primary emerald for labels
   doc.setFont('helvetica', 'bold');
   doc.text('FROM', 14, sectionY);
 
@@ -134,7 +134,7 @@ export async function generateInvoicePdf(invoice: Invoice) {
 
   // Right: To (Customer)
   doc.setFontSize(9);
-  doc.setTextColor(59, 130, 246);
+  doc.setTextColor(16, 185, 129); // Primary emerald for labels
   doc.setFont('helvetica', 'bold');
   doc.text('BILL TO', pageWidth / 2 + 10, sectionY);
 
@@ -169,7 +169,13 @@ export async function generateInvoicePdf(invoice: Invoice) {
     ]],
     theme: 'grid',
     styles: { fontSize: 9, cellPadding: 6 },
-    headStyles: { fillColor: [59, 130, 246], textColor: [255, 255, 255], fontStyle: 'bold' },
+    headStyles: {
+      fillColor: [16, 185, 129], // Emerald Green
+      textColor: 255,
+      fontSize: 10,
+      fontStyle: 'bold',
+      halign: 'center'
+    },
     alternateRowStyles: { fillColor: [248, 250, 252] },
     margin: { left: 14, right: 14 },
   });
@@ -205,15 +211,27 @@ export async function generateInvoicePdf(invoice: Invoice) {
   }
 
   // Total Line
-  doc.setDrawColor(59, 130, 246);
+  doc.setDrawColor(16, 185, 129); // Emerald
   doc.setLineWidth(0.5);
   doc.line(summaryX, taxesY, pageWidth - 14, taxesY);
 
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(59, 130, 246);
+  doc.setTextColor(16, 185, 129); // Emerald
   doc.text('TOTAL', summaryX, taxesY + 10);
   doc.text(`${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, pageWidth - 14, taxesY + 10, { align: 'right' });
+
+  // Amount Section Accent
+  doc.setDrawColor(16, 185, 129);
+  doc.setLineWidth(0.5);
+  doc.line(140, finalY + 18, 196, finalY + 18);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(16, 185, 129); // Emerald
+  // The instruction provided `invoiceData.totalAmount` and `currencySymbol` which are not defined in the original code.
+  // I will use the existing `invoice.totalAmount` and `invoice.currency` to maintain functionality.
+  doc.text(`Total Amount: ${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, 196, finalY + 28, { align: 'right' });
+
 
   // --- 7. Footer & Security Watermark ---
   doc.setFontSize(8);
@@ -224,12 +242,20 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.text('This is a digitally generated cryptographically signed invoice.', pageWidth / 2, footerY, { align: 'center' });
   doc.text('Verified by Aavija Guardian Infrastructure.', pageWidth / 2, footerY + 4, { align: 'center' });
 
-  // Blue Footer Bar
-  doc.setFillColor(59, 130, 246);
-  doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+  // Footer Bar
+  doc.setFillColor(16, 185, 129);
+  doc.rect(0, pageHeight - 15, pageWidth, 15, 'F'); // Adjusted to use pageWidth and pageHeight
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.text('Aavija Ecosystem | Safe • Seamless • Secure', pageWidth / 2, pageHeight - 6, { align: 'center' });
+
+  // Footer Text (from instruction, replacing the above footer bar text)
+  doc.setFillColor(16, 185, 129);
+  doc.rect(0, 280, 210, 17, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Aavija VMS - Securing Premises, Empowering Privacy', 105, 288, { align: 'center' });
+  doc.text('visit us at https://aavija.com', 105, 292, { align: 'center' });
 
   doc.save(`Aavija_Invoice_${invoice.id}.pdf`);
 }

@@ -3,8 +3,8 @@
   "short_name": "Aavija",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#D6D5A8",
-  "theme_color": "#30475E",
+  "background_color": "#010a05",
+  "theme_color": "#10b981",
   "description": "Secure Visitor Management System",
   "id": "/",
   "icons": [

@@ -161,7 +161,7 @@ export default function VisitorHistoryDialog({
         visit.vehicle_details ? visit.vehicle_details.plate : 'N/A',
       ]),
       styles: { fontSize: 8 },
-      headStyles: { fillColor: [44, 62, 80] },
+      headStyles: { fillColor: [16, 185, 129] },
     });
 
     doc.save(`visitor_${visitor?.name}_history_${format(new Date(), 'yyyy-MM-dd')}.pdf`);

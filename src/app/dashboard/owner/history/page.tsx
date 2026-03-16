@@ -401,7 +401,7 @@ export default function HistoryPage() {
             visit.vehicle_details ? `${visit.vehicle_details.plate} (${visit.vehicle_details.model})` : 'N/A',
           ]),
           styles: { fontSize: 8 },
-          headStyles: { fillColor: [44, 62, 80] },
+          headStyles: { fillColor: [16, 185, 129] },
         });
 
         doc.save(`premise_history_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
@@ -655,7 +655,7 @@ export default function HistoryPage() {
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-6">
             <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirm Download
             </AlertDialogAction>
