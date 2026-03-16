@@ -195,7 +195,7 @@ export default function AdminBillsPage() {
                 )}>
                     <CardHeader className="pb-2">
                         <CardDescription className="flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4 text-blue-500" />
+                            <ShieldCheck className="h-4 w-4 text-emerald-500" />
                             GST RECONCILIATION
                         </CardDescription>
                     </CardHeader>
@@ -222,7 +222,7 @@ export default function AdminBillsPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-blue-500">
+                <Card className="border-l-4 border-emerald-600">
                     <CardHeader className="pb-2">
                         <CardDescription>TOTAL REVENUE (MONTH)</CardDescription>
                     </CardHeader>
@@ -235,7 +235,7 @@ export default function AdminBillsPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-indigo-500">
+                <Card className="border-l-4 border-teal-500">
                     <CardHeader className="pb-2">
                         <CardDescription>TAX COMPLIANCE</CardDescription>
                     </CardHeader>

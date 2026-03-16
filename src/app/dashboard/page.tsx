@@ -105,7 +105,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#020617]">
+      <div className="flex min-h-screen items-center justify-center bg-[#010a05]">
         <div className="flex flex-col items-center gap-8">
           <AavijaLogo iconClassName="text-primary animate-pulse" textClassName="text-white scale-150" />
           <div className="relative">

@@ -55,28 +55,28 @@ export function OnboardingChecklist({ premise, isLoading }: OnboardingChecklistP
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative bg-gradient-to-br from-blue-500/10 to-transparent border border-white/10 rounded-3xl p-8 mb-8 overflow-hidden group backdrop-blur-3xl glass-card"
+            className="relative bg-gradient-to-br from-emerald-500/10 to-transparent border border-white/10 rounded-3xl p-8 mb-8 overflow-hidden group backdrop-blur-3xl glass-card"
         >
             <div className="absolute top-0 right-0 p-8 opacity-5">
-                <Zap className="w-32 h-32 text-blue-400" />
+                <Zap className="w-32 h-32 text-emerald-400" />
             </div>
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                 <div>
                     <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-white">
                         Get Started with Aavija
-                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-medium">Setup Guide</span>
+                        <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-medium">Setup Guide</span>
                     </h2>
                     <p className="text-zinc-400 text-sm">Follow these steps to fully activate your premise security.</p>
                 </div>
                 <div className="flex items-center gap-4 bg-black/40 rounded-2xl px-4 py-2 border border-white/10">
                     <div className="text-right">
                         <p className="text-[10px] uppercase font-bold text-zinc-500">Progress</p>
-                        <p className="text-lg font-bold text-blue-400 leading-none">{completedCount}/{steps.length}</p>
+                        <p className="text-lg font-bold text-emerald-400 leading-none">{completedCount}/{steps.length}</p>
                     </div>
                     <div className="w-24 h-2 bg-white/5 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-blue-500 transition-all duration-500 shadow-[0_0_10px_#3b82f6]"
+                            className="h-full bg-emerald-500 transition-all duration-500 shadow-[0_0_10px_#10b981]"
                             style={{ width: `${(completedCount / steps.length) * 100}%` }}
                         />
                     </div>
@@ -90,7 +90,7 @@ export function OnboardingChecklist({ premise, isLoading }: OnboardingChecklistP
                         href={step.completed ? '#' : step.href}
                         className={`p-4 rounded-2xl border transition-all ${step.completed
                             ? 'bg-green-500/5 border-green-500/20 opacity-60 grayscale'
-                            : 'bg-white/5 border-white/10 hover:border-blue-500/40 hover:bg-white/10'
+                            : 'bg-white/5 border-white/10 hover:border-emerald-500/40 hover:bg-white/10'
                             }`}
                     >
                         <div className="flex items-center justify-between mb-3">

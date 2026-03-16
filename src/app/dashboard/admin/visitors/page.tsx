@@ -195,7 +195,7 @@ export default function VisitorsPage() {
             </TableBody>
           </Table>
           {filteredVisitors.length === 0 && (
-            <div className="py-20 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.02] rounded-2xl border border-white/5">
+            <div className="py-20 text-center bg-[#010a05]/95 backdrop-blur-3xl/[0.02] rounded-2xl border border-white/5">
               <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">No Match Found</p>
             </div>
           )}
@@ -255,7 +255,7 @@ export default function VisitorsPage() {
       )}
 
       <Dialog open={!!imageUrlToView} onOpenChange={() => setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl bg-[#020617]/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden">
+        <DialogContent className="max-w-xl bg-[#010a05]/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden">
           <div className="p-6 border-b border-white/10 bg-white/5">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-white tracking-tight">Visitor <span className="text-primary/80">Photo</span></DialogTitle>

@@ -95,11 +95,11 @@ export default function LandingSettingsPage() {
                 </div>
             </div>
 
-            <Card className="border-blue-500/20">
+            <Card className="border-emerald-500/20">
                 <CardHeader>
                     <CardTitle className="text-2xl flex items-center gap-2">
                         Landing Page Content
-                        <span className="text-xs font-normal text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">Premium v2</span>
+                        <span className="text-xs font-normal text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">Premium v2</span>
                     </CardTitle>
                     <CardDescription>
                         Customize the "WOW" experience for your regional audience. Changes reflect immediately on india.aavija.com.
@@ -178,7 +178,7 @@ export default function LandingSettingsPage() {
                             <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
                                 <h4 className="text-sm font-semibold mb-2">Pro Tip</h4>
                                 <p className="text-xs text-muted-foreground leading-relaxed">
-                                    Use impactful words like "Instant", "Secure", and "Sovereign" to establish trust. The last word of the Headline will automatically receive an Electric Blue gradient for maximum visual punch.
+                                    Use impactful words like "Instant", "Secure", and "Sovereign" to establish trust. The last word of the Headline will automatically receive an Emerald gradient for maximum visual punch.
                                 </p>
                             </div>
 

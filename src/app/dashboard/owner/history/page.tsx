@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import {
@@ -434,7 +434,7 @@ export default function HistoryPage() {
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-24 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.01]">
+        <div className="py-24 text-center bg-[#010a05]/95 backdrop-blur-3xl/[0.01]">
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
             <HistoryIcon className="h-8 w-8 text-zinc-400" />
           </div>
@@ -450,7 +450,7 @@ export default function HistoryPage() {
       <div className="space-y-8">
         <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
           <Table>
-            <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+            <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
               <TableRow className="border-white/5 hover:bg-transparent">
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">Photo</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Visitor Name</TableHead>
@@ -463,7 +463,7 @@ export default function HistoryPage() {
             </TableHeader>
             <TableBody>
               {filteredVisits.map((visit) => (
-                <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] group/row transition-colors">
                   <TableCell className="pl-8 py-4">
                     <Button
                       variant="ghost"
@@ -563,7 +563,7 @@ export default function HistoryPage() {
           </CardHeader>
           <CardContent className="relative z-10 pt-8">
             <div className="space-y-8">
-              <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
                 <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6">
                   <DateRangePicker
@@ -599,7 +599,7 @@ export default function HistoryPage() {
                     <SelectTrigger className="h-12 bg-black/40 border-white/5 text-zinc-300 rounded-2xl font-bold uppercase tracking-widest text-[10px]">
                       <SelectValue placeholder="All Visitors" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#020617] border-white/10">
+                    <SelectContent className="bg-[#010a05] border-white/10">
                       <SelectItem value="all" className="text-zinc-400 uppercase tracking-widest font-black text-[9px]">All Visitors</SelectItem>
                       {uniqueVisitors.map((v) => (
                         <SelectItem key={v.id} value={v.id} className="text-white">{v.name}</SelectItem>
@@ -610,7 +610,7 @@ export default function HistoryPage() {
                     <SelectTrigger className="h-12 bg-black/40 border-white/5 text-zinc-300 rounded-2xl font-bold uppercase tracking-widest text-[10px]">
                       <SelectValue placeholder="All Hosts" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#020617] border-white/10">
+                    <SelectContent className="bg-[#010a05] border-white/10">
                       <SelectItem value="all" className="text-zinc-400 uppercase tracking-widest font-black text-[9px]">All Hosts</SelectItem>
                       {uniqueHosts.map((h) => (
                         <SelectItem key={h.id} value={h.id} className="text-white">{h.name}</SelectItem>
@@ -637,7 +637,7 @@ export default function HistoryPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black opacity-40" />
             </div>
           )}
-          <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
+          <div className="p-4 bg-[#010a05] border-t border-white/5 flex justify-end">
             <DialogClose asChild>
               <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6 rounded-lg">Close</Button>
             </DialogClose>

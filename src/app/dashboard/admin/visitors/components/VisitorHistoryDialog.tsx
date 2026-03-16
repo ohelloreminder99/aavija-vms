@@ -170,7 +170,7 @@ export default function VisitorHistoryDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-5xl bg-[#020617]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-2xl">
+        <DialogContent className="sm:max-w-5xl bg-[#010a05]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-2xl">
           <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
 
           <div className="relative z-10 p-8 border-b border-white/5 bg-white/[0.01]">
@@ -300,7 +300,7 @@ export default function VisitorHistoryDialog({
       </Dialog>
 
       <Dialog open={!!imageUrlToView} onOpenChange={(open) => !open && setImageUrlToView(null)}>
-        <DialogContent className="max-w-xl bg-[#020617]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-2xl z-[70]">
+        <DialogContent className="max-w-xl bg-[#010a05]/95 backdrop-blur-3xl border-white/10 p-0 overflow-hidden shadow-2xl z-[70]">
           <div className="absolute top-4 left-4 z-20">
             <Badge className="bg-primary/20 text-primary border-primary/30 text-[8px] font-black uppercase tracking-widest px-3 py-1">Visitor Snapshot</Badge>
           </div>

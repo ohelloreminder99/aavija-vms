@@ -68,7 +68,7 @@ export default function StaffDashboardPage() {
 
     if (!submissions || submissions.length === 0) {
       return (
-        <div className="py-24 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-3xl">
+        <div className="py-24 text-center bg-[#010a05]/95 backdrop-blur-3xl/[0.01] border-2 border-dashed border-white/5 rounded-3xl">
           <Inbox className="mx-auto h-12 w-12 text-zinc-700 mb-4" />
           <p className="font-bold text-white uppercase tracking-widest text-sm">Clear Horizon</p>
           <p className="text-xs text-zinc-500 mt-1 uppercase tracking-tighter">No contact submissions found.</p>
@@ -88,7 +88,7 @@ export default function StaffDashboardPage() {
         </TableHeader>
         <TableBody>
           {submissions.map((submission) => (
-            <TableRow key={submission.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+            <TableRow key={submission.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.01] transition-colors group">
               <TableCell className="text-[11px] font-mono text-zinc-500 whitespace-nowrap pl-8">
                 {format(new Date(submission.createdAt), 'PP p')}
               </TableCell>

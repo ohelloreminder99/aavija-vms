@@ -74,7 +74,7 @@ export function VehicleManager({
     };
 
     return (
-        <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
+        <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
             <FormField control={form.control} name="vehicles" render={() => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-3 text-zinc-300 font-headline font-bold uppercase tracking-widest text-[10px]">
@@ -116,7 +116,7 @@ export function VehicleManager({
                         <SelectTrigger className="w-[140px] bg-black/20 border-white/10 text-white h-10">
                             <SelectValue placeholder="Type" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#020617] border-white/10 text-white">
+                        <SelectContent className="bg-[#010a05] border-white/10 text-white">
                             <SelectItem value="walking">Walking</SelectItem>
                             <SelectItem value="car">Car</SelectItem>
                             <SelectItem value="bike">Bike</SelectItem>

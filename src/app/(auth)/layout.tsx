@@ -11,7 +11,7 @@ export default function AuthLayout({
 }) {
 
     return (
-        <div className="flex min-h-screen flex-col bg-[#050505]">
+        <div className="flex min-h-screen flex-col bg-[#010a05]">
             <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/50 backdrop-blur-xl transition-colors">
                 <div className="container flex h-16 max-w-7xl items-center justify-between">
                     <Link href="/">

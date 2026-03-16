@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import {
@@ -294,7 +294,7 @@ export default function VisitorHistoryPage() {
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-24 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.01]">
+        <div className="py-24 text-center bg-[#010a05]/95 backdrop-blur-3xl/[0.01]">
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
             <History className="h-8 w-8 text-zinc-400" />
           </div>
@@ -309,7 +309,7 @@ export default function VisitorHistoryPage() {
     return (
       <div className="space-y-8">
         <Table>
-          <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+          <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
             <TableRow className="border-white/5 hover:bg-transparent">
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8">Location</TableHead>
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Host</TableHead>
@@ -320,7 +320,7 @@ export default function VisitorHistoryPage() {
           </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+              <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] backdrop-blur-3xl/[0.02] group/row transition-colors">
                 <TableCell className="pl-8 py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-white/5 border border-white/5 group-hover/row:bg-primary/10 group-hover/row:border-primary/20 transition-all">
@@ -394,7 +394,7 @@ export default function VisitorHistoryPage() {
         </CardHeader>
         <CardContent className="relative z-10 pt-8">
           <div className="space-y-8">
-            <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+            <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
               <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
               <div className="relative z-10 flex flex-wrap items-end gap-6">
                 <DateRangePicker
@@ -445,7 +445,7 @@ export default function VisitorHistoryPage() {
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3 pt-6">
             <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+            <AlertDialogAction onClick={() => handleExecuteExport(exportToConfirm!)} disabled={isExporting !== null} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
               {isExporting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Confirm Download
             </AlertDialogAction>

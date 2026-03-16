@@ -109,7 +109,7 @@ export default function AllUsersPage() {
       </div>
     );
     if (!users || users.length === 0) return (
-      <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+      <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
         <Search className="mx-auto h-10 w-10 mb-4 opacity-20" />
         <p className="font-bold uppercase tracking-widest text-[11px]">Registry Empty</p>
         <p className="text-[10px] opacity-60 mt-1">No verified identities detected in the global mesh.</p>
@@ -269,7 +269,7 @@ export default function AllUsersPage() {
       </Card>
 
       <AlertDialog open={!!userToManage} onOpenChange={(open) => !open && setUserToManage(null)}>
-        <AlertDialogContent className="bg-[#020617]/95 backdrop-blur-3xl border-white/10 shadow-2xl">
+        <AlertDialogContent className="bg-[#010a05]/95 backdrop-blur-3xl border-white/10 shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white text-2xl font-bold tracking-tight text-red-600">Sever Analog Link?</AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400 leading-relaxed text-sm font-medium">

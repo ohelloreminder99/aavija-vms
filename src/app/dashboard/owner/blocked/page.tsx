@@ -100,7 +100,7 @@ export default function BlockedVisitorsPage() {
 
         if (!premiseBlocks || premiseBlocks.length === 0) {
             return (
-                <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+                <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                     <p className="mb-2 font-black uppercase tracking-widest text-[11px]">No Visitors Blocked</p>
                     <p className="text-[10px] opacity-60">
                         You have not blocked any visitors from this premise.
@@ -111,7 +111,7 @@ export default function BlockedVisitorsPage() {
 
         return (
             <Table>
-                <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                     <TableRow className="border-white/5 hover:bg-transparent">
                         <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Visitor</TableHead>
                         <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Blocked On</TableHead>
@@ -164,7 +164,7 @@ export default function BlockedVisitorsPage() {
                 </Button>
             </div>
             <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
-                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#020617]/40">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#010a05]/40">
                     <CardTitle className="text-2xl font-headline font-bold text-white tracking-tight">Blocked <span className="text-red-500/60">Visitors</span></CardTitle>
                     <CardDescription className="text-zinc-400 text-[10px] font-medium uppercase tracking-[0.2em] mt-1">
                         Manage restricted individuals for this premise.

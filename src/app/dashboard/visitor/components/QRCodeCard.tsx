@@ -1,4 +1,4 @@
-﻿
+
 'use client';
 
 import {
@@ -77,7 +77,7 @@ export function QRCodeCard() {
     if (background) setBgColor(`hsl(${background})`);
 
     // Explicitly set for scanning reliability if theme variables feel too dark
-    setFgColor('#020617'); // Deep dark for QR bits
+    setFgColor('#010a05'); // Deep dark for QR bits
     setBgColor('#FFFFFF'); // White for QR background
   }, []);
 
@@ -275,7 +275,7 @@ export function QRCodeCard() {
           <Button
             onClick={handleGenerateToken}
             disabled={isButtonDisabled}
-            className="w-full h-20 text-xl font-bold bg-primary hover:bg-primary/90 text-white shadow-[0_0_30px_rgba(var(--primary),0.3)] transition-all transform active:scale-[0.98]"
+            className="w-full h-20 text-xl font-bold bg-primary hover:bg-primary/90 text-[#010a05] shadow-[0_0_30px_rgba(var(--primary),0.3)] transition-all transform active:scale-[0.98]"
           >
             {isGenerating ? (
               <Loader2 className="mr-3 h-8 w-8 animate-spin" />
@@ -302,7 +302,7 @@ export function QRCodeCard() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-md bg-[#020617]/95 border-white/10 backdrop-blur-3xl text-white shadow-[0_0_50px_rgba(0,0,0,1)]">
+        <DialogContent className="sm:max-w-md bg-[#010a05]/95 border-white/10 backdrop-blur-3xl text-white shadow-[0_0_50px_rgba(0,0,0,1)]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold tracking-tight text-white">Entry Pass Ready</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -312,7 +312,7 @@ export function QRCodeCard() {
           <div className="flex flex-col items-center justify-center p-8 gap-6 border border-white/5 rounded-2xl bg-white/5 mt-4">
             {tokenData ? (
               <div
-                className="p-4 bg-[#020617]/95 backdrop-blur-3xl rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform animate-in fade-in zoom-in duration-500"
+                className="p-4 bg-[#010a05]/95 backdrop-blur-3xl rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform animate-in fade-in zoom-in duration-500"
               >
                 <QRCode
                   value={tokenData.token}

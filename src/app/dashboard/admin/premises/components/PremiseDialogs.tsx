@@ -110,7 +110,7 @@ export function PremiseDialogs({
             {/* Create Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogContent className="sm:max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden flex flex-col h-[90vh] max-h-[800px]">
-                    <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+                    <div className="p-8 border-b border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                         <DialogHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
@@ -271,7 +271,7 @@ export function PremiseDialogs({
                                     )} />
                                 </div>
                             </ScrollArea>
-                            <div className="p-8 border-t border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
+                            <div className="p-8 border-t border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
                                 <DialogClose asChild>
                                     <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button>
                                 </DialogClose>
@@ -288,7 +288,7 @@ export function PremiseDialogs({
             {/* Edit Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="sm:max-w-xl bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden flex flex-col h-[90vh] max-h-[800px]">
-                    <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+                    <div className="p-8 border-b border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                         <DialogHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
@@ -393,7 +393,7 @@ export function PremiseDialogs({
                                     )} />
                                 </div>
                             </ScrollArea>
-                            <div className="p-8 border-t border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
+                            <div className="p-8 border-t border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
                                 <DialogClose asChild>
                                     <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button>
                                 </DialogClose>

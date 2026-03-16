@@ -95,7 +95,7 @@ export default function ReferPage() {
                 <CardContent className="space-y-6">
                     {/* Share buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <Button className="flex-1 h-12 text-lg" onClick={handleWhatsApp} variant="default" style={{ backgroundColor: '#25D366' }}>
+                        <Button className="flex-1 h-12 text-lg text-[#010a05]" onClick={handleWhatsApp} variant="default" style={{ backgroundColor: '#25D366' }}>
                             <Share2 className="h-5 w-5 mr-3" />
                             Share on WhatsApp
                         </Button>

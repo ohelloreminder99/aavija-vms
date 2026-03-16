@@ -102,7 +102,7 @@ export default function HostActiveVisitsPage() {
             </div>
 
             <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
-                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#020617]/40">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#010a05]/40">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                             <Users className="h-5 w-5 text-primary" />
@@ -138,7 +138,7 @@ export default function HostActiveVisitsPage() {
                                 />
                             </div>
                             <Table>
-                                <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                                <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                                     <TableRow className="border-white/5 hover:bg-transparent">
                                         <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Visitor</TableHead>
                                         <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Checked In</TableHead>
@@ -148,7 +148,7 @@ export default function HostActiveVisitsPage() {
                                 </TableHeader>
                                 <TableBody>
                                     {filteredVisits.map((visit: WithId<Visit>) => (
-                                        <TableRow key={visit.id} className="border-white/5 hover:bg-white/5">
+                                        <TableRow key={visit.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.01] transition-colors group">
                                             <TableCell className="font-bold text-white tracking-tight pl-8">{visit.visitor_name}</TableCell>
                                             <TableCell className="text-zinc-400 text-[11px] font-medium">
                                                 {formatDistanceToNow(new Date(visit.checkin_time), { addSuffix: true })}

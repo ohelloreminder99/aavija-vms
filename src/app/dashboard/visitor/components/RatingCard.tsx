@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -29,7 +29,7 @@ const RatingCardComponent = () => {
     if (isLoading) {
         return (
             <Card className="glass-card border-white/5 min-h-[160px] relative overflow-hidden">
-                <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-3xl/[0.01]" />
+                <div className="absolute inset-0 bg-[#010a05]/95 backdrop-blur-3xl/[0.01]" />
                 <CardHeader className="relative z-10">
                     <Skeleton className="h-5 w-3/4 bg-white/5" />
                 </CardHeader>
@@ -54,7 +54,7 @@ const RatingCardComponent = () => {
                     </span>
                     <span className="text-zinc-400 font-bold tracking-tight text-sm">/ 5.0</span>
                 </div>
-                <div className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] inline-flex p-2 rounded-lg border border-white/5 shadow-inner">
+                <div className="bg-[#010a05]/95 backdrop-blur-3xl/[0.02] inline-flex p-2 rounded-lg border border-white/5 shadow-inner">
                     {renderStars(userProfile?.global_rating ?? 0)}
                 </div>
                 <p className="text-[10px] text-zinc-400 font-medium uppercase tracking-wider mt-6 border-t border-white/5 pt-4">

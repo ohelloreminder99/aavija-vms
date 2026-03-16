@@ -43,7 +43,7 @@ export function SnapshotDialog({
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
                     </div>
                 )}
-                <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
+                <div className="p-4 bg-[#010a05] border-t border-white/5 flex justify-end">
                     <DialogClose asChild>
                         <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6">
                             Close

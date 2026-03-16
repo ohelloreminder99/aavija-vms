@@ -117,7 +117,7 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
                       </div>
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent className="bg-[#020617] border-white/10 text-white">
+                  <SelectContent className="bg-[#010a05] border-white/10 text-white">
                     {availabilityOptions.map(option => (
                       <SelectItem key={option.value} value={option.value} className="focus:bg-white/5 cursor-pointer">
                         <div className="flex items-center gap-3 py-1">
@@ -132,7 +132,7 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
                 <Button
                   onClick={handleSave}
                   disabled={isSubmitting || selectedAvailability === currentDbAvailability}
-                  className="h-10 px-8 bg-primary hover:bg-primary/90 text-white font-bold tracking-wide shadow-sm rounded-xl transition-all"
+                  className="h-10 px-8 bg-primary hover:bg-primary/90 text-[#010a05] font-bold tracking-wide shadow-sm rounded-xl transition-all"
                 >
                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Update Status'}
               </Button>

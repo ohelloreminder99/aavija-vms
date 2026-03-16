@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import Image from 'next/image';
@@ -179,7 +179,7 @@ export default function PremiseHistoryDialog({
         <DialogContent className="sm:max-w-6xl bg-black/95 border-white/5 backdrop-blur-3xl p-0 overflow-hidden shadow-2xl">
           <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
 
-          <div className="relative z-10 p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+          <div className="relative z-10 p-8 border-b border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
             <div className="flex items-start gap-6">
               <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-2xl relative overflow-hidden group">
                 <div className="absolute inset-0 bg-primary/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -201,7 +201,7 @@ export default function PremiseHistoryDialog({
 
           <ScrollArea className="max-h-[70vh]">
             <div className="p-8 space-y-8">
-              <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
                 <div className="absolute inset-0 mesh-obsidian opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6 justify-between">
                   <div className="flex flex-wrap items-end gap-4">
@@ -247,7 +247,7 @@ export default function PremiseHistoryDialog({
                 ) : (
                   <div className="space-y-4">
                     <Table>
-                      <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                      <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                         <TableRow className="border-white/5 hover:bg-transparent">
                           <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">View</TableHead>
                           <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Visitor</TableHead>
@@ -259,7 +259,7 @@ export default function PremiseHistoryDialog({
                       </TableHeader>
                       <TableBody>
                         {filteredVisits.map((visit) => (
-                          <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                          <TableRow key={visit.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                             <TableCell className="pl-8 py-4">
                               <Button variant="ghost" size="icon" aria-label="View visitor snapshot" onClick={() => setImageUrlToView(visit.visitor_snapshot_url || null)} disabled={!visit.visitor_snapshot_url} className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all">
                                 <Eye className="h-4 w-4" />
@@ -303,7 +303,7 @@ export default function PremiseHistoryDialog({
             </div>
           </ScrollArea>
 
-          <div className="p-4 bg-[#020617]/95 backdrop-blur-3xl/[0.01] border-t border-white/5 flex justify-end">
+          <div className="p-4 bg-[#010a05]/95 backdrop-blur-3xl/[0.01] border-t border-white/5 flex justify-end">
             <DialogClose asChild>
               <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-black uppercase tracking-widest px-8 rounded-xl border border-white/5 transition-all">Close Audit</Button>
             </DialogClose>
@@ -322,7 +322,7 @@ export default function PremiseHistoryDialog({
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-40" />
             </div>
           )}
-          <div className="p-4 bg-[#020617] border-t border-white/5 flex justify-end">
+          <div className="p-4 bg-[#010a05] border-t border-white/5 flex justify-end">
             <DialogClose asChild>
               <Button className="bg-white/5 text-zinc-400 hover:text-white h-9 text-[10px] font-bold uppercase tracking-widest px-6 rounded-lg transition-all">Dismiss</Button>
             </DialogClose>

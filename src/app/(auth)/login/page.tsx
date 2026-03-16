@@ -63,21 +63,21 @@ function LoginContent() {
             </p>
 
             <div className="flex items-start gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs mt-0.5 shrink-0">1</div>
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-xs mt-0.5 shrink-0">1</div>
               <div className="text-gray-300">
                 <strong className="text-white">Windows, Mac, &amp; Linux Desktop:</strong> Click the "Install App" button located in the header at the top-right of this page. You may also see an install icon in your browser's address bar.
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs mt-0.5 shrink-0">2</div>
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-xs mt-0.5 shrink-0">2</div>
               <div className="text-gray-300">
                 <strong className="text-white">Android:</strong> Tap the "Install App" button in the header or select "Add to Home Screen" from your browser's menu.
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xs mt-0.5 shrink-0">3</div>
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-xs mt-0.5 shrink-0">3</div>
               <div className="text-gray-300">
                 <strong className="text-white">iOS (iPhone/iPad):</strong> Tap the "Share" icon <ArrowUpRightFromSquare className="inline-block h-4 w-4 text-gray-400" /> in Safari's toolbar, then find and tap "Add to Home Screen".
               </div>

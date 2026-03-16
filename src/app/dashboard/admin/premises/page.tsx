@@ -323,7 +323,7 @@ export default function PremisesPage() {
       </div>
     );
     if (!premises || premises.length === 0) return (
-      <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+      <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
         <Building className="mx-auto h-10 w-10 mb-4 opacity-20" />
         <p className="font-bold uppercase tracking-widest text-[11px]">No Properties Found</p>
         <p className="text-[10px] opacity-60 mt-1">There are no properties registered in the system yet.</p>
@@ -356,7 +356,7 @@ export default function PremisesPage() {
             </TableHeader>
             <TableBody>
               {filteredPremises.map((p) => (
-                <TableRow key={p.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                <TableRow key={p.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                   <TableCell className="pl-8 py-5">
                     <Button variant="link" className="p-0 h-auto font-bold text-white tracking-tight hover:text-primary transition-colors flex items-center gap-3 no-underline group-hover/row:text-primary" onClick={() => openHistoryDialog(p)}>
                       <div className="h-8 w-8 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center group-hover/row:border-primary/30 transition-all">
@@ -427,7 +427,7 @@ export default function PremisesPage() {
         <div className="flex items-center gap-4">
           <Button
             onClick={() => setIsCreateOpen(true)}
-            className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all"
+            className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all"
           >
             <Plus className="mr-2 h-4 w-4" /> Add Property
           </Button>

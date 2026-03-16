@@ -56,8 +56,8 @@ const DashboardCardComponent = ({
           <CardTitle className="text-base font-bold text-white group-hover/card:text-glow transition-all leading-tight">{title}</CardTitle>
           {description && <CardDescription className="text-sm text-zinc-400 group-hover/card:text-zinc-200 transition-colors leading-relaxed line-clamp-2">{description}</CardDescription>}
         </div>
-        <div className="h-10 w-10 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover/card:border-primary/50 group-hover/card:bg-primary/20 transition-all duration-300 ml-4">
-          <Icon className="h-5 w-5 text-primary group-hover/card:scale-110 transition-all duration-300 drop-shadow-[0_0_8px_rgba(59,130,246,0)] group-hover/card:drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+        <div className="h-10 w-10 shrink-0 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover/card:border-primary/30 group-hover/card:bg-primary/10 transition-all duration-300 ml-4">
+          <Icon className="h-5 w-5 text-primary group-hover/card:scale-110 transition-all duration-300 drop-shadow-[0_0_8px_rgba(16,185,129,0)] group-hover/card:drop-shadow-[0_0_12px_rgba(16,185,129,0.4)]" />
         </div>
       </CardHeader>
       {value !== undefined && (

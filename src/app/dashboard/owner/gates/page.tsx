@@ -178,7 +178,7 @@ export default function GatesPage() {
         if ((isGatesLoading || isPremiseLoading) && !gates) return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
         
         if (!gates || gates.length === 0) return (
-            <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+            <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                 <DoorOpen className="mx-auto h-8 w-8 mb-3 opacity-20" />
                 <p className="font-bold uppercase tracking-widest text-[11px]">No Gates Found</p>
                 <p className="text-[10px] opacity-60 mt-1">Add a gate entry point for this premise.</p>
@@ -189,7 +189,7 @@ export default function GatesPage() {
             <div className="space-y-6">
                 <div className="rounded-2xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
                     <Table>
-                        <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                        <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                             <TableRow className="border-white/5 hover:bg-transparent">
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Gate Name</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Description</TableHead>
@@ -198,7 +198,7 @@ export default function GatesPage() {
                         </TableHeader>
                         <TableBody>
                             {filteredGates.map((gate) => (
-                                <TableRow key={gate.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                                <TableRow key={gate.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                                     <TableCell className="pl-8 py-5">
                                         <div className="flex items-center gap-4">
                                             <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover/row:border-primary/40 transition-colors">
@@ -258,7 +258,7 @@ export default function GatesPage() {
                                 Add Gate
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-[#020617]/95 border-white/10 backdrop-blur-2xl">
+                        <DialogContent className="bg-[#010a05]/95 border-white/10 backdrop-blur-2xl">
                             <DialogHeader>
                                 <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">{gateToEdit ? 'Edit Gate' : 'Add New Gate'}</DialogTitle>
                                 <DialogDescription className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest mt-1">
@@ -284,7 +284,7 @@ export default function GatesPage() {
                                     )} />
                                     <DialogFooter className="pt-4">
                                         <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 text-[9px] font-black uppercase">Cancel</Button></DialogClose>
-                                        <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
+                                        <Button type="submit" disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                             {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : gateToEdit ? 'Update Gate' : 'Create Gate'}
                                         </Button>
                                     </DialogFooter>
@@ -296,7 +296,7 @@ export default function GatesPage() {
             </div>
 
             <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
-                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#020617]/40">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#010a05]/40">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                             <DoorOpen className="h-5 w-5 text-primary" />

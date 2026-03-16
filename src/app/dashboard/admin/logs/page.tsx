@@ -153,7 +153,7 @@ export default function LogsPage() {
           const timestamp = new Date(log.timestamp);
 
           return (
-            <div key={log.id} className="group relative flex items-center gap-6 p-5 rounded-2xl transition-all hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-transparent hover:border-white/5">
+            <div key={log.id} className="group relative flex items-center gap-6 p-5 rounded-2xl transition-all hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-transparent hover:border-white/5">
               <div className="relative flex-shrink-0">
                 <div className="h-12 w-12 rounded-xl bg-black border border-white/5 flex items-center justify-center text-zinc-400 group-hover:text-primary group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
                   <Icon className="h-5 w-5" />
@@ -229,7 +229,7 @@ export default function LogsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 p-2 rounded-2xl backdrop-blur-sm">
+        <div className="flex items-center gap-3 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 p-2 rounded-2xl backdrop-blur-sm">
           <Select value={roleFilter} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-[160px] bg-black/40 border-white/5 text-zinc-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:border-white/10 hover:text-white transition-all">
               <SelectValue placeholder="All Roles" />
@@ -275,7 +275,7 @@ export default function LogsPage() {
       </Card>
 
       <div className="flex justify-center pt-8">
-        <div className="px-6 py-3 rounded-full bg-[#020617]/95 backdrop-blur-3xl/[0.01] border border-white/5 backdrop-blur-xl">
+        <div className="px-6 py-3 rounded-full bg-[#010a05]/95 backdrop-blur-3xl/[0.01] border border-white/5 backdrop-blur-xl">
           <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-[0.5em] leading-none">
             End of Current <span className="text-zinc-300">Temporal Thread</span>
           </p>

@@ -187,7 +187,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
                         <SelectValue placeholder="Select your state" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-[#020617] border-white/10 text-white">
+                    <SelectContent className="bg-[#010a05] border-white/10 text-white">
                       {states?.map((s) => (
                         <SelectItem key={s.id} value={s.name} className="capitalize hover:bg-white/5 focus:bg-white/5">
                           {s.name}
@@ -213,7 +213,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting} className="w-full h-12 bg-primary text-white font-bold tracking-wide uppercase hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+            <Button type="submit" disabled={isSubmitting} className="w-full h-12 bg-primary text-[#010a05] font-bold tracking-wide uppercase hover:bg-primary/90 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (

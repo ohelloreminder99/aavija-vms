@@ -1,6 +1,6 @@
 'use client';
 
-import { useStaticCollection, useDoc, useRpc } from '@/supabase';
+import { useStaticCollection, useCollection, useDoc, useRpc } from '@/supabase';
 import * as React from 'react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -126,7 +126,7 @@ export function usePremiseGates(premiseId: string | undefined) {
     };
   }, [premiseId]);
 
-  return useStaticCollection<PremiseGate>(query as any);
+  return useCollection<PremiseGate>(query as any);
 }
 
 /**
@@ -147,7 +147,34 @@ export function usePremiseMembers(
     offset_param: page * pageSize
   }), [premiseId, role, searchTerm, pageSize, page]);
 
-  const { data: rawData, isLoading, error } = useRpc<any[]>('search_premise_members', params, [params]);
+  const [refreshKey, setRefreshKey] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!premiseId) return;
+    
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`members-realtime-${premiseId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'premise_members',
+          filter: `premise_id=eq.${premiseId}`
+        },
+        () => {
+          setRefreshKey(prev => prev + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [premiseId]);
+
+  const { data: rawData, isLoading, error } = useRpc<any[]>('search_premise_members', params, [params, refreshKey]);
 
   const data = React.useMemo(() => {
     if (!rawData) return null;

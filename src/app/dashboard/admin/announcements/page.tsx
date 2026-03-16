@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -286,12 +286,12 @@ export default function AnnouncementsPage() {
 
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setAnnouncementToEdit(null); setBrowseStateId(''); setBrowseDistrictId(''); }} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all">
+            <Button onClick={() => { setAnnouncementToEdit(null); setBrowseStateId(''); setBrowseDistrictId(''); }} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all">
               <Plus className="mr-2 h-4 w-4" /> Initialize Broadcast
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-2xl bg-black/95 border-white/10 backdrop-blur-3xl p-0 overflow-hidden h-[90vh] flex flex-col">
-            <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+            <div className="p-8 border-b border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
               <DialogHeader>
                 <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Signal <span className="text-primary/80">Configuration</span></DialogTitle>
                 <DialogDescription className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
@@ -346,7 +346,7 @@ export default function AnnouncementsPage() {
                         <Separator className="flex-1 bg-white/5" />
                       </div>
 
-                      <Alert className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] border-primary/20 rounded-2xl p-4">
+                      <Alert className="bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border-primary/20 rounded-2xl p-4">
                         <Info className="h-4 w-4 text-primary" />
                         <AlertTitle className="text-xs font-bold text-white mb-1">Targeting Logic</AlertTitle>
                         <AlertDescription className="text-[10px] text-zinc-400 uppercase tracking-wider leading-relaxed">
@@ -369,7 +369,7 @@ export default function AnnouncementsPage() {
                             <ScrollArea className="h-40">
                               <div className="divide-y divide-white/5">
                                 {filteredStates.map(s => (
-                                  <div key={s.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
+                                  <div key={s.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
                                     <div className="flex items-center gap-3">
                                       <Checkbox
                                         id={`s-${s.id}`}
@@ -406,7 +406,7 @@ export default function AnnouncementsPage() {
                               <div className="divide-y divide-white/5">
                                 {filteredDistricts.length > 0 ? (
                                   filteredDistricts.map(d => (
-                                    <div key={d.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
+                                    <div key={d.id} className="flex items-center justify-between px-4 py-3 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
                                       <div className="flex items-center gap-3">
                                         <Checkbox
                                           id={`d-${d.id}`}
@@ -446,7 +446,7 @@ export default function AnnouncementsPage() {
                               <div className="divide-y divide-white/5">
                                 {filteredCities.length > 0 ? (
                                   filteredCities.map(c => (
-                                    <div key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
+                                    <div key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] transition-colors group/row">
                                       <Checkbox
                                         id={`ci-${c.id}`}
                                         checked={field.value?.includes(c.id)}
@@ -467,9 +467,9 @@ export default function AnnouncementsPage() {
                     </div>
                   </div>
                 </ScrollArea>
-                <div className="p-8 border-t border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
+                <div className="p-8 border-t border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] flex justify-end gap-4">
                   <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-8">Cancel</Button></DialogClose>
-                  <Button type="submit" className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-12 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">Inject Signal</Button>
+                  <Button type="submit" className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-12 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">Inject Signal</Button>
                 </div>
               </form>
             </Form>

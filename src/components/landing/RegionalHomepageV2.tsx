@@ -77,8 +77,8 @@ const pricingTiers = [
 
 const GlowingCard = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
     <div className={`relative group ${className}`}>
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-        <div className="relative bg-black border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+        <div className="relative bg-[#010a05] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl">
             {children}
         </div>
     </div>
@@ -101,21 +101,21 @@ export function RegionalHomepageV2() {
     };
 
     if (isLoading) {
-        return <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+        return <div className="min-h-screen bg-[#010a05] flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
         </div>;
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden selection:bg-blue-500/30">
+        <div className="min-h-screen bg-[#010a05] text-white overflow-x-hidden selection:bg-emerald-500/30">
             {/* Dynamic Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute top-[10%] left-[20%] w-[30rem] h-[30rem] bg-blue-600/10 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-[20%] right-[10%] w-[25rem] h-[25rem] bg-indigo-900/10 blur-[120px] rounded-full" />
+                <div className="absolute top-[10%] left-[20%] w-[30rem] h-[30rem] bg-emerald-600/10 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-[20%] right-[10%] w-[25rem] h-[25rem] bg-teal-900/10 blur-[120px] rounded-full" />
             </div>
 
             {/* Nav */}
-            <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl transition-colors">
+            <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#010a05]/50 backdrop-blur-xl transition-colors">
                 <div className="container max-w-7xl h-20 flex items-center justify-between px-6">
                     <AavijaLogo />
                     <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
@@ -126,7 +126,7 @@ export function RegionalHomepageV2() {
                         <Button variant="ghost" asChild className="text-gray-300 hover:text-white">
                             <Link href="/login">Sign In</Link>
                         </Button>
-                        <Button className="bg-white text-black hover:bg-white/90 rounded-full px-6">
+                        <Button className="bg-primary text-[#010a05] hover:bg-primary/90 rounded-full px-6">
                             <Link href="/signup">Get Started</Link>
                         </Button>
                     </div>
@@ -142,14 +142,14 @@ export function RegionalHomepageV2() {
                         transition={{ duration: 0.8 }}
                         style={{ opacity, scale }}
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-400 text-xs font-semibold mb-8">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs font-semibold mb-8">
                             <Zap className="w-3 h-3" />
                             <span>Next-Gen Visitor Management for India</span>
                         </div>
 
                         <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 leading-[1.1]">
                             {heroTitle.split(' ').slice(0, -1).join(' ')} <br />
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-600">
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-600">
                                 {heroTitle.split(' ').slice(-1)}
                             </span>
                         </h1>
@@ -159,7 +159,7 @@ export function RegionalHomepageV2() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <Button size="lg" className="h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white border-blue-400/50 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                            <Button size="lg" className="h-14 px-8 rounded-full bg-emerald-600 hover:bg-emerald-500 text-[#010a05] border-emerald-400/50 shadow-[0_0_20px_rgba(16,185,129,0.4)]">
                                 <Link href="/signup" className="flex items-center gap-2 text-lg">
                                     {ctaPrimary} <ArrowRight className="w-5 h-5" />
                                 </Link>
@@ -177,21 +177,21 @@ export function RegionalHomepageV2() {
                         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                         className="mt-24 w-full max-w-6xl relative"
                     >
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-[2.5rem] blur-2xl opacity-50" />
-                        <div className="relative rounded-[2rem] border border-white/10 bg-black/40 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-teal-600/20 rounded-[2.5rem] blur-2xl opacity-50" />
+                        <div className="relative rounded-[2rem] border border-white/10 bg-[#010a05]/40 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
                             <div className="aspect-[21/9] w-full relative group">
                                 <Image
                                     src="/hero-mockup.png"
                                     alt="Aavija Dashboard Preview"
                                     fill
-                                    className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-[2s]"
+                                    className="object-cover opacity-80 group-hover:scale-105 transition-transform [transition-duration:2000ms]"
                                     priority
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-60" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#010a05] via-transparent to-transparent opacity-60" />
 
                                 {/* Overlay Floating Badges for 'Complete' feel */}
                                 <div className="absolute top-6 left-6 flex gap-3">
-                                    <div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 backdrop-blur-md text-[10px] uppercase font-bold text-blue-400">
+                                    <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-md text-[10px] uppercase font-bold text-emerald-400">
                                         Production Ready 9.0
                                     </div>
                                     <div className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 backdrop-blur-md text-[10px] uppercase font-bold text-green-400">
@@ -202,7 +202,7 @@ export function RegionalHomepageV2() {
                         </div>
 
                         {/* Shadow Floor */}
-                        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-blue-600/10 blur-3xl rounded-full" />
+                        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[80%] h-20 bg-emerald-600/10 blur-3xl rounded-full" />
                     </motion.div>
                 </section>
 
@@ -228,7 +228,7 @@ export function RegionalHomepageV2() {
                                     transition={{ delay: index * 0.1 }}
                                     className="group p-8 rounded-3xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300"
                                 >
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-blue-500/10 text-blue-400 border border-blue-500/20`}>
+                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20`}>
                                         <Icon className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
@@ -261,12 +261,12 @@ export function RegionalHomepageV2() {
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.1 }}
                                 className={`relative p-8 rounded-3xl border transition-all duration-300 ${tier.highlight
-                                    ? 'border-blue-500/50 bg-blue-500/5 scale-105 shadow-[0_0_40px_rgba(37,99,235,0.1)]'
+                                    ? 'border-emerald-500/50 bg-emerald-500/5 scale-105 shadow-[0_0_40px_rgba(16,185,129,0.1)]'
                                     : 'border-white/5 bg-white/5 hover:border-white/10'
                                     }`}
                             >
                                 {tier.highlight && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-blue-500 text-[10px] font-bold uppercase tracking-wider">
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-[10px] font-bold uppercase tracking-wider">
                                         Most Popular
                                     </div>
                                 )}
@@ -282,14 +282,14 @@ export function RegionalHomepageV2() {
                                 <ul className="space-y-4 mb-8">
                                     {tier.features.map((f, j) => (
                                         <li key={j} className="flex items-center gap-3 text-sm text-gray-400">
-                                            <ShieldCheck className="w-4 h-4 text-blue-400" />
+                                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
                                             {f}
                                         </li>
                                     ))}
                                 </ul>
                                 <Button
                                     className={`w-full rounded-2xl h-12 font-bold ${tier.highlight
-                                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                        ? 'bg-primary hover:bg-primary/90 text-[#010a05]'
                                         : 'bg-white/10 hover:bg-white/20 text-white'
                                         }`}
                                 >
@@ -303,7 +303,7 @@ export function RegionalHomepageV2() {
 
                 {/* Call to Action */}
                 <section className="container max-w-5xl px-6 py-20">
-                    <div className="relative p-12 md:p-20 rounded-3xl border border-white/10 bg-gradient-to-br from-blue-600/20 to-indigo-900/20 text-center overflow-hidden">
+                    <div className="relative p-12 md:p-20 rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-600/20 to-teal-900/20 text-center overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Building2 className="w-48 h-48" />
                         </div>
@@ -314,7 +314,7 @@ export function RegionalHomepageV2() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button size="lg" className="rounded-full px-10 h-14 bg-white text-black hover:bg-white/90 font-bold text-lg" asChild>
+                            <Button size="lg" className="rounded-full px-10 h-14 bg-primary text-[#010a05] hover:bg-primary/90 font-bold text-lg" asChild>
                                 <Link href="/signup">Create Free Account</Link>
                             </Button>
                             <Button size="lg" variant="ghost" className="rounded-full px-10 h-14 text-white hover:bg-white/5 border border-white/10" asChild>

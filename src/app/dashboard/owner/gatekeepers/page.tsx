@@ -239,7 +239,7 @@ export default function GatekeepersPage() {
         if (isLoading && !gatekeepers) return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
         
         if (!gatekeepers || gatekeepers.length === 0) return (
-            <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+            <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                 <Shield className="mx-auto h-8 w-8 mb-3 opacity-20" />
                 <p className="font-bold uppercase tracking-widest text-[11px]">No Gatekeepers Registered</p>
                 <p className="text-[10px] opacity-60 mt-1">Add gatekeeper records to manage premise security.</p>
@@ -250,7 +250,7 @@ export default function GatekeepersPage() {
             <div className="space-y-6">
                 <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
                     <Table>
-                        <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                        <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                             <TableRow className="border-white/5 hover:bg-transparent">
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Gatekeeper Name</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Assigned Gate</TableHead>
@@ -260,7 +260,7 @@ export default function GatekeepersPage() {
                         </TableHeader>
                         <TableBody>
                             {gatekeepers.map((gk) => (
-                                <TableRow key={gk.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                                <TableRow key={gk.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                                     <TableCell className="pl-8 py-5">
                                         <div className="flex items-center gap-4">
                                             <Avatar className="h-10 w-10 border border-white/10 group-hover/row:border-primary/30 transition-colors">
@@ -358,11 +358,11 @@ export default function GatekeepersPage() {
                     </div>
                     <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                         <DialogTrigger asChild>
-                            <Button className="h-11 bg-primary text-white font-black uppercase tracking-widest text-[10px] px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-xl hover:opacity-90 transition-all">
+                            <Button className="h-11 bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] rounded-xl hover:opacity-90 transition-all">
                                 <Plus className="mr-2 h-4 w-4" /> Add Gatekeeper
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-[#020617]/95 border-white/10 backdrop-blur-2xl">
+                        <DialogContent className="bg-[#010a05]/95 border-white/10 backdrop-blur-2xl">
                             <DialogHeader>
                                 <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">Add Gatekeeper</DialogTitle>
                                 <DialogDescription className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest mt-1">
@@ -414,7 +414,7 @@ export default function GatekeepersPage() {
                                                                 <SelectValue placeholder="All Gates (Default)" />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent className="bg-[#020617] border-white/10 text-white">
+                                                        <SelectContent className="bg-[#010a05] border-white/10 text-white">
                                                             <SelectItem value="all">Unrestricted Access</SelectItem>
                                                             {gates?.map(gate => (
                                                                 <SelectItem key={gate.id} value={gate.id}>{gate.name}</SelectItem>
@@ -433,7 +433,7 @@ export default function GatekeepersPage() {
                                             )} />
                                             <DialogFooter className="pt-4">
                                                 <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 text-[9px] font-black uppercase">Cancel</Button></DialogClose>
-                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8 shadow-lg shadow-primary/20">
+                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[9px] h-11 px-8 shadow-lg shadow-primary/20">
                                                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Confirm Add'}
                                                 </Button>
                                             </DialogFooter>
@@ -460,7 +460,7 @@ export default function GatekeepersPage() {
                                                                 <SelectValue placeholder="All Gates (Default)" />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent className="bg-[#020617] border-white/10 text-white">
+                                                        <SelectContent className="bg-[#010a05] border-white/10 text-white">
                                                             <SelectItem value="all">Unrestricted Access</SelectItem>
                                                             {gates?.map(gate => (
                                                                 <SelectItem key={gate.id} value={gate.id}>{gate.name}</SelectItem>
@@ -472,7 +472,7 @@ export default function GatekeepersPage() {
                                             )} />
                                             <DialogFooter className="pt-4">
                                                 <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 text-[9px] font-black uppercase">Cancel</Button></DialogClose>
-                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
+                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Link User'}
                                                 </Button>
                                             </DialogFooter>
@@ -486,7 +486,7 @@ export default function GatekeepersPage() {
             </div>
 
             <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
-                <CardHeader className="relative z-10 border-b border-white/5 pb-8 bg-[#020617]/40 text-center sm:text-left">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-8 bg-[#010a05]/40 text-center sm:text-left">
                     <div className="flex flex-col sm:flex-row items-center gap-4 mb-2">
                         <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
                             <Shield className="h-6 w-6 text-primary" />
@@ -542,7 +542,7 @@ export default function GatekeepersPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-6">
                         <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400">Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleToggleStatusConfirm} disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8">
+                        <AlertDialogAction onClick={handleToggleStatusConfirm} disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-8">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Confirm Protocol
                         </AlertDialogAction>

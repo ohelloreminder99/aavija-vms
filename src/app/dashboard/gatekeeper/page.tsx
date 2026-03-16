@@ -105,7 +105,7 @@ function ScannerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#020617]/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden max-w-lg">
+      <DialogContent className="bg-[#010a05]/95 backdrop-blur-3xl border-white/10 shadow-2xl p-0 overflow-hidden max-w-lg">
         <DialogHeader className="p-8 border-b border-white/10 bg-white/5">
           <DialogTitle className="text-2xl font-bold text-white tracking-tight">Scan <span className="text-primary/80">QR Code</span></DialogTitle>
           <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-2">

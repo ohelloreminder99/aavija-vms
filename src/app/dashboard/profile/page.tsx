@@ -79,7 +79,7 @@ const SkeletonProfile = () => (
   <div className="space-y-6">
     <Skeleton className="h-10 w-48 bg-white/5" />
     <Card className="glass-card border-white/5 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-3xl/[0.01]" />
+      <div className="absolute inset-0 bg-[#010a05]/95 backdrop-blur-3xl/[0.01]" />
       <CardHeader className="relative z-10 border-b border-white/5 pb-8">
         <Skeleton className="h-8 w-1/3 bg-white/5" />
         <Skeleton className="mt-4 h-4 w-2/3 bg-white/5" />
@@ -354,7 +354,7 @@ export default function ProfilePage() {
             <CardContent className="relative z-10 pt-8">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                  <div className="mb-8 flex items-center gap-8 p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl group/avatar">
+                  <div className="mb-8 flex items-center gap-8 p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl group/avatar">
                     <div className="relative">
                       <Avatar className="h-28 w-28 border-2 border-white/5 group-hover/avatar:border-primary/50 transition-all duration-500 shadow-2xl">
                         <AvatarImage src={userProfile?.photo_url} alt={userProfile?.name} className="object-cover" />
@@ -403,7 +403,7 @@ export default function ProfilePage() {
                     />
 
                     <FormField control={form.control} name="cityId" render={({ field }) => (
-                      <FormItem className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
+                      <FormItem className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
                         <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">
                           City {field.value && (
                             <span className="text-primary ml-2 border-l border-white/10 pl-2">
@@ -439,7 +439,7 @@ export default function ProfilePage() {
                   <Separator className="bg-white/5 h-[1px]" />
 
                   <FormField control={form.control} name="products" render={({ field }) => (
-                    <FormItem className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
+                    <FormItem className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
                       <FormLabel className="flex items-center gap-2 text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4">
                         <Package className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
                         <span>Specialization</span>
@@ -472,7 +472,7 @@ export default function ProfilePage() {
 
                   {userProfile?.is_agent && (
                     <>
-                      <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
+                      <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                             <Coins className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
@@ -552,7 +552,7 @@ export default function ProfilePage() {
                     removeVehicle={removeVehicle}
                   />
 
-                  <Button type="submit" disabled={isSubmitting} className="w-full h-14 bg-primary text-white font-black tracking-[0.2em] uppercase hover:bg-primary/90 shadow-[0_0_30px_rgba(59,130,246,0.3)] text-base">
+                  <Button type="submit" disabled={isSubmitting} className="w-full h-14 bg-primary text-[#010a05] font-black tracking-[0.2em] uppercase hover:bg-primary/90 shadow-[0_0_30px_rgba(16,185,129,0.3)] text-base">
                     {isSubmitting ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Save className="mr-3 h-5 w-5" />}
                     Save Profile
                   </Button>

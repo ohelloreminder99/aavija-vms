@@ -200,7 +200,7 @@ export default function GatekeeperHistoryPage() {
 
     if (!visits || visits.length === 0) {
       return (
-        <div className="py-24 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.01]">
+        <div className="py-24 text-center bg-[#010a05]/95 backdrop-blur-3xl/[0.01]">
           <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
             <History className="h-8 w-8 text-zinc-400" />
           </div>
@@ -215,7 +215,7 @@ export default function GatekeeperHistoryPage() {
     return (
       <div className="space-y-8">
         <Table>
-          <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+          <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
             <TableRow className="border-white/5 hover:bg-transparent">
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8 w-16">Snapshot</TableHead>
               <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Visitor Name</TableHead>
@@ -227,7 +227,7 @@ export default function GatekeeperHistoryPage() {
           </TableHeader>
           <TableBody>
             {filteredVisits.map((visit) => (
-              <TableRow key={visit.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+              <TableRow key={visit.id} className="border-white/5 hover:bg-white/[0.02] backdrop-blur-3xl/[0.02] group/row transition-colors">
                 <TableCell className="pl-8 py-4">
                   <Button
                     variant="ghost"
@@ -316,7 +316,7 @@ export default function GatekeeperHistoryPage() {
           </CardHeader>
           <CardContent className="relative z-10 pt-8">
             <div className="space-y-8">
-              <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
+              <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6 relative overflow-hidden">
                 <div className="absolute inset-0 mesh-blue opacity-5 pointer-events-none" />
                 <div className="relative z-10 flex flex-wrap items-end gap-6">
                   <DateRangePicker

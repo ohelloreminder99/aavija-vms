@@ -73,7 +73,7 @@ export default function EarningsPage() {
 
     const getPayoutStatus = () => {
         if (!profile.kyc_verified) return { state: 'kyc', label: 'KYC Required', color: 'text-amber-600' };
-        if (hasPendingReq) return { state: 'pending', label: 'Request Pending', color: 'text-blue-600' };
+        if (hasPendingReq) return { state: 'pending', label: 'Request Pending', color: 'text-emerald-500' };
         if (isEligible) return { state: 'eligible', label: 'Eligible for Payout 🟢', color: 'text-green-600' };
         return { state: 'accumulating', label: `₹${(threshold - balance).toFixed(2)} more to reach threshold`, color: 'text-muted-foreground' };
     };
@@ -129,7 +129,7 @@ export default function EarningsPage() {
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div
-                            className={cn('h-full rounded-full transition-all', isEligible ? 'bg-green-500' : 'bg-primary')}
+                            className={cn('h-full rounded-full transition-all', isEligible ? 'bg-green-500' : 'bg-emerald-600')}
                             style={{ width: `${Math.min(100, threshold > 0 ? (balance / threshold) * 100 : 100)}%` }}
                         />
                     </div>

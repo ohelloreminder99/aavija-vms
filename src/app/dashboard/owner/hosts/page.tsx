@@ -305,7 +305,7 @@ export default function HostsPage() {
         if (isPremiseLoading || isLoadingHosts) return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
         
         if (!hosts || hosts.length === 0) return (
-            <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+            <div className="py-12 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-2xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                 <Users className="mx-auto h-8 w-8 mb-3 opacity-20" />
                 <p className="font-bold uppercase tracking-widest text-[11px]">No Hosts Found</p>
                 <p className="text-[10px] opacity-60 mt-1">Add host records or use bulk import to populate the list.</p>
@@ -316,7 +316,7 @@ export default function HostsPage() {
             <div className="space-y-6">
                 <div className="rounded-3xl border border-white/5 bg-black/20 overflow-hidden shadow-2xl">
                     <Table>
-                        <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                        <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                             <TableRow className="border-white/5 hover:bg-transparent">
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Host Name</TableHead>
                                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Unit / Flat No.</TableHead>
@@ -328,7 +328,7 @@ export default function HostsPage() {
                             {filteredHosts.map((host) => {
                                 const isActive = host.is_active ?? true;
                                 return (
-                                    <TableRow key={host.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                                    <TableRow key={host.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                                         <TableCell className="pl-8 py-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="relative">
@@ -336,7 +336,7 @@ export default function HostsPage() {
                                                         {host.user?.photo_url && <AvatarImage src={host.user.photo_url} alt={host.user.name} />}
                                                         <AvatarFallback className="bg-white/5 text-zinc-400 font-bold">{host.user?.name?.charAt(0) || '?'}</AvatarFallback>
                                                     </Avatar>
-                                                    <div className={cn("absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#020617]", isActive ? "bg-emerald-500" : "bg-red-500")} />
+                                                    <div className={cn("absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#010a05]", isActive ? "bg-emerald-500" : "bg-red-500")} />
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-bold text-white tracking-tight group-hover/row:text-primary transition-colors">{host.user?.name || 'Unknown'}</span>
@@ -440,7 +440,7 @@ export default function HostsPage() {
                                 Bulk Import
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-[#020617]/95 border-white/10 backdrop-blur-2xl max-w-2xl">
+                        <DialogContent className="bg-[#010a05]/95 border-white/10 backdrop-blur-2xl max-w-2xl">
                             <DialogHeader className="space-y-4">
                                 <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                                     <FileUp className="h-6 w-6 text-primary" />
@@ -529,11 +529,11 @@ export default function HostsPage() {
                     </Dialog>
                     <Dialog open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
                         <DialogTrigger asChild>
-                            <Button className="h-11 bg-primary text-white font-black uppercase tracking-widest text-[10px] px-8 rounded-xl">
+                            <Button className="h-11 bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] px-8 rounded-xl">
                                 <Plus className="mr-2 h-4 w-4" /> Add Host
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-[#020617]/95 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+                        <DialogContent className="bg-[#010a05]/95 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
                             <DialogHeader className="space-y-4">
                                 <div className="h-12 w-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                                     <Plus className="h-6 w-6 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
@@ -599,7 +599,7 @@ export default function HostsPage() {
                                             )} />
                                             <DialogFooter className="pt-4">
                                                 <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
-                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
+                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                     {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Confirm Add'}
                                                 </Button>
                                             </DialogFooter>
@@ -627,7 +627,7 @@ export default function HostsPage() {
                                             )} />
                                             <DialogFooter className="pt-4">
                                                 <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 uppercase tracking-widest text-[9px] font-black">Cancel</Button></DialogClose>
-                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[9px] h-11 px-8">
+                                                <Button type="submit" disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[9px] h-11 px-8">
                                                     {isSubmitting ? <Loader2 className="mr-2 h-3.3 w-4 animate-spin" /> : 'Link User'}
                                                 </Button>
                                             </DialogFooter>
@@ -642,7 +642,7 @@ export default function HostsPage() {
 
             <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
                 <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-20" />
-                <CardHeader className="relative z-10 border-b border-white/5 pb-8 bg-[#020617]/40">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-8 bg-[#010a05]/40">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                             <Users className="h-5 w-5 text-primary" />
@@ -682,7 +682,7 @@ export default function HostsPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter className="gap-3 pt-6">
                         <AlertDialogCancel className="bg-transparent border-white/5 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleToggleStatusConfirm} disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+                        <AlertDialogAction onClick={handleToggleStatusConfirm} disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
                             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Confirm
                         </AlertDialogAction>

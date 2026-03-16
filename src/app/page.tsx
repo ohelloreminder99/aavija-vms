@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { GlobalPortal } from '@/components/landing/GlobalPortal';
@@ -15,7 +15,7 @@ export default function Home() {
 
   // If we haven't detected the hostname yet, show a loading state or default to Portal
   if (hostname === null) {
-    return <div className="min-h-screen bg-[#050505]" />;
+    return <div className="min-h-screen bg-[#010a05]" />;
   }
 
   // Logic: 

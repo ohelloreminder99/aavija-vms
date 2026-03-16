@@ -28,7 +28,7 @@ export function VisitorTokenBalanceCard() {
   if (isLoading) {
     return (
       <Card className="glass-card border-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[#020617]/95 backdrop-blur-3xl/[0.01]" />
+        <div className="absolute inset-0 bg-[#010a05]/95 backdrop-blur-3xl/[0.01]" />
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
           <Skeleton className="h-5 w-1/2 bg-white/5" />
         </CardHeader>
@@ -79,7 +79,7 @@ export function VisitorTokenBalanceCard() {
           )}
 
           <Button
-            className="w-full h-12 bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(59,130,246,0.25)] transition-all transform active:scale-[0.98] font-bold tracking-wide rounded-xl"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-[#010a05] shadow-[0_0_20px_rgba(59,130,246,0.25)] transition-all transform active:scale-[0.98] font-bold tracking-wide rounded-xl"
             onClick={() => setIsDialogOpen(true)}
           >
             <Coins className="mr-2 h-5 w-5" /> Recharge Tokens

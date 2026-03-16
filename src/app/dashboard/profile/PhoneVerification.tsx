@@ -111,7 +111,7 @@ export function PhoneVerification({
 
     return (
         <>
-            <div className="p-6 bg-[#020617]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
+            <div className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl space-y-6">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                         <ShieldCheck className="h-5 w-5 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
@@ -186,7 +186,7 @@ export function PhoneVerification({
                     </AlertDialogHeader>
                     <AlertDialogFooter className="pt-6">
                         <AlertDialogCancel className="bg-transparent border-white/10 text-zinc-400 hover:text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-white font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Change</AlertDialogAction>
+                        <AlertDialogAction onClick={() => { setIsPhoneLocked(false); setOtpSent(false); setVerificationError(null); setIsUpdateConfirmOpen(false); }} className="bg-primary text-[#010a05] font-bold uppercase tracking-widest text-[10px] h-10 px-8">Confirm Change</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

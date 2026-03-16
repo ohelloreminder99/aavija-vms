@@ -284,7 +284,7 @@ export default function StaffManagementPage() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-lg bg-black/90 border-white/10 backdrop-blur-2xl p-0 overflow-hidden">
-                        <div className="p-8 border-b border-white/5 bg-[#020617]/95 backdrop-blur-3xl/[0.02]">
+                        <div className="p-8 border-b border-white/5 bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
                             <DialogHeader>
                                 <DialogTitle className="text-3xl font-headline font-bold text-white tracking-tight">Add <span className="text-primary/80">Staff</span></DialogTitle>
                                 <DialogDescription className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em]">
@@ -340,7 +340,7 @@ export default function StaffManagementPage() {
                                         )} />
                                         <div className="flex justify-end gap-4 pt-4">
                                             <DialogClose asChild><Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">Cancel</Button></DialogClose>
-                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
+                                            <Button type="submit" disabled={isSubmitting} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-11 px-8 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
                                                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                                 Create Staff Member
                                             </Button>
@@ -353,7 +353,7 @@ export default function StaffManagementPage() {
                                         <FormField control={assignForm.control} name="email" render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">User Email</FormLabel>
-                                                <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-[#020617]/95 backdrop-blur-3xl border-white/10 text-white h-11 rounded-xl placeholder:text-zinc-400" /></FormControl>
+                                                <FormControl><Input type="email" placeholder="user@aavija.com" {...field} className="bg-[#010a05]/95 backdrop-blur-3xl border-white/10 text-white h-11 rounded-xl placeholder:text-zinc-400" /></FormControl>
                                                 <FormDescription className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Assign staff permissions to an existing user account.</FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -381,7 +381,7 @@ export default function StaffManagementPage() {
             </Card>
 
             <AlertDialog open={!!staffToRemove} onOpenChange={(open) => { if (!open) { setStaffToRemove(null); } }}>
-                <AlertDialogContent className="bg-[#020617]/95 backdrop-blur-3xl border-white/10 shadow-2xl max-w-md">
+                <AlertDialogContent className="bg-[#010a05]/95 backdrop-blur-3xl border-white/10 shadow-2xl max-w-md">
                     <AlertDialogHeader>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="h-10 w-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center shadow-sm">
@@ -405,7 +405,7 @@ export default function StaffManagementPage() {
             </AlertDialog>
 
             <AlertDialog open={showDuplicateUserDialog} onOpenChange={setShowDuplicateUserDialog}>
-                <AlertDialogContent className="bg-[#020617]/95 backdrop-blur-3xl border-white/10 shadow-2xl max-w-sm">
+                <AlertDialogContent className="bg-[#010a05]/95 backdrop-blur-3xl border-white/10 shadow-2xl max-w-sm">
                     <AlertDialogHeader>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shadow-sm">

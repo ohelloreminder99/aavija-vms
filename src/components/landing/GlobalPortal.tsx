@@ -34,10 +34,10 @@ const regions = [
 
 export function GlobalPortal() {
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4 overflow-hidden relative">
+        <div className="min-h-screen bg-[#010a05] text-white flex flex-col items-center justify-center p-4 overflow-hidden relative">
             {/* Background Ambient Glow */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-900/10 blur-[120px] rounded-full" />
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-900/10 blur-[120px] rounded-full" />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -51,7 +51,7 @@ export function GlobalPortal() {
                         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                         className="p-3 bg-white/5 rounded-full border border-white/10 backdrop-blur-xl"
                     >
-                        <Globe className="w-12 h-12 text-blue-400" />
+                        <Globe className="w-12 h-12 text-emerald-400" />
                     </motion.div>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
@@ -73,7 +73,7 @@ export function GlobalPortal() {
                         <Link
                             href={region.domain === '#' ? '#' : `https://${region.domain}`}
                             className={`group block p-6 rounded-2xl border bg-white/5 backdrop-blur-md transition-all duration-300 ${region.status === 'Operational'
-                                    ? 'border-white/10 hover:border-blue-500/50 hover:bg-white/10'
+                                    ? 'border-white/10 hover:border-emerald-500/50 hover:bg-white/10'
                                     : 'border-white/5 opacity-60 cursor-not-allowed'
                                 }`}
                         >
@@ -86,7 +86,7 @@ export function GlobalPortal() {
                                     {region.status}
                                 </span>
                             </div>
-                            <h3 className="text-xl font-bold mb-2 flex items-center group-hover:text-blue-400 transition-colors">
+                            <h3 className="text-xl font-bold mb-2 flex items-center group-hover:text-emerald-400 transition-colors">
                                 {region.name}
                                 {region.status === 'Operational' && (
                                     <ChevronRight className="w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />

@@ -59,7 +59,7 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
       </CardHeader>
       <CardContent className="relative z-10">
         {isActuallyLoading ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-4 bg-[#020617]/95 backdrop-blur-3xl/[0.01] rounded-2xl border border-white/5">
+          <div className="flex flex-col items-center justify-center h-48 gap-4 bg-[#010a05]/95 backdrop-blur-3xl/[0.01] rounded-2xl border border-white/5">
             <Loader2 className="h-8 w-8 animate-spin text-primary/30" />
             <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Loading...</p>
           </div>
@@ -73,7 +73,7 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
           <ScrollArea className="h-64 pr-4">
             <div className="space-y-4">
               {announcements.map((ann) => (
-                <div key={ann.id} className="p-5 border border-white/5 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.02] hover:bg-[#020617]/95 backdrop-blur-3xl/[0.05] hover:border-white/10 transition-all group/item">
+                <div key={ann.id} className="p-5 border border-white/5 rounded-2xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02] hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.05] hover:border-white/10 transition-all group/item">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold text-white group-hover/item:text-primary transition-colors text-base">{ann.title}</h3>
                     <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 bg-white/5 px-2 py-0.5 rounded shadow-sm">
@@ -88,7 +88,7 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
             </div>
           </ScrollArea>
         ) : (
-          <div className="flex flex-col items-center justify-center h-48 text-center bg-[#020617]/95 backdrop-blur-3xl/[0.01] border border-white/5 rounded-2xl p-6">
+          <div className="flex flex-col items-center justify-center h-48 text-center bg-[#010a05]/95 backdrop-blur-3xl/[0.01] border border-white/5 rounded-2xl p-6">
             <Info className="h-8 w-8 mb-4 text-zinc-400 opacity-50" />
             <p className="font-bold text-zinc-400 uppercase tracking-widest text-xs">No Announcements</p>
             <p className="text-[10px] text-zinc-400 mt-1">There are no new updates at this time.</p>

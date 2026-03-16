@@ -98,11 +98,11 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-px bg-white/5 rounded-2xl overflow-hidden border border-white/5">
-                            <div className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] p-6 space-y-1">
+                            <div className="bg-[#010a05]/95 backdrop-blur-3xl/[0.02] p-6 space-y-1">
                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-black flex items-center"><Clock className="w-3 h-3 mr-2 text-primary" /> Check-in Sequence</p>
                                 <p className="text-lg font-bold text-white">{visit.checkin_time.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
                             </div>
-                            <div className="bg-[#020617]/95 backdrop-blur-3xl/[0.02] p-6 space-y-1 border-l border-white/5 text-right">
+                            <div className="bg-[#010a05]/95 backdrop-blur-3xl/[0.02] p-6 space-y-1 border-l border-white/5 text-right">
                                 <p className="text-[10px] text-primary uppercase tracking-widest font-black inline-flex items-center">Operational Duration <Clock className="w-3 h-3 ml-2" /></p>
                                 <p className="text-4xl font-black text-white tracking-tighter tabular-nums text-glow">{timeInside}</p>
                             </div>

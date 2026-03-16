@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { env } from '@/lib/env';
@@ -87,7 +87,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={cn('font-body antialiased min-h-screen bg-background')}>
+      <body className={cn('font-body antialiased min-h-screen bg-background text-foreground')}>
         <SupabaseClientProvider>
           <I18nProvider>
             {children}

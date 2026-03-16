@@ -313,7 +313,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   // Show referral banner at top of signup form if ?ref= is present
   const referralBanner = mode === 'signup' && refCode ? (
-    <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700 mb-2">
+    <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-sm text-emerald-400 mb-2">
       <Gift className="h-4 w-4 shrink-0" />
       <span>You were invited! Bonus tokens will be added after signup.</span>
     </div>

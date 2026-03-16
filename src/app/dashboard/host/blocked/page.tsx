@@ -143,7 +143,7 @@ export default function HostBlockedPage() {
 
         return (
             <Table>
-                <TableHeader className="bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                <TableHeader className="bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                     <TableRow className="border-white/5 hover:bg-transparent">
                         <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4 pl-8">Visitor</TableHead>
                         <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-4">Blocked On</TableHead>
@@ -153,7 +153,7 @@ export default function HostBlockedPage() {
                 <TableBody>
                     {blocks.map((block) => {
                         return (
-                            <TableRow key={block.id} className="border-white/5 hover:bg-[#020617]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
+                            <TableRow key={block.id} className="border-white/5 hover:bg-[#010a05]/95 backdrop-blur-3xl/[0.02] group/row transition-colors">
                                 <TableCell className="pl-8 py-4">
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-9 w-9 border border-white/10">
@@ -192,7 +192,7 @@ export default function HostBlockedPage() {
                 </Button>
             </div>
             <Card className="glass-card border-white/5 shadow-2xl relative overflow-hidden mb-20">
-                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#020617]/40">
+                <CardHeader className="relative z-10 border-b border-white/5 pb-6 bg-[#010a05]/40">
                     <CardTitle className="text-2xl font-headline font-bold text-white tracking-tight">Blocked <span className="text-red-500/60">Visitors</span></CardTitle>
                     <CardDescription className="text-zinc-400 text-[10px] font-medium uppercase tracking-[0.2em] mt-1">
                         You have restricted these individuals from visiting you at this premise.
@@ -204,7 +204,7 @@ export default function HostBlockedPage() {
             </Card>
 
             <AlertDialog open={!!visitorToUnblock} onOpenChange={(open) => !open && setVisitorToUnblock(null)}>
-                <AlertDialogContent>
+                <AlertDialogContent className="bg-[#010a05]/95 border-white/10 backdrop-blur-2xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure you want to unblock this visitor?</AlertDialogTitle>
                         <AlertDialogDescription>

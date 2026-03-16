@@ -78,7 +78,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                 className={cn(
                     "w-full justify-start overflow-hidden group relative transition-all duration-300",
                     isActive
-                        ? "bg-primary/20 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-bold shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                        ? "bg-primary/20 text-primary border-r-2 border-primary border-l-0 border-t-0 border-b-0 rounded-none font-bold shadow-[0_0_20px_rgba(16,185,129,0.15)]"
                         : "text-zinc-400 hover:text-white hover:bg-white/5 font-semibold"
                 )}
                 asChild
@@ -88,7 +88,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     {isActive && <div className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none" />}
                     <Icon className={cn(
                         "mr-3 h-5 w-5 shrink-0 transition-all duration-300",
-                        isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" : "group-hover:text-white text-zinc-400"
+                        isActive ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "group-hover:text-white text-zinc-400"
                     )} />
                     <span className="truncate">{label}</span>
                 </Link>
@@ -155,7 +155,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
 export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { userProfile: UserProfile | null, isCollapsed: boolean, toggleCollapse: () => void }) {
     return (
         <aside className={cn(
-            "hidden md:flex flex-col border-r border-white/10 bg-[#020617]/50 backdrop-blur-xl transition-all duration-500 relative",
+            "hidden md:flex flex-col border-r border-white/10 bg-[#010a05]/50 backdrop-blur-xl transition-all duration-500 relative",
             isCollapsed ? "w-20 items-center" : "w-72"
         )}>
             {/* Collapse Toggle */}
@@ -163,7 +163,7 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                 variant="ghost"
                 size="icon"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-[#020617] text-zinc-400 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
+                className="absolute -right-4 top-4 z-10 h-8 w-8 rounded-full border border-white/10 bg-[#010a05] text-zinc-400 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:bg-white/10 hover:text-white transition-all transform active:scale-95"
                 onClick={toggleCollapse}
             >
                 {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}

@@ -103,7 +103,7 @@ export default function OwnerSettingsPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="border-t border-white/5 pt-6 flex justify-end">
-                    <Button onClick={handleSave} disabled={isSaving} className="bg-primary hover:bg-primary/90">
+                    <Button onClick={handleSave} disabled={isSaving} className="bg-primary text-[#010a05] hover:bg-primary/90">
                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         Save Configuration
                     </Button>

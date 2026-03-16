@@ -36,7 +36,7 @@ const StarRatingInput = ({
 }) => {
     const [hoverRating, setHoverRating] = React.useState(0);
     return (
-        <div className="flex items-center gap-1.5 p-4 rounded-2xl bg-[#020617]/95 backdrop-blur-3xl/[0.03] border border-white/5 shadow-inner">
+        <div className="flex items-center gap-1.5 p-4 rounded-2xl bg-[#010a05]/95 backdrop-blur-3xl/[0.03] border border-white/5 shadow-inner">
             {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                     key={star}
@@ -121,7 +121,7 @@ export function RatingDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-[#020617]/90 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <DialogContent className="bg-[#010a05]/90 border-white/10 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
                 <DialogHeader className="space-y-4">
                     <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                         <Star className="h-6 w-6 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
@@ -143,7 +143,7 @@ export function RatingDialog({
                     <DialogClose asChild>
                         <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-white/5 border-white/5">Cancel</Button>
                     </DialogClose>
-                    <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="bg-primary text-white font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+                    <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="bg-primary text-[#010a05] font-black uppercase tracking-widest text-[10px] h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
                         {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Submit Rating'}
                     </Button>
                 </DialogFooter>

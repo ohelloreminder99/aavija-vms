@@ -83,7 +83,7 @@ export function TokenBalanceCard({ premise, isLoading: isPremiseLoading }: Token
             </Alert>
           )}
           <Button
-            className="w-full mt-8 h-12 bg-primary hover:bg-primary/90 text-white font-bold tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.25)] rounded-xl transition-all transform active:scale-[0.98]"
+            className="w-full mt-8 h-12 bg-primary hover:bg-primary/90 text-[#010a05] font-bold tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.25)] rounded-xl transition-all transform active:scale-[0.98]"
             onClick={() => setIsDialogOpen(true)}
           >
             <Coins className="mr-2 h-5 w-5" /> Recharge Tokens

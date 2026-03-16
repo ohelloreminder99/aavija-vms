@@ -220,7 +220,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
           contact: fullContact,
         },
         theme: {
-          color: '#3399cc',
+          color: '#10b981',
         },
         modal: {
           ondismiss: function () {
@@ -251,9 +251,9 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
       <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
         <DialogContent 
            onOpenAutoFocus={(e) => e.preventDefault()} 
-           className="bg-[#020617]/95 border-white/10 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
+           className="bg-[#010a05]/95 border-white/10 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
         >
-          <DialogHeader className="p-6 border-b border-white/5 bg-[#020617]/40 relative">
+          <DialogHeader className="p-6 border-b border-white/5 bg-[#010a05]/40 relative">
             <div className="flex items-center gap-2">
               {step === 2 && (
                 <Button 
@@ -266,10 +266,10 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                 </Button>
               )}
               <DialogTitle className="text-2xl font-headline font-bold text-white tracking-tight">
-                {step === 1 ? 'Select' : 'Review'} <span className="text-primary/60">Tokens</span>
+                {step === 1 ? 'Select' : 'Review'} <span className="text-emerald-500/60">Tokens</span>
               </DialogTitle>
             </div>
-            <DialogDescription className="text-zinc-400 text-xs uppercase font-bold tracking-widest mt-1">
+            <DialogDescription className="text-emerald-400/60 text-xs uppercase font-bold tracking-widest mt-1">
               {step === 1 ? 'How many tokens would you like to buy?' : 'Review your order details before payment.'}
             </DialogDescription>
           </DialogHeader>
@@ -283,7 +283,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                   Per our Terms and Conditions, you must provide your Legal Name and Billing Address before purchasing tokens.
                 </AlertDescription>
               </Alert>
-              <Button asChild className="w-full bg-primary hover:opacity-90 transition-opacity rounded-xl h-11 text-xs font-black uppercase tracking-widest">
+              <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-500 transition-colors border-emerald-400/50 rounded-xl h-11 text-xs font-black uppercase tracking-widest text-[#010a05] shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                 <Link href={gstUpdateHref}>
                   <FileText className="mr-2 h-4 w-4" />
                   Update Billing Details
@@ -314,7 +314,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                                   placeholder="e.g., 1000"
                                   {...field}
                                   disabled={isSubmitting}
-                                  className="bg-black/40 border-white/5 text-white h-12 text-lg font-bold focus:ring-primary/50 pl-4"
+                                  className="bg-black/40 border-white/5 text-white h-12 text-lg font-bold focus:ring-emerald-500/50 pl-4"
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                       e.preventDefault();
@@ -339,8 +339,8 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                               type="button"
                               variant="outline"
                               className={cn(
-                                "h-10 border-white/5 bg-white/5 hover:bg-primary/20 hover:border-primary/50 text-xs font-bold transition-all text-white",
-                                quantity === val ? "border-primary bg-primary/20 text-white shadow-[0_0_15px_rgba(59,130,246,0.2)]" : "text-white/70"
+                                "h-10 border-white/5 bg-white/5 hover:bg-emerald-500/20 hover:border-emerald-500/50 text-xs font-bold transition-all text-white",
+                                quantity === val ? "border-emerald-500 bg-emerald-500/20 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)]" : "text-white/70"
                               )}
                               onClick={() => form.setValue('quantity', val)}
                             >
@@ -357,11 +357,11 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                   ) : (
                     <div className="space-y-4">
                       {settingsLoading ? (
-                        <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+                        <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-emerald-500" /></div>
                       ) : (
-                        <div className="space-y-4 rounded-2xl border border-white/5 p-5 bg-[#020617]/95 backdrop-blur-3xl/[0.03]">
+                        <div className="space-y-4 rounded-2xl border border-white/5 p-5 bg-[#010a05]/95 backdrop-blur-3xl/[0.03]">
                           <h4 className="font-bold text-white text-xs uppercase tracking-widest flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4 text-primary" />
+                            <ShieldCheck className="h-4 w-4 text-emerald-500" />
                             Price Summary
                           </h4>
                           <Separator className="bg-white/5" />
@@ -376,10 +376,10 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                             </div>
                           </div>
                           <Separator className="bg-white/5" />
-                          <div className="flex justify-between items-center bg-primary/5 p-4 rounded-xl border border-primary/10 shadow-[0_0_20px_rgba(59,130,246,0.05)]">
-                            <span className="text-xs font-black uppercase tracking-widest text-primary/80">Total Payable</span>
+                          <div className="flex justify-between items-center bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+                            <span className="text-xs font-black uppercase tracking-widest text-emerald-500/80">Total Payable</span>
                             <span className="flex items-center gap-1.5 text-2xl font-headline font-black text-white tracking-tighter">
-                              <CurrencyIcon className="h-6 w-6 text-primary" />{' '}
+                              <CurrencyIcon className="h-6 w-6 text-emerald-500" />{' '}
                               {totalPayable.toFixed(2)}
                             </span>
                           </div>
@@ -392,7 +392,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                   )}
                 </div>
 
-                <DialogFooter className="bg-[#020617]/40 p-6 border-t border-white/5 gap-3">
+                <DialogFooter className="bg-[#010a05]/40 p-6 border-t border-white/5 gap-3">
                   <DialogClose asChild>
                     <Button type="button" variant="ghost" disabled={isSubmitting} className="flex-1 text-zinc-400 hover:text-white hover:bg-white/5 text-xs font-black uppercase h-12">
                       Cancel
@@ -403,7 +403,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                     <Button 
                       type="submit" 
                       disabled={quantity <= 0}
-                      className="flex-[2] bg-primary hover:opacity-90 transition-opacity text-white font-black uppercase tracking-widest text-xs h-12 rounded-xl"
+                      className="flex-[2] bg-emerald-600 hover:bg-emerald-500 transition-opacity text-[#010a05] font-black uppercase tracking-widest text-xs h-12 rounded-xl"
                     >
                       Continue
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -412,7 +412,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                     <Button 
                       type="submit" 
                       disabled={isSubmitting || quantity <= 0} 
-                      className="flex-[2] bg-primary hover:opacity-90 transition-opacity text-white font-black uppercase tracking-widest text-xs h-12 rounded-xl shadow-[0_5px_20px_rgba(59,130,246,0.3)]"
+                      className="flex-[2] bg-emerald-600 hover:bg-emerald-500 transition-opacity text-[#010a05] font-black uppercase tracking-widest text-xs h-12 rounded-xl shadow-[0_5px_20px_rgba(16,185,129,0.3)]"
                     >
                       {isSubmitting && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
@@ -429,4 +429,3 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
     </>
   );
 }
-
