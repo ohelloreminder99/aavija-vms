@@ -63,6 +63,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
+  const [captchaStatus, setCaptchaStatus] = React.useState<'idle' | 'loading' | 'success' | 'expired' | 'error'>('idle');
   const router = useRouter();
   const searchParams = useSearchParams();
   const refCode = searchParams?.get('ref') || null;  // e.g. /signup?ref=ABC12345
@@ -81,10 +82,14 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   const onSubmit = async (data: UserFormValue) => {
     if (!captchaToken && process.env.NODE_ENV === 'production') {
+      let desc = 'Please wait for the security check to complete.';
+      if (captchaStatus === 'error') desc = 'Security check failed to load. Please check your internet or disable ad-blockers.';
+      if (captchaStatus === 'expired') desc = 'Security check expired. Please try again.';
+      
       toast({
         variant: 'destructive',
-        title: 'Verification Failed',
-        description: 'Please wait for the security check to complete.',
+        title: 'Verification Required',
+        description: desc,
       });
       return;
     }
@@ -250,7 +255,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         });
       }
     } catch (error: any) {
-      console.error('Authentication Error:', error);
+      console.error('[AuthForm] Submission Error:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        mode: mode
+      });
       let errorMessage = 'An unexpected error occurred. Please try again.';
       switch (error.message) {
         case 'User already registered':
@@ -448,10 +458,13 @@ export function AuthForm({ mode }: AuthFormProps) {
               </div>
             )}
 
-            <div className="flex justify-center my-2">
+            <div className="flex justify-center my-2 min-h-[65px]">
               <Turnstile
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-                onSuccess={(token) => setCaptchaToken(token)}
+                onSuccess={(token) => { setCaptchaToken(token); setCaptchaStatus('success'); }}
+                onExpire={() => { setCaptchaToken(null); setCaptchaStatus('expired'); }}
+                onError={() => { setCaptchaToken(null); setCaptchaStatus('error'); }}
+                onBeforeInteractive={() => setCaptchaStatus('loading')}
               />
             </div>
 

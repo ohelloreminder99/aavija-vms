@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -104,6 +104,12 @@ export default function ChangePasswordPage() {
           <CardDescription>
             Enter your current password and a new password to update your account.
           </CardDescription>
+          {user?.app_metadata?.provider === 'google' && (
+            <div className="mt-4 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400">
+              <p className="font-bold uppercase tracking-wider mb-1">💡 Professional Tip</p>
+              Since you signed up with Google, setting a password here allows you to log in with your email address and this password on any device, even without accessing your Google account.
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <Form {...form}>

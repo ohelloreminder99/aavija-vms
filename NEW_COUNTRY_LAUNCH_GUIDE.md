@@ -142,7 +142,14 @@ Some configurations cannot be done via SQL and must be toggled manually in the S
     - `visits`, `users`, `logs`, `premises`, `checkin_tokens`.
 - **Note**: Running `enable-realtime.sql` (Phase 2) already does this via SQL, but a visual check is recommended for production stability.
 
-### C. Storage CORS & Access
+### C. Identity Linking (Essential for Google + Password)
+1.  Navigate to **Project Settings (Gear Icon) -> Auth**.
+2.  Enable **Link identities with the same email**.
+    - **Why?** This ensures that if a user signs up with Google and later adds a password, they can log in using either method without creating duplicate accounts.
+3.  Ensure **Enable Email provider** is **ON**.
+4.  Ensure **Confirm email** is **ON** (to prevent unauthorized account creation with others' emails).
+
+### D. Storage CORS & Access
 1.  Navigate to **Storage -> Configuration -> CORS**.
 2.  Ensure your specific subdomain is allowed to access the buckets (`avatars`, `visitor-snapshots`, etc.) with `GET`, `POST`, and `PUT` methods.
 3.  Ensure the buckets are set to **Public** so visitors can see snapshots.
