@@ -142,7 +142,12 @@ export function PhoneVerification({
                             <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px] ml-1">Neural ID (Phone)</FormLabel>
                             <FormControl>
                                 <div className="flex gap-2">
-                                    <Input {...field} disabled={isPhoneLocked} className="bg-black/20 border-white/5 text-white h-11" />
+                                    <Input 
+                                        {...field} 
+                                        disabled={isPhoneLocked} 
+                                        maxLength={settings?.phone_number_length || undefined}
+                                        className="bg-black/20 border-white/5 text-white h-11" 
+                                    />
                                     {!isPhoneLocked && !otpSent && (
                                         <Button type="button" variant="outline" onClick={handleSendOtp} disabled={isVerifying || !hasSufficientTokens} className="h-11 border-white/10 text-primary hover:bg-primary/5 text-[10px] font-bold uppercase tracking-widest px-6 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
                                             {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send OTP'}

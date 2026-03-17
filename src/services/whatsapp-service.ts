@@ -61,11 +61,16 @@ type WhatsAppPayload = {
  * Normalizes any Indian phone number to international format without +
  * WhatsApp Cloud API requires: 919876543210 (country code + number, no +)
  */
-function normalizePhone(raw: string, defaultCountryCode = '91'): string {
+function normalizePhone(raw: string, defaultCountryCode = '91', expectedLength = 10): string {
   const digits = raw.replace(/\D/g, '');
-  if (digits.startsWith('0')) return defaultCountryCode + digits.slice(1);
-  if (digits.length === 10) return defaultCountryCode + digits;
-  if (digits.startsWith('91') && digits.length === 12) return digits;
+  
+  // If digits match the expected local length, prepend country code
+  if (digits.length === expectedLength) return defaultCountryCode + digits;
+  
+  // If it's already the country code + expected length, return as is
+  const fullLength = defaultCountryCode.length + expectedLength;
+  if (digits.startsWith(defaultCountryCode) && digits.length === fullLength) return digits;
+  
   return digits;
 }
 
@@ -80,13 +85,16 @@ async function sendWhatsApp(payload: WhatsAppPayload): Promise<void> {
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN || process.env.WHATSAPP_API_TOKEN;
 
   if (!phoneNumberId || !accessToken) {
-    console.warn('[WhatsApp] Mission Configuration: WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_ACCESS_TOKEN is missing.');
-    console.log('[WhatsApp] Current Settings ID:', phoneNumberId || 'MISSING');
-    console.log('[WhatsApp] Current Token Status:', accessToken ? 'PRESENT (Masked)' : 'MISSING');
-    return;
+    const errorMsg = `[WhatsApp] Configuration Error: ${!phoneNumberId ? 'WHATSAPP_PHONE_NUMBER_ID' : ''} ${!accessToken ? 'WHATSAPP_ACCESS_TOKEN' : ''} is missing.`;
+    console.error(errorMsg);
+    throw new Error(errorMsg + " Please ensure your environment variables are set in your hosting provider (Vercel).");
   }
 
-  const to = normalizePhone(payload.phone);
+  const to = normalizePhone(
+    payload.phone, 
+    settings?.default_country_code || '91', 
+    settings?.phone_number_length || 10
+  );
 
   const body = {
     messaging_product: 'whatsapp',
@@ -126,9 +134,10 @@ async function sendWhatsApp(payload: WhatsAppPayload): Promise<void> {
 
   if (!res.ok) {
     const errText = await res.text();
+    const errorMsg = `WhatsApp Cloud API error ${res.status} when sending to ${to}: ${errText}`;
     console.error(`[WhatsApp] API Failure (${res.status}):`, errText);
-    console.error(`[WhatsApp] Payload sent to ${phoneNumberId}:`, JSON.stringify(body));
-    throw new Error(`WhatsApp Cloud API error ${res.status}: ${errText}`);
+    console.error(`[WhatsApp] Payload sent:`, JSON.stringify(body));
+    throw new Error(errorMsg);
   }
 }
 

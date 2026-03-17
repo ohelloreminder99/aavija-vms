@@ -37,7 +37,35 @@ In your screenshot, **Confirm email** is currently **ON**.
 
 ---
 
-## Phase 3: Final Test
+## Phase 3: Vercel Environment Variables
+
+Based on your screenshot, these two essential keys are missing from your Vercel project. Without them, the WhatsApp API cannot be called.
+
+1.  Open your [Vercel Dashboard](https://vercel.com/dashboard).
+2.  Select your Project (**Aavija**).
+3.  Click on the **Settings** tab at the top.
+4.  Click on **Environment Variables** in the left sidebar.
+5.  **Add the First Variable**:
+    - **Key**: `WHATSAPP_PHONE_NUMBER_ID`
+    - **Value**: (Copy the ID from your Meta Developer Portal)
+    - Ensure **Production**, **Preview**, and **Development** are checked.
+    - Click **Save**.
+6.  **Add the Second Variable**:
+    - **Key**: `WHATSAPP_ACCESS_TOKEN`
+    - **Value**: (Copy your Permanent System User Token from Meta)
+    - Ensure **Production**, **Preview**, and **Development** are checked.
+    - Click **Save**.
+
+### ⚠️ IMPORTANT: RE-DEPLOY REQUIRED
+Vercel environment variables do **not** take effect immediately on a running site.
+1.  After adding the keys, go to the **Deployments** tab in Vercel.
+2.  Find your latest deployment (it should be at the top).
+3.  Click the three dots `...` and select **Redeploy**.
+4.  Once the new deployment is "Ready", the WhatsApp OTPs will start working.
+
+---
+
+## Phase 4: Final Verification
 
 1. Sign in with **Google** at `https://india.aavija.com/login`.
 2. Go to **Settings -> Security Settings (Change Password)**.

@@ -131,7 +131,9 @@ export default function ProfilePage() {
   const profileSchema = React.useMemo(() => {
     const phoneLength = settings?.phone_number_length;
     const phoneSchema = phoneLength
-      ? z.string().length(phoneLength, { message: `Phone number must be ${phoneLength} digits.` }).regex(/^[0-9]+$/, { message: 'Phone number must contain only digits.' })
+      ? z.string()
+        .regex(/^[1-9][0-9]*$/, { message: 'Phone number must contain only digits and cannot start with 0.' })
+        .length(phoneLength, { message: `Phone number must be exactly ${phoneLength} digits.` })
       : z.string().min(5, { message: 'Please enter a valid phone number.' }).regex(/^[0-9]+$/, { message: 'Phone number must contain only digits.' });
 
     return z.object({
@@ -452,7 +454,7 @@ export default function ProfilePage() {
                       <div className="space-y-4 pt-4">
                         {field.value && field.value.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
-                            {field.value.map((product) => (
+                            {field.value.map((product: string) => (
                               <Badge key={product} variant="secondary" className="pl-3 py-1.5 bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10 transition-colors">
                                 {product}
                                 <button type="button" onClick={() => handleRemoveProduct(product)} className="ml-2 rounded-full p-0.5 text-zinc-400 hover:text-red-500 transition-colors">
