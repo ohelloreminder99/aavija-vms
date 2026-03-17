@@ -77,10 +77,12 @@ async function sendWhatsApp(payload: WhatsAppPayload): Promise<void> {
   const { data: settings } = await supabase.from('settings').select('*').eq('id', 'global').single();
 
   const phoneNumberId = settings?.whatsapp_phone_number_id || process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN || process.env.WHATSAPP_API_TOKEN;
 
   if (!phoneNumberId || !accessToken) {
-    console.warn('[WhatsApp] WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_ACCESS_TOKEN not set — skipping notification.');
+    console.warn('[WhatsApp] Mission Configuration: WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_ACCESS_TOKEN is missing.');
+    console.log('[WhatsApp] Current Settings ID:', phoneNumberId || 'MISSING');
+    console.log('[WhatsApp] Current Token Status:', accessToken ? 'PRESENT (Masked)' : 'MISSING');
     return;
   }
 
@@ -124,6 +126,8 @@ async function sendWhatsApp(payload: WhatsAppPayload): Promise<void> {
 
   if (!res.ok) {
     const errText = await res.text();
+    console.error(`[WhatsApp] API Failure (${res.status}):`, errText);
+    console.error(`[WhatsApp] Payload sent to ${phoneNumberId}:`, JSON.stringify(body));
     throw new Error(`WhatsApp Cloud API error ${res.status}: ${errText}`);
   }
 }

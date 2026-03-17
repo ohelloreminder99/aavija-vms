@@ -11,7 +11,8 @@ const envSchema = z.object({
     RAZORPAY_KEY_SECRET: z.string().min(1),
 
     // WhatsApp
-    WHATSAPP_API_TOKEN: z.string().min(1).optional(),
+    WHATSAPP_ACCESS_TOKEN: z.string().min(1).optional(),
+    WHATSAPP_API_TOKEN: z.string().min(1).optional(), // Legacy fallback
     WHATSAPP_PHONE_NUMBER_ID: z.string().min(1).optional(),
 
     // Site
@@ -31,6 +32,7 @@ const parsed = envSchema.safeParse({
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     NEXT_PUBLIC_RAZORPAY_KEY_ID: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,
+    WHATSAPP_ACCESS_TOKEN: process.env.WHATSAPP_ACCESS_TOKEN || process.env.WHATSAPP_API_TOKEN,
     WHATSAPP_API_TOKEN: process.env.WHATSAPP_API_TOKEN,
     WHATSAPP_PHONE_NUMBER_ID: process.env.WHATSAPP_PHONE_NUMBER_ID,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
