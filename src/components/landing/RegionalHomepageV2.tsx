@@ -14,7 +14,20 @@ import {
     MessageSquareText,
     LayoutDashboard,
     ClipboardCheck,
-    Coins
+    Coins,
+    History,
+    Scan,
+    Users,
+    DoorOpen,
+    UserPlus,
+    ArrowLeftRight,
+    UserCog,
+    Camera,
+    Gift,
+    UserCheck,
+    CheckCircle,
+    UserMinus,
+    BarChart3
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -62,13 +75,23 @@ const pricingTiers = [
         price: "Pay as you use",
         description: "Zero monthly commitment. Everything unlimited. Only pay for what you actually use.",
         features: [
-            "Unlimited QR Generations",
-            "Unlimited Gatekeepers",
-            "Unlimited Resident Profiles",
-            "Everything Unlimited",
-            "WhatsApp Alerts Included",
-            "Advanced Analytics & Exports",
-            "Military-grade Security"
+            { text: "QR code Generation", type: "Free", icon: "QrCode" },
+            { text: "Visit History", type: "Free", icon: "History" },
+            { text: "Scanner", type: "Free", icon: "Scan" },
+            { text: "Create Unlimited Host", type: "Free", icon: "Users" },
+            { text: "Create Unlimited Gate", type: "Free", icon: "DoorOpen" },
+            { text: "Create Unlimited Gatekeeper", type: "Free", icon: "UserPlus" },
+            { text: "Transfer Premise Ownership", type: "Free", icon: "ArrowLeftRight" },
+            { text: "Update Profile", type: "Free", icon: "UserCog" },
+            { text: "Update Photo", type: "Free", icon: "Camera" },
+            { text: "Refer & Earn", type: "Free", icon: "Gift" },
+            { text: "Availibility / Status Change", type: "Free", icon: "UserCheck" },
+            { text: "Verified Meeting", type: "Free", icon: "CheckCircle" },
+            { text: "WhatsApp Notification", type: "Free", icon: "MessageSquareText" },
+            { text: "Block / Unblock Visitor", type: "Token", icon: "UserMinus" },
+            { text: "Mobile Verification", type: "Token", icon: "Smartphone" },
+            { text: "Advance Visit History", type: "Token", icon: "BarChart3" },
+            { text: "Star Rating", type: "Token", icon: "Star" }
         ],
         cta: "Start Your Free Setup",
         highlight: true
@@ -97,7 +120,9 @@ export function RegionalHomepageV2() {
     const dynamicFeatures = settings?.landing_features || defaultFeatures;
 
     const iconMap: Record<string, any> = {
-        QrCode, MessageSquareText, ShieldCheck, Coins, LayoutDashboard, ClipboardCheck
+        QrCode, MessageSquareText, ShieldCheck, Coins, LayoutDashboard, ClipboardCheck,
+        History, Scan, Users, DoorOpen, UserPlus, ArrowLeftRight, UserCog, Camera, Gift,
+        UserCheck, CheckCircle, UserMinus, BarChart3, Star, Smartphone
     };
 
     if (isLoading) {
@@ -163,9 +188,6 @@ export function RegionalHomepageV2() {
                                 <Link href="/signup" className="flex items-center gap-2 text-lg">
                                     {ctaPrimary} <ArrowRight className="w-5 h-5" />
                                 </Link>
-                            </Button>
-                            <Button size="lg" variant="outline" className="h-14 px-8 rounded-full border-white/10 hover:bg-white/5 bg-transparent" asChild>
-                                <Link href="/signup" className="text-lg">{ctaSecondary}</Link>
                             </Button>
                         </div>
                     </motion.div>
@@ -251,78 +273,72 @@ export function RegionalHomepageV2() {
                         </p>
                     </div>
 
-                    <div className="flex justify-center">
-                        <div className="grid grid-cols-1 md:grid-cols-1 max-w-md w-full gap-8">
-                        {pricingTiers.map((tier, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className={`relative p-8 rounded-3xl border transition-all duration-300 ${tier.highlight
-                                    ? 'border-emerald-500/50 bg-emerald-500/5 scale-105 shadow-[0_0_40px_rgba(16,185,129,0.1)]'
-                                    : 'border-white/5 bg-white/5 hover:border-white/10'
-                                    }`}
-                            >
-                                {tier.highlight && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-[10px] font-bold uppercase tracking-wider">
-                                        Most Popular
-                                    </div>
-                                )}
-                                <div className="mb-8">
-                                    <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-4xl font-bold tracking-tight">{tier.price}</span>
-                                        {/* @ts-ignore */}
-                                        {tier.period && <span className="text-gray-500 text-sm">{tier.period}</span>}
-                                    </div>
-                                    <p className="text-gray-500 text-sm mt-4 font-light">{tier.description}</p>
-                                </div>
-                                <ul className="space-y-4 mb-8">
-                                    {tier.features.map((f, j) => (
-                                        <li key={j} className="flex items-center gap-3 text-sm text-gray-400">
-                                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                                            {f}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Button
-                                    className={`w-full rounded-2xl h-12 font-bold ${tier.highlight
-                                        ? 'bg-primary hover:bg-primary/90 text-[#010a05]'
-                                        : 'bg-white/10 hover:bg-white/20 text-white'
-                                        }`}
+                    <div className="flex flex-col items-center gap-20">
+                        {/* Main Plan Card */}
+                        <div className="max-w-md w-full">
+                            {pricingTiers.map((tier, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.5 }}
+                                    className="relative p-10 rounded-[2.5rem] border border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_60px_rgba(16,185,129,0.1)] backdrop-blur-xl text-center"
                                 >
-                                    {tier.cta}
-                                </Button>
-                            </motion.div>
-                        ))}
-                    </div>
+                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1.5 rounded-full bg-emerald-500 text-[10px] font-bold uppercase tracking-[0.2em] whitespace-nowrap shadow-[0_0_20px_rgba(16,185,129,0.4)] text-[#010a05]">
+                                        The Gold Standard for All
+                                    </div>
+                                    
+                                    <h3 className="text-3xl font-black tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-400">
+                                        Pay as you Use
+                                    </h3>
+                                    <p className="text-gray-400 text-sm font-light mb-10 leading-relaxed">
+                                        {tier.description}
+                                    </p>
+                                    
+                                    <Button className="w-full rounded-2xl h-14 bg-primary hover:bg-primary/90 text-[#010a05] font-bold text-lg shadow-lg">
+                                        {tier.cta}
+                                    </Button>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {/* Feature Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full max-w-6xl mt-10">
+                            {pricingTiers[0].features.map((f: any, j: number) => (
+                                <motion.div
+                                    key={j}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: j * 0.05 }}
+                                    className="relative p-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md flex flex-col items-center justify-center text-center group hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all duration-500"
+                                >
+                                    {/* Badge Above the Box */}
+                                    <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-lg transition-transform duration-300 group-hover:-translate-y-1 ${
+                                        f.type === 'Free'
+                                            ? 'bg-emerald-500 border-emerald-400 text-[#010a05]'
+                                            : 'bg-amber-500 border-amber-400 text-[#010a05]'
+                                    }`}>
+                                        {f.type}
+                                    </div>
+
+                                    <div className={`mb-4 p-3 rounded-2xl transition-colors duration-300 ${
+                                        f.type === 'Free' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                                    }`}>
+                                        {React.createElement(iconMap[f.icon] || ShieldCheck, { className: "w-6 h-6" })}
+                                    </div>
+
+                                    <h4 className="text-xs md:text-sm font-medium text-gray-300 group-hover:text-white transition-colors leading-snug">
+                                        {f.text}
+                                    </h4>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </section>
 
-                {/* Call to Action */}
-                <section className="container max-w-5xl px-6 py-20">
-                    <div className="relative p-12 md:p-20 rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-600/20 to-teal-900/20 text-center overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 opacity-10">
-                            <Building2 className="w-48 h-48" />
-                        </div>
 
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to digitize your gate?</h2>
-                        <p className="text-gray-300 text-lg mb-10 max-w-xl mx-auto font-light">
-                            Join hundreds of premises that have upgraded to a smarter, safer way to manage access.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button size="lg" className="rounded-full px-10 h-14 bg-primary text-[#010a05] hover:bg-primary/90 font-bold text-lg" asChild>
-                                <Link href="/signup">Create Free Account</Link>
-                            </Button>
-                            <Button size="lg" variant="ghost" className="rounded-full px-10 h-14 text-white hover:bg-white/5 border border-white/10" asChild>
-                                <Link href="/contact">Contact Sales</Link>
-                            </Button>
-                        </div>
-                    </div>
-                </section>
             </main>
 
             <footer className="border-t border-white/5 py-12">
