@@ -18,6 +18,7 @@ import { DesktopSidebar, MobileSidebar } from '@/components/Sidebar';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { needsSetup, shouldBypassSetup } from '@/lib/user-setup-check';
 import { RoleGuard } from '@/components/auth/RoleGuard';
+import { SessionTimeoutWarning } from '@/components/shared/SessionTimeoutWarning';
 import * as React from 'react';
 
 function HeaderContent() {
@@ -255,6 +256,9 @@ export default function DashboardLayout({
                             </div>
                         </main>
                     </div>
+
+                    {/* Session expiry warning — shows a toast 5 min before JWT expires */}
+                    <SessionTimeoutWarning />
 
                     {/* Setup Gatekeeper */}
                     {NeedsSetup && (

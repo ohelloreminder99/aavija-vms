@@ -1,0 +1,78 @@
+name: CI — Tests & Checks
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: node node_modules/vitest/vitest.mjs run src/__tests__/unit.test.ts
+
+      - name: Type check
+        run: npm run typecheck
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  rebuild-sql-check:
+    name: Master SQL Integrity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check MASTER_DB_SETUP.sql exists
+        run: |
+          if [ ! -f database_sql_backups/MASTER_DB_SETUP.sql ]; then
+            echo "❌ MASTER_DB_SETUP.sql is missing!"
+            echo "Run: node scripts/rebuild-master-sql.js"
+            exit 1
+          fi
+          echo "✅ MASTER_DB_SETUP.sql exists"
+
+      - name: Count migrations not yet in master
+        run: |
+          MIGRATION_COUNT=$(ls supabase/migrations/*.sql 2>/dev/null | wc -l)
+          echo "✅ Found $MIGRATION_COUNT migration files in supabase/migrations/"

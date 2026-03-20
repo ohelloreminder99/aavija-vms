@@ -2,6 +2,7 @@
 'use client';
 
 import {
+  Activity,
   Megaphone,
   Users,
   Building,
@@ -154,6 +155,11 @@ export function AdminDashboard() {
       title: 'Service Config',
       href: '/dashboard/admin/service-settings',
       icon: Box,
+    },
+    {
+      title: 'System Health',
+      href: '/dashboard/admin/health',
+      icon: Activity,
     },
   ].sort((a, b) => a.title.localeCompare(b.title));
 

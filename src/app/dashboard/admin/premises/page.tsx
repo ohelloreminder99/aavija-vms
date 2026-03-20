@@ -264,7 +264,22 @@ export default function PremisesPage() {
         is_active: data.is_active,
       };
 
-      const res = await updatePremiseAdmin(selectedPremise.id, dataToUpdate);
+      // Pass the updated_at timestamp for optimistic locking
+      // If another admin edited this premise since you opened the dialog,
+      // the server will return conflict:true instead of silently overwriting.
+      const expectedUpdatedAt = (selectedPremise as any).updated_at ?? undefined;
+
+      const res = await updatePremiseAdmin(selectedPremise.id, dataToUpdate, expectedUpdatedAt);
+
+      if (res.conflict) {
+        toast({
+          variant: 'destructive',
+          title: '⚠️ Edit Conflict',
+          description: 'This premise was modified by someone else while you were editing. Please close and reopen the dialog to see the latest values.',
+        });
+        return;
+      }
+
       if (!res.success) throw new Error(res.error);
       toast({ title: 'Success', description: 'Premise has been updated.' });
       setIsEditOpen(false);
@@ -275,6 +290,7 @@ export default function PremisesPage() {
       setIsSubmitting(false);
     }
   };
+
 
   const handleDeleteConfirm = async () => {
     if (!selectedPremise || !selectedPremise.owner) return;

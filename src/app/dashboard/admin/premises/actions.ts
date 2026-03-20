@@ -11,6 +11,7 @@ import { PremiseCategory } from '@/services/premise-category-service';
 import { Premise } from '@/services/premise-service';
 import { createLogEntry } from '@/services/log-service';
 import { PREMISE_LIST_COLS, CATEGORY_COLS, paginationRange } from '@/types/database.types';
+import { sanitizeText } from '@/lib/sanitize';
 
 interface NewOwnerPremiseData {
   premiseName: string;
@@ -530,7 +531,12 @@ export async function updatePremiseAdmin(
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
   try {
     const updateData: any = { ...dataToUpdate };
-    
+
+    // Sanitize free-text fields to prevent stored XSS
+    if (typeof updateData.name === 'string')    updateData.name    = sanitizeText(updateData.name);
+    if (typeof updateData.address === 'string') updateData.address = sanitizeText(updateData.address);
+    if (typeof updateData.city === 'string')    updateData.city    = sanitizeText(updateData.city);
+
     // The premises table uses camelCase (agent_id, categoryId).
     // Normalize any camelCase agent field to the correct snake_case agent_id
     if ('agentId' in updateData) {
@@ -538,21 +544,24 @@ export async function updatePremiseAdmin(
       delete updateData.agentId;
     }
     // categoryId is the actual column name in DB — no remapping needed
-    // (do NOT remap to category_id)
 
-    // ── Optimistic Locking ─────────────────────────────────────────────────────
-    // If the caller provides the `updated_at` they last saw, we only update if the
-    // row hasn't been changed by someone else in the meantime.
+    // ── Optimistic Locking ────────────────────────────────────────────────────
+    // Check whether the row has been modified since the admin last loaded it.
+    // If updated_at doesn't match, return conflict instead of overwriting.
     if (expectedUpdatedAt) {
       const { data: current } = await adminDb
         .from('premises')
-        .select('created_at')
+        .select('updated_at')
         .eq('id', premiseId)
         .single();
 
-      // Note: premises table has `created_at` but not `updated_at` yet.
-      // We still do a stale-check on the edit form's prefetch timestamp.
-      // TODO: Add an `updated_at` column via migration for full optimistic locking.
+      if (current?.updated_at && current.updated_at !== expectedUpdatedAt) {
+        return {
+          success: false,
+          conflict: true,
+          error: 'This premise was recently modified by someone else. Please reload and try again.',
+        };
+      }
     }
 
     const { error: updateError } = await adminDb.from('premises').update(updateData).eq('id', premiseId);
@@ -561,7 +570,6 @@ export async function updatePremiseAdmin(
     return { success: true };
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error('Unknown update error');
-    // Capture update failures in Sentry for visibility
     const Sentry = await import('@sentry/nextjs');
     Sentry.captureException(err, { extra: { premiseId, dataToUpdate } });
     return { success: false, error: err.message };

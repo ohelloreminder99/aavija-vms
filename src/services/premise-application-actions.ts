@@ -14,6 +14,8 @@ import { checkRateLimit, contactRateLimit } from '@/lib/rate-limit';
 import { notifyAdminNewPremiseApplication, notifyAgentPremiseApproved, notifyOwnerPremiseApproved } from './whatsapp-service';
 import { LogAction } from './log-actions';
 import { createLogEntry } from './log-service';
+import { zSanitize, zSanitizeOptional } from '@/lib/sanitize';
+import { withTiming } from '@/lib/with-timing';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -41,14 +43,14 @@ export interface PremiseApplication {
 // ─── VALIDATION SCHEMA ────────────────────────────────────────────────────────
 
 const ApplicationSchema = z.object({
-  premise_name: z.string().min(2).max(120),
-  premise_address: z.string().min(5).max(300),
-  city_id: z.string().uuid(),
-  city_name: z.string().optional(),
-  city_state: z.string().optional(),
-  category_id: z.string().uuid().optional(),
-  category_name: z.string().optional(),
-  owner_email: z.string().email(),
+  premise_name:    z.string().min(2).max(120).transform(zSanitize),
+  premise_address: z.string().min(5).max(300).transform(zSanitize),
+  city_id:         z.string().uuid(),
+  city_name:       z.string().optional().transform(v => zSanitizeOptional(v)),
+  city_state:      z.string().optional().transform(v => zSanitizeOptional(v)),
+  category_id:     z.string().uuid().optional(),
+  category_name:   z.string().optional().transform(v => zSanitizeOptional(v)),
+  owner_email:     z.string().email(),
   // agent fields come from the authenticated session, not user input
 });
 
@@ -222,12 +224,21 @@ export async function approvePremiseApplication(
     // ─── ATOMIC OPERATION via Supabase RPC ────────────────────────────────────
     // The `approve_premise_application` SQL function runs as a single DB transaction.
     // If ANY step fails (create premise, update roles, mark approved), ALL changes roll back.
+    // Manual performance timing around the RPC for Sentry slow-query monitoring.
+    const _rpcStart = performance.now();
     const { data: rpcResult, error: rpcError } = await adminDb.rpc('approve_premise_application', {
       p_application_id: applicationId,
-      p_category_id: categoryId,
-      p_admin_id: profile.id,
-      p_admin_name: profile.name || 'Admin',
+      p_category_id:    categoryId,
+      p_admin_id:       profile.id,
+      p_admin_name:     profile.name || 'Admin',
     });
+    const _rpcMs = Math.round(performance.now() - _rpcStart);
+    if (_rpcMs > 3000) {
+      Sentry.captureMessage(`[SLOW] approve_premise_application_rpc took ${_rpcMs}ms`, {
+        level: 'warning',
+        extra: { duration_ms: _rpcMs, applicationId, categoryId },
+      });
+    }
 
     if (rpcError) {
       Sentry.captureException(rpcError, { extra: { applicationId, categoryId, adminId: profile.id } });

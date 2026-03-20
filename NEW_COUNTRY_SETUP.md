@@ -253,6 +253,39 @@ if (data.length === 0) return (
 
 ---
 
+## 🔐 Security Hardening (Phase 3B — applied to all deployments)
+
+### Input Sanitization
+All user-supplied text goes through HTML stripping to prevent stored XSS:
+
+```typescript
+// src/lib/sanitize.ts — import these in any Server Action
+import { zSanitize, zSanitizeOptional } from '@/lib/sanitize';
+
+// Apply to Zod text fields:
+const MySchema = z.object({
+  name:    z.string().transform(zSanitize),           // required
+  address: z.string().optional().transform(v => zSanitizeOptional(v)), // optional
+});
+```
+
+**Files with sanitization applied:**
+- `src/lib/sanitize.ts` — utility (source of truth)
+- `src/services/premise-application-actions.ts` — ApplicationSchema
+- `src/services/contact-actions.ts` — ContactSchema
+- `src/app/dashboard/admin/premises/actions.ts` — updatePremiseAdmin (name, address, city)
+
+> When adding a new Server Action that accepts user text, always import `zSanitize` and apply it to text fields.
+
+### Optimistic Locking (Premise Edits)
+Prevents two admins overwriting each other's changes:
+
+- DB: `premises.updated_at` column + auto-update trigger (in `MASTER_DB_SETUP.sql`)
+- Server: `updatePremiseAdmin()` accepts `expectedUpdatedAt` and returns `{ conflict: true }` if stale
+- UI: `handleEditSubmit` passes `selectedPremise.updated_at` → shows conflict toast if mismatched
+
+
+
 ## ⚠️ Common Mistakes to Avoid
 
 | Mistake | Fix |
@@ -262,3 +295,166 @@ if (data.length === 0) return (
 | Forgetting to run `MASTER_DB_SETUP.sql` | Only running partial old SQL files |
 | Exposing `SUPABASE_SERVICE_ROLE_KEY` client-side | It must be server-only (no `NEXT_PUBLIC_` prefix) |
 | Skipping pg_cron extension | Logs and tokens won't auto-expire |
+
+---
+
+## 📊 Observability (Phase 3C — applied to all deployments)
+
+### Admin Health Dashboard
+Live system overview available for all admins at:
+```
+/dashboard/admin/health
+```
+Shows: active check-ins (with live pulse), visits today, pending applications, platform totals, 24h log count, and service status indicators. **Auto-refreshes every 60 seconds.**
+
+### Performance Timing
+Critical server actions are instrumented using `src/lib/with-timing.ts`:
+```typescript
+import { withTiming } from '@/lib/with-timing';
+
+const result = await withTiming('my_action_name', async () => {
+  return await db.from('table').select('...');
+}, { slowThresholdMs: 2000, context: { userId } });
+```
+Any action exceeding `slowThresholdMs` automatically sends a Sentry warning with duration and context.
+
+**Currently instrumented:**
+- `approve_premise_application` RPC (inline, 3000ms threshold)
+- `getHealthMetrics` (all 10 COUNT queries, 3000ms threshold)
+
+### Sentry Alerting
+Configure in your Sentry project (sentry.io → Alerts):
+- Alert when `[SLOW]` messages appear (slow DB queries)
+- Alert when `approve_premise_application` exception rate > 0
+- Alert when any `captureException` occurs from `premise-application-actions`
+
+---
+
+## 🧪 Testing (Phase 3D)
+
+Run the unit test suite (no DB or network required):
+```bash
+# Using node directly (works on Windows with restricted PowerShell)
+node node_modules/vitest/vitest.mjs run
+
+# Or if npm scripts work:
+npm test
+```
+
+**Test file:** `src/__tests__/unit.test.ts`
+
+| Test Group | What's tested |
+|---|---|
+| `sanitizeText` | XSS tag stripping, entity removal, whitespace trim |
+| `sanitizeOptional` | null/undefined/empty handling |
+| `zSanitize / zSanitizeOptional` | Zod transform wrappers |
+| `withTiming` | Return value, error propagation, context |
+| Optimistic locking | Conflict detection logic (pure, no DB) |
+| `paginationRange` | Page 0/1/2 range calculations |
+
+> When adding new server utilities, add corresponding tests to `unit.test.ts`.
+
+---
+
+## ⚙️ Automations (Phase 4 — apply to every deployment)
+
+### 1. Rebuild Master SQL After Every Migration
+
+**When:** After adding any new file to `supabase/migrations/`
+
+```bash
+node scripts/rebuild-master-sql.js
+```
+
+This reads all migration files in `supabase/migrations/` (chronological order), prepends the base `CONSOLIDATED_FINAL_SETUP.sql`, writes a fresh `database_sql_backups/MASTER_DB_SETUP.sql`, and prints a summary. **Always run this before deploying to a new country.**
+
+> ✅ Already ran: 21 migrations included, 78 KB
+
+---
+
+### 2. GitHub Actions CI (Auto-runs on every push)
+
+**File:** `.github/workflows/ci.yml`
+
+Three jobs run automatically on every push/PR to `main`, `master`, or `develop`:
+
+| Job | What it checks |
+|---|---|
+| `test` | Vitest unit tests + `tsc --noEmit` typecheck |
+| `lint` | ESLint |
+| `rebuild-sql-check` | Verifies `MASTER_DB_SETUP.sql` exists |
+
+**Step-by-step to enable:**
+1. Push your code to GitHub (if not already)
+2. Go to your repo → **Actions** tab
+3. The CI workflow will appear automatically — GitHub reads `.github/workflows/ci.yml`
+4. On your next push, tests run. You'll see ✅ or ❌ on every pull request
+
+**Add a badge to your README:**
+```markdown
+![CI](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/ci.yml/badge.svg)
+```
+
+---
+
+### 3. Session Timeout Warning (Already Wired)
+
+**File:** `src/components/shared/SessionTimeoutWarning.tsx`
+
+Mounted in `src/app/dashboard/layout.tsx` — active for **all authenticated users**.
+
+- Checks JWT expiry every **60 seconds**
+- Shows a toast **5 minutes before** the session expires: *"⏱️ Session expiring in X min"*
+- No config needed — works automatically
+
+---
+
+### 4. CSV Export (Use Anywhere)
+
+**File:** `src/lib/export-csv.ts`
+
+One-liner to add a download button on any admin list page:
+
+```typescript
+import { exportToCsv, filenameWithDate } from '@/lib/export-csv';
+
+// Export all columns
+exportToCsv(visits, filenameWithDate('visits'));
+
+// Export specific columns only
+exportToCsv(users, filenameWithDate('users'), ['name', 'email', 'role', 'created_at']);
+```
+
+**To add to any table page:**
+```tsx
+<Button variant="ghost" onClick={() => exportToCsv(data, filenameWithDate('my-data'))}>
+  <Download className="h-4 w-4 mr-2" />
+  Export CSV
+</Button>
+```
+
+> `papaparse` is already installed — no new dependencies needed.
+
+---
+
+### 5. DB Backup Verification (Run after setup)
+
+After creating a new Supabase project, confirm WAL/PITR is enabled (requires Pro plan):
+
+```sql
+-- In SQL Editor — should return "replica" or "logical" on paid plans
+SELECT name, setting FROM pg_settings WHERE name = 'wal_level';
+```
+
+And confirm pg_cron jobs are running:
+```sql
+-- Check last 5 cron job runs
+SELECT jobname, start_time, end_time, status
+FROM cron.job_run_details
+ORDER BY start_time DESC
+LIMIT 5;
+```
+
+> ⚠️ If `cron.job_run_details` returns empty, your cleanup jobs haven't run yet — wait 24h after setup or trigger them manually.
+
+

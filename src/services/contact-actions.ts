@@ -4,11 +4,12 @@ import { getAdminDb } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { checkRateLimit, contactRateLimit } from '@/lib/rate-limit'; 
 import { headers } from 'next/headers';
+import { zSanitize } from '@/lib/sanitize';
  
 const ContactSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email(),
-  message: z.string().min(10).max(2000),
+  name:    z.string().min(2).max(100).transform(zSanitize),
+  email:   z.string().email(),
+  message: z.string().min(10).max(2000).transform(zSanitize),
 });
  
 /**
