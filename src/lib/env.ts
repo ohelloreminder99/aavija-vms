@@ -23,6 +23,9 @@ const envSchema = z.object({
 
     // Sentry
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+
+    // Admin
+    ADMIN_EMAIL: z.string().email().optional(),
 });
 
 // Use safeParse to prevent crashing the entire app if some variables are missing in production.
@@ -38,6 +41,7 @@ const parsed = envSchema.safeParse({
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL, // Support migration
 });
 
 if (!parsed.success) {
@@ -56,6 +60,7 @@ export const env = parsed.success ? parsed.data : {
     RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || "",
     NODE_ENV: (process.env.NODE_ENV as any) || 'development',
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
 } as Env;
 
 export type Env = z.infer<typeof envSchema>;

@@ -11,27 +11,45 @@ type AgentLookupResult = { id: string; name: string; photo_url: string; is_agent
 
 interface AgentEmailLookupProps {
     value: string;
+    initialEmail?: string;
+    initialName?: string;
     onChange: (agentId: string) => void;
 }
 
-export function AgentEmailLookup({ value, onChange }: AgentEmailLookupProps) {
-    const [email, setEmail] = React.useState('');
-    const [lookupResult, setLookupResult] = React.useState<AgentLookupResult>(null);
+export function AgentEmailLookup({ value, initialEmail, initialName, onChange }: AgentEmailLookupProps) {
+    const [email, setEmail] = React.useState(initialEmail || '');
+    const [lookupResult, setLookupResult] = React.useState<AgentLookupResult>(
+        initialName ? { id: value, name: initialName, photo_url: '', is_agent: true } : null
+    );
     const [isLooking, setIsLooking] = React.useState(false);
     const [lookupError, setLookupError] = React.useState<string | null>(null);
 
-    const handleVerify = async () => {
-        if (!email.trim()) return;
+    // Auto-lookup if value is provided and initialEmail is provided
+    React.useEffect(() => {
+        if (value && initialEmail && !lookupResult && !isLooking) {
+            handleVerify(initialEmail);
+        }
+    }, [value, initialEmail, lookupResult, isLooking]);
+
+    const handleVerify = async (emailToVerify?: string) => {
+        const targetEmail = (typeof emailToVerify === 'string' ? emailToVerify : '') || email || '';
+        if (!targetEmail || typeof targetEmail !== 'string' || !targetEmail.trim()) return;
+        
+        const finalEmail = targetEmail.trim();
+
         setIsLooking(true);
         setLookupError(null);
         setLookupResult(null);
-        const result = await lookupUserByEmail(email);
+        const result = await lookupUserByEmail(finalEmail);
         if (result.success && result.user) {
             setLookupResult(result.user);
+            setEmail(finalEmail); // Sync internal email state
             onChange(result.user.id);
         } else {
-            setLookupError(result.error || 'User not found.');
-            onChange('');
+            if (typeof emailToVerify !== 'string') { // Only show error if manual ping
+                setLookupError(result.error || 'User not found.');
+                onChange('');
+            }
         }
         setIsLooking(false);
     };
@@ -55,7 +73,7 @@ export function AgentEmailLookup({ value, onChange }: AgentEmailLookupProps) {
                 <Button
                     type="button"
                     variant="outline"
-                    onClick={handleVerify}
+                    onClick={() => handleVerify()}
                     disabled={isLooking || !email}
                     className="h-11 border-white/5 hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6"
                 >

@@ -101,10 +101,14 @@ export async function processScannedToken(
       throw new Error('Expired QR code. Please ask the visitor to generate a new one.');
     }
 
-    const { data: visitorData, error: userError } = await adminDb.from('users').select('*').eq('id', userId).single();
+    const { data: visitorData, error: userError } = await adminDb.from('users')
+      .select('id, name, email, phone, role, is_verified, is_active, global_rating, token_balance_visitor, active_checkin_id, photo_url, city, vehicles, selected_vehicle_number, products, companyName')
+      .eq('id', userId).single();
     if (userError || !visitorData) throw new Error('Visitor profile not found for the user associated with this QR code.');
 
-    const { data: premiseData, error: premiseError } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
+    const { data: premiseData, error: premiseError } = await adminDb.from('premises')
+      .select('id, name, address, city, cityId, is_active, owner_id, agent_id, categoryId, token_balance, require_host_verification, staff')
+      .eq('id', premiseId).single();
     if (premiseError || !premiseData) throw new Error('The premise you are scanning for could not be found.');
 
     const { data: blockedDoc } = await adminDb.from('blocked_visitors').select('id').eq('premise_id', premiseId).eq('visitor_id', userId).single();
@@ -112,7 +116,9 @@ export async function processScannedToken(
       throw new Error("This visitor is blocked from entering this premise.");
     }
 
-    const { data: categoryData } = await adminDb.from('premise_categories').select('*').eq('id', premiseData.categoryId).single();
+    const { data: categoryData } = await adminDb.from('premise_categories')
+      .select('id, name, type, deduction_rate_visitor, deduction_rate_premise')
+      .eq('id', premiseData.categoryId).single();
     let requiredTokensPremiseSide = 0;
     let requiredTokensVisitorSide = 0;
     let categoryType = 'industrial';

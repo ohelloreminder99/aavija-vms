@@ -377,7 +377,12 @@ export function PremiseDialogs({
                                     <FormField control={editForm.control} name="agentId" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Sales Agent</FormLabel>
-                                            <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
+                                            <AgentEmailLookup 
+                                                value={field.value || ''} 
+                                                initialEmail={selectedPremise?.agent?.email}
+                                                initialName={selectedPremise?.agent?.name}
+                                                onChange={field.onChange} 
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )} />

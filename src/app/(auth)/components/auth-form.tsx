@@ -118,99 +118,20 @@ export function AuthForm({ mode }: AuthFormProps) {
         const user = authData.user;
         if (!user) throw new Error("No user returned from signup");
 
-        const isAdmin = process.env.NEXT_PUBLIC_ADMIN_EMAIL && data.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
-        // Use Supabase directly to create profiles instead of firestore
-        if (isAdmin) {
-
-          await supabase.from('users').insert({
-            id: user.id,
-            name: data.name || 'Admin',
-            email: data.email,
-            role: 'admin',
-            is_verified: false,
-            token_balance_visitor: 0,
-            global_rating: 0,
-            photo_url: '',
+        // Use server-side action to create profile and assign role securely
+        const { handleSignupProfile } = await import('@/app/auth/actions');
+        const profileResult = await handleSignupProfile(user.id, data.email, data.name || '', refCode);
+        
+        if (!profileResult.success) {
+          console.error('[AuthForm] Profile creation error:', profileResult.error);
+        } else if (profileResult.welcomeTokens && profileResult.welcomeTokens > 0) {
+          toast({
+            title: `🎁 Welcome Gift!`,
+            description: `${profileResult.welcomeTokens} bonus tokens added because you joined via a referral.`,
           });
-
-          await supabase.from('logs').insert({
-            actorId: user.id,
-            actorName: data.name || 'Admin',
-            actorRole: 'admin',
-            action: LogAction.USER_SIGNUP,
-            description: `New admin user "${data.name || 'Admin'}" (${data.email}) signed up.`
-          });
-        } else {
-          const userName = data.name || 'Unnamed User';
-
-          let startingTokens = 0;
-          const { data: settingsData } = await supabase.from('settings').select('*').eq('id', 'global').single();
-          if (settingsData) {
-            startingTokens = settingsData.starting_token_visitor || 0;
-          }
-
-          await supabase.from('users').insert({
-            id: user.id,
-            name: userName,
-            email: data.email,
-            role: 'visitor',
-            is_verified: false,
-            token_balance_visitor: startingTokens,
-            global_rating: 0,
-            photo_url: '',
-          });
-
-          await supabase.from('logs').insert({
-            actorId: user.id,
-            actorName: userName,
-            actorRole: 'visitor',
-            action: LogAction.USER_SIGNUP,
-            description: `New user "${userName}" (${data.email}) signed up as a visitor.`
-          });
-
-          if (startingTokens > 0) {
-            await supabase.from('logs').insert({
-              actorId: user.id,
-              actorName: userName,
-              actorRole: 'visitor',
-              action: LogAction.INITIAL_TOKEN_ALLOCATION,
-              description: `Welcome Bonus: Received ${startingTokens} tokens on signup.`,
-              tokenChange: startingTokens,
-            });
-          }
-
-          // Apply referral code if ?ref= was in the signup URL (non-fatal)
-          if (refCode) {
-            try {
-              const refResult = await applyReferralCode(refCode, user.id);
-              if (refResult.success && refResult.welcomeTokens && refResult.welcomeTokens > 0) {
-                toast({
-                  title: `🎁 Welcome Gift!`,
-                  description: `${refResult.welcomeTokens} bonus tokens added because you joined via a referral.`,
-                });
-                // Log the referral welcome token credit
-                void supabase.from('logs').insert({
-                  actorId: user.id,
-                  actorName: userName,
-                  actorRole: 'visitor',
-                  action: LogAction.REFERRAL_WELCOME_TOKENS,
-                  description: `${userName} received ${refResult.welcomeTokens} bonus tokens for signing up via referral code "${refCode}".`,
-                  tokenChange: refResult.welcomeTokens,
-                });
-              }
-            } catch (refErr) {
-              console.error('[Referral] Apply code failed at signup (non-fatal):', refErr);
-            }
-          }
-
-          // Generate referral code for new user so they can share immediately (non-fatal)
-          try {
-            await ensureReferralCode();
-          } catch (codeErr) {
-            console.error('[Referral] Code generation failed (non-fatal):', codeErr);
-          }
         }
+
+        const userName = data.name || 'Unnamed User';
 
 
         toast({

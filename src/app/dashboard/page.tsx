@@ -5,9 +5,12 @@ import { useUser, useFirestore, useDoc } from '@/supabase';
 import { useUserProfile, updateUserProfile } from '@/services/user-service';
 import { usePremises } from '@/services/premise-service';
 import { useSettings } from '@/services/settings-service';
-import { Loader2, Building, User, Briefcase, KeyRound, UserCog, ShieldCheck, LockKeyhole, UserX, Wallet } from 'lucide-react';
+import { Loader2, Building, User, Briefcase, KeyRound, UserCog, ShieldCheck, LockKeyhole, UserX, Wallet, LogOut, Share2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { clearSettingsCache } from '@/services/settings-service';
 import { AavijaLogo } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
@@ -74,6 +77,14 @@ export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { data: premises, isLoading: arePremisesLoading } = usePremises();
+  const router = useRouter();
+
+  const handleSignOut = React.useCallback(async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    clearSettingsCache();
+    router.push('/');
+  }, [router]);
 
   const isAdmin = userProfile?.role === 'admin';
   const isLoading = isUserLoading || isProfileLoading || arePremisesLoading;
@@ -130,17 +141,43 @@ export default function DashboardPage() {
       <div className="container max-w-2xl px-0">
         <div className="mx-auto flex w-full flex-col justify-center space-y-12">
           <div className="flex flex-col items-center space-y-6 text-center">
-            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary backdrop-blur-md shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-              <span className="relative flex h-2 w-2 mr-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              SECURE SESSION ACTIVE
+            <div className="flex flex-col items-center gap-4">
+              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary backdrop-blur-md shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                <span className="relative flex h-2 w-2 mr-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                SECURE SESSION ACTIVE
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleSignOut}
+                className="text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Checkout & End Session
+              </Button>
             </div>
             <div className="space-y-2">
               <h1 className="text-4xl font-headline font-bold tracking-tight text-white sm:text-5xl">Select Your Role</h1>
               <p className="text-lg text-zinc-400 max-w-sm mx-auto">Choose how you want to continue.</p>
             </div>
+
+            <Link href="/dashboard/visitor/refer" className="w-full">
+              <Card className="relative overflow-hidden group transition-all duration-500 glass-card bg-primary/5 border-primary/20 hover:border-primary/50 hover:scale-[1.01] liquid-neon-border">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent" />
+                <CardHeader className="flex flex-row items-center gap-4 p-4 relative z-10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                    <Share2 className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg font-headline text-white group-hover:text-glow">Share & Earn</CardTitle>
+                    <CardDescription className="text-zinc-400">Invite friends and earn rewards</CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
           </div>
 
           <div className="grid gap-5">

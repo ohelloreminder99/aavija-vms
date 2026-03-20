@@ -17,6 +17,10 @@
 
 import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+const UserIdSchema = z.string().uuid();
+const UpdateUserSchema = z.record(z.any());
 
 /**
  * Grants admin role to a user.
@@ -25,6 +29,9 @@ import { revalidatePath } from 'next/cache';
  */
 export async function grantAdminRole(targetUserId: string): Promise<{ success: boolean; error?: string }> {
     try {
+        // Validation
+        UserIdSchema.parse(targetUserId);
+
         // Verify the caller is already an admin
         const { profile: callerProfile } = await requireAuth();
         if (callerProfile.role !== 'admin') {
@@ -56,6 +63,9 @@ export async function grantAdminRole(targetUserId: string): Promise<{ success: b
  */
 export async function revokeAdminRole(targetUserId: string): Promise<{ success: boolean; error?: string }> {
     try {
+        // Validation
+        UserIdSchema.parse(targetUserId);
+
         const { user: callerUser, profile: callerProfile } = await requireAuth();
         if (callerProfile.role !== 'admin') {
             throw new Error('Unauthorized: Only admins can revoke admin roles.');
@@ -93,6 +103,10 @@ export async function adminUpdateUser(
     data: Record<string, any>
 ): Promise<{ success: boolean; error?: string }> {
     try {
+        // Validation
+        UserIdSchema.parse(targetUserId);
+        UpdateUserSchema.parse(data);
+
         const { profile: callerProfile } = await requireAuth();
         if (callerProfile.role !== 'admin') {
             throw new Error('Unauthorized: Only admins can perform this operation.');

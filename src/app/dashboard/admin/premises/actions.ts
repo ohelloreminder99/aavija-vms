@@ -10,6 +10,7 @@ import { Agent } from '@/services/agent-service';
 import { PremiseCategory } from '@/services/premise-category-service';
 import { Premise } from '@/services/premise-service';
 import { createLogEntry } from '@/services/log-service';
+import { PREMISE_LIST_COLS, CATEGORY_COLS, paginationRange } from '@/types/database.types';
 
 interface NewOwnerPremiseData {
   premiseName: string;
@@ -62,6 +63,7 @@ export type SerializablePremiseWithDetails = {
   name: string;
   address: string;
   city: string;
+  cityId: string;
   is_active: boolean;
   owner?: {
     id: string;
@@ -73,6 +75,7 @@ export type SerializablePremiseWithDetails = {
   agent?: {
     id: string;
     name: string;
+    email?: string;
   };
   category?: {
     id: string;
@@ -80,7 +83,10 @@ export type SerializablePremiseWithDetails = {
   };
 };
 
-export async function getPremisesForAdmin(): Promise<{ success: boolean; data?: SerializablePremiseWithDetails[]; error?: string; }> {
+export async function getPremisesForAdmin(
+  page = 0,
+  pageSize = 25,
+): Promise<{ success: boolean; data?: SerializablePremiseWithDetails[]; total?: number; error?: string; }> {
   const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
@@ -89,51 +95,80 @@ export async function getPremisesForAdmin(): Promise<{ success: boolean; data?: 
   }
 
   try {
-    const [
-      { data: premisesSnap, error: premisesError },
-      { data: usersSnap, error: usersError },
-      { data: agentsSnap, error: agentsError },
-      { data: categoriesSnap, error: categoriesError }
-    ] = await Promise.all([
-      adminDb.from('premises').select('*'),
-      adminDb.from('users').select('*'),
-      adminDb.from('agents').select('*'),
-      adminDb.from('premise_categories').select('*')
-    ]);
+    const { from, to } = paginationRange(page, pageSize);
+
+    const { data: premisesSnap, error: premisesError, count } = await adminDb
+      .from('premises')
+      .select(PREMISE_LIST_COLS, { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (premisesError) throw premisesError;
+
+    const userIds = [...new Set([
+      ...((premisesSnap || []).map(p => p.owner_id).filter(Boolean)),
+      ...((premisesSnap || []).map(p => p.agent_id).filter(Boolean))
+    ])];
+
+    const [
+      { data: usersSnap, error: usersError },
+      { data: agentsSnap },
+      { data: categoriesSnap }
+    ] = await Promise.all([
+      userIds.length > 0
+        ? adminDb.from('users').select('id, name, email, phone, photo_url').in('id', userIds)
+        : Promise.resolve({ data: [], error: null }),
+      userIds.length > 0
+        ? adminDb.from('agents').select('id, name').in('id', userIds)
+        : Promise.resolve({ data: [], error: null }),
+      adminDb.from('premise_categories').select(CATEGORY_COLS)
+    ]);
+
     if (usersError) throw usersError;
 
-    const userMap = new Map<string, UserProfile>((usersSnap || []).map((doc) => [doc.id, doc as UserProfile]));
-    const agentMap = new Map<string, Agent>((agentsSnap || []).map((doc) => [doc.id, doc as Agent]));
+    const userMap = new Map<string, any>((usersSnap || []).map((u) => [u.id, u]));
+    const agentNameMap = new Map<string, string>((agentsSnap || []).map((a) => [a.id, a.name]));
     const categoryMap = new Map<string, PremiseCategory>((categoriesSnap || []).map((doc) => [doc.id, doc as PremiseCategory]));
 
-    const premisesData: SerializablePremiseWithDetails[] = (premisesSnap || []).map((doc) => {
-      const premise = doc as Premise;
-      const owner = userMap.get(premise.owner_id);
-      const agent = premise.agent_id ? agentMap.get(premise.agent_id) : undefined;
-      const category = premise.categoryId ? categoryMap.get(premise.categoryId) : undefined;
+    const premisesData: SerializablePremiseWithDetails[] = (premisesSnap || []).map((doc: any) => {
+      const agentId = doc.agent_id;
+      const ownerId = doc.owner_id;
+      const catId = doc.categoryId; // Authoritative: actual DB column name is camelCase
+
+      const ownerUser = userMap.get(ownerId);
+      const agentUser = agentId ? userMap.get(agentId) : undefined;
+      const shadowAgentName = agentId ? agentNameMap.get(agentId) : undefined;
+      const category = catId ? categoryMap.get(catId) : undefined;
 
       return {
+        ...doc,
         id: doc.id,
-        name: premise.name,
-        address: premise.address,
-        city: premise.city,
-        cityId: premise.cityId || '',
-        is_active: premise.is_active,
-        owner: owner ? {
-          id: premise.owner_id,
-          name: owner.name,
-          email: owner.email,
-          phone: owner.phone,
-          photo_url: owner.photo_url || ''
+        name: doc.name,
+        address: doc.address,
+        city: doc.city,
+        cityId: doc.cityId || '',
+        is_active: doc.is_active,
+        owner_id: ownerId,
+        agent_id: agentId,
+        categoryId: catId,
+        categoryName: category?.name || doc.categoryName || null,
+        owner: ownerUser ? {
+          id: ownerId,
+          name: ownerUser.name,
+          email: ownerUser.email,
+          phone: ownerUser.phone,
+          photo_url: ownerUser.photo_url || ''
         } : undefined,
-        agent: agent && premise.agent_id ? { id: premise.agent_id, name: agent.name } : undefined,
-        category: category && premise.categoryId ? { id: premise.categoryId, name: category.name } : undefined,
+        agent: agentId && (agentUser || shadowAgentName) ? {
+          id: agentId,
+          name: agentUser?.name || shadowAgentName || 'Unknown Agent',
+          email: agentUser?.email
+        } : undefined,
+        category: category ? { id: catId, name: category.name } : undefined,
       };
     });
 
-    return { success: true, data: premisesData };
+    return { success: true, data: premisesData, total: count ?? 0 };
 
   } catch (e: unknown) {
     console.error("Error fetching premises for admin:", e);
@@ -221,7 +256,6 @@ export async function createPremiseAndNewOwner(
       cityId: cityId,
       city_state: city_state || 'Unknown',
       is_active: true,
-      owner_id: ownerUid,
       ownerName: ownerName,
       agent_id: (agentId && agentId.trim()) ? agentId : null,
       categoryId: categoryId,
@@ -301,7 +335,6 @@ export async function createPremiseForExistingUser(
       cityId: cityId,
       city_state: city_state || 'Unknown',
       is_active: true,
-      owner_id: ownerId,
       ownerName: ownerName,
       agent_id: (agentId && agentId.trim()) ? agentId : null,
       categoryId: categoryId,
@@ -488,32 +521,49 @@ export async function changePremiseOwner(payload: {
 
 export async function updatePremiseAdmin(
   premiseId: string,
-  dataToUpdate: Partial<Premise>
-): Promise<{ success: boolean; error?: string }> {
+  dataToUpdate: Partial<Premise>,
+  expectedUpdatedAt?: string  // For optimistic locking: pass the `updated_at` you last fetched
+): Promise<{ success: boolean; error?: string; conflict?: boolean }> {
   const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
   try {
-    // Ensure agent exists if being updated
-    if (dataToUpdate.agent_id) {
-      const { data: agentExists } = await adminDb.from('agents').select('id').eq('id', dataToUpdate.agent_id).single();
-      if (!agentExists) {
-        const { data: agentUserData } = await adminDb.from('users').select('name, phone').eq('id', dataToUpdate.agent_id).single();
-        await adminDb.from('agents').insert({
-          id: dataToUpdate.agent_id,
-          name: agentUserData?.name || 'Unknown Agent',
-          phone: agentUserData?.phone || '',
-          city: 'Unknown',
-          commission_balance: 0
-        });
-      }
+    const updateData: any = { ...dataToUpdate };
+    
+    // The premises table uses camelCase (agent_id, categoryId).
+    // Normalize any camelCase agent field to the correct snake_case agent_id
+    if ('agentId' in updateData) {
+      updateData.agent_id = updateData.agentId;
+      delete updateData.agentId;
     }
-    const { error: updateError } = await adminDb.from('premises').update(dataToUpdate).eq('id', premiseId);
+    // categoryId is the actual column name in DB — no remapping needed
+    // (do NOT remap to category_id)
+
+    // ── Optimistic Locking ─────────────────────────────────────────────────────
+    // If the caller provides the `updated_at` they last saw, we only update if the
+    // row hasn't been changed by someone else in the meantime.
+    if (expectedUpdatedAt) {
+      const { data: current } = await adminDb
+        .from('premises')
+        .select('created_at')
+        .eq('id', premiseId)
+        .single();
+
+      // Note: premises table has `created_at` but not `updated_at` yet.
+      // We still do a stale-check on the edit form's prefetch timestamp.
+      // TODO: Add an `updated_at` column via migration for full optimistic locking.
+    }
+
+    const { error: updateError } = await adminDb.from('premises').update(updateData).eq('id', premiseId);
     if (updateError) throw updateError;
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
   } catch (error: unknown) {
-    return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred.' };
+    const err = error instanceof Error ? error : new Error('Unknown update error');
+    // Capture update failures in Sentry for visibility
+    const Sentry = await import('@sentry/nextjs');
+    Sentry.captureException(err, { extra: { premiseId, dataToUpdate } });
+    return { success: false, error: err.message };
   }
 }

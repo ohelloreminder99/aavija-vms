@@ -32,8 +32,11 @@ export async function createPremiseCategoryAction(data: PremiseCategory, actor: 
     throw new Error('Admin database is not available.');
   }
 
-  const { error } = await adminDb.from('premise_categories').insert({ ...data, type: 'standard' });
-  if (error) throw error;
+  const { error } = await adminDb.from('premise_categories').insert(data);
+  if (error) {
+    console.error('Error creating premise category:', error);
+    throw new Error(error.message || 'Failed to create premise category.');
+  }
 
   await createLogEntry({
     actorId: actor.id,
@@ -57,7 +60,10 @@ export async function updatePremiseCategoryAction(id: string, data: Partial<Prem
   }
 
   const { error } = await adminDb.from('premise_categories').update(data).eq('id', id);
-  if (error) throw error;
+  if (error) {
+    console.error('Error updating premise category:', error);
+    throw new Error(error.message || 'Failed to update premise category.');
+  }
 
   await createLogEntry({
     actorId: actor.id,

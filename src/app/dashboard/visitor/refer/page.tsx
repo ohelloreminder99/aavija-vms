@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Loader2, Share2, Copy, CheckCheck, Users, TrendingUp, Coins } from 'lucide-react';
+import { Loader2, Share2, Copy, CheckCheck, Users, TrendingUp, Coins, Building, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { getMyReferralStats, type ReferralStats, type ReferralEvent } from '@/se
 import { useSettings } from '@/services/settings-service';
 import { useUser } from '@/supabase';
 import { Separator } from '@/components/ui/separator';
+import Link from 'next/link';
 
 export default function ReferPage() {
     const { user } = useUser();
@@ -160,6 +161,33 @@ export default function ReferPage() {
                     Ready to withdraw? Go to <a href="/dashboard/visitor/earnings" className="underline text-primary">My Earnings</a> to request a payout.
                 </p>
             )}
+
+            {/* Apply for Premise - Expansion Opportunity */}
+            <Card className="glass-card border-primary/20 bg-primary/5 hover:border-primary/40 transition-all duration-300 group overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
+                <CardHeader className="pb-2 relative z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/20 border border-primary/30">
+                            <Building className="h-5 w-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-xl font-headline text-white group-hover:text-glow transition-all duration-300">Expand the Ecosystem</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4 relative z-10">
+                    <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] leading-relaxed text-emerald-400 font-bold uppercase tracking-wider mb-2">
+                        💡 Important: Before applying, share your unique referral link (above) with the Property Owner. They must create an account first so you can find their email during application.
+                    </div>
+                    <p className="text-sm text-zinc-400">
+                        Know a property that needs a better visitor management system? <strong>Apply to become their managing agent</strong> and earn continuous rewards once they are approved.
+                    </p>
+                    <Button asChild className="w-full h-11 group/btn" variant="outline">
+                        <Link href="/dashboard/visitor/apply">
+                            Apply for New Premise
+                            <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
 
             {/* Commission history */}
             {stats && stats.referrals.length > 0 && (

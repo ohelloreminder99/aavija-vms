@@ -7,7 +7,9 @@
  */
 
 import * as React from 'react';
-import { ArrowLeft, Loader2, Plus, Edit, Trash2, Search, Users, CheckCircle2, UserCircle2, Building, Shield } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Search, Users, CheckCircle2, UserCircle2, Building, Shield, AlertTriangle } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { SkeletonTableRows } from '@/components/shared/SkeletonLoaders';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -26,6 +28,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { createPremiseAndNewOwner, createPremiseForExistingUser, deletePremise, changePremiseOwner, getPremisesForAdmin, updatePremiseAdmin, type SerializablePremiseWithDetails } from './actions';
+import { getPremiseApplications, type PremiseApplication } from '@/services/premise-application-actions';
 import { lookupUserByEmail, designateAgentByEmail } from '@/services/agent-service';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -41,6 +44,8 @@ import { LogAction } from '@/services/log-actions';
 import { cn } from '@/lib/utils';
 import { AgentEmailLookup } from './components/AgentEmailLookup';
 import { PremiseDialogs } from './components/PremiseDialogs';
+import { PremiseApplicationsPanel } from './components/PremiseApplicationsPanel';
+import { ClipboardList } from 'lucide-react';
 
 const PremiseHistoryDialog = React.lazy(() => import('./components/PremiseHistoryDialog'));
 
@@ -89,6 +94,10 @@ export default function PremisesPage() {
   const [premises, setPremises] = React.useState<SerializablePremiseWithDetails[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [applications, setApplications] = React.useState<PremiseApplication[]>([]);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const [totalPremises, setTotalPremises] = React.useState(0);
+  const PAGE_SIZE = 25;
 
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -121,25 +130,32 @@ export default function PremisesPage() {
 
   const editForm = useForm<EditFormValues>({ resolver: zodResolver(editFormSchema), });
 
-  const fetchPremises = React.useCallback(async () => {
+  const fetchPremises = React.useCallback(async (page = 0) => {
     setIsLoading(true);
     setError(null);
-    const result = await getPremisesForAdmin();
-    if (result.success && result.data) {
-      setPremises(result.data);
+    const [premisesResult, appsResult] = await Promise.all([
+      getPremisesForAdmin(page, PAGE_SIZE),
+      getPremiseApplications(),
+    ]);
+    if (premisesResult.success && premisesResult.data) {
+      setPremises(premisesResult.data);
+      setTotalPremises(premisesResult.total ?? 0);
     } else {
-      setError(result.error || 'Failed to load premises data.');
+      setError(premisesResult.error || 'Failed to load premises data.');
+    }
+    if (appsResult.success && appsResult.data) {
+      setApplications(appsResult.data);
     }
     setIsLoading(false);
-  }, []);
+  }, [PAGE_SIZE]);
 
   // Realtime Pulse: Whenever the premises table broadcasts a mutation, this will update and trigger a refetch.
   const { data: realtimePulse } = useCollection({ table: 'premises', __memo: true });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;
 
   React.useEffect(() => {
-    fetchPremises();
-  }, [fetchPremises, pulseHash]);
+    fetchPremises(currentPage);
+  }, [fetchPremises, pulseHash, currentPage]);
 
   const hasLogged = React.useRef(false);
   React.useEffect(() => {
@@ -313,21 +329,58 @@ export default function PremisesPage() {
     setIsHistoryDialogOpen(true);
   };
 
+  // User-friendly error message mapping
+  const friendlyError = (raw: string | null) => {
+    if (!raw) return 'Something went wrong. Please try again.';
+    if (raw.includes('JWT') || raw.includes('auth')) return 'Your session has expired. Please refresh the page and log in again.';
+    if (raw.includes('network') || raw.includes('fetch')) return 'Network error — check your connection and try again.';
+    if (raw.includes('permission') || raw.includes('Unauthorized')) return 'You do not have permission to perform this action.';
+    if (raw.includes('not found')) return 'The requested record could not be found. It may have been deleted.';
+    if (raw.includes('duplicate') || raw.includes('already exists')) return 'A record with this information already exists.';
+    if (raw.includes('timeout')) return 'The request timed out. Please try again.';
+    return raw;
+  };
+
   const renderContent = () => {
-    if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
-    if (error) return (
-      <div className="py-20 text-center text-red-500 border border-red-500/20 rounded-3xl bg-red-500/5">
-        <Shield className="mx-auto h-10 w-10 mb-4 opacity-50" />
-        <p className="font-bold uppercase tracking-widest text-[11px]">System Error</p>
-        <p className="text-[10px] opacity-60 mt-1">{error}</p>
+    if (isLoading) return (
+      // Skeleton table — same structure as the real table
+      <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden shadow-xl">
+        <Table>
+          <TableHeader className="bg-white/5">
+            <TableRow className="border-white/5 hover:bg-transparent">
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 pl-8">Property Name</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Type</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">City</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Owner</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Sales Agent</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 text-right pr-8">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <SkeletonTableRows rows={6} cols={7} />
+        </Table>
       </div>
     );
+
+    if (error) return (
+      <EmptyState
+        icon={AlertTriangle}
+        title="Failed to load properties"
+        description={friendlyError(error)}
+        actionLabel="Try Again"
+        onAction={() => fetchPremises(currentPage)}
+        className="border-red-500/10 bg-red-500/5"
+      />
+    );
+
     if (!premises || premises.length === 0) return (
-      <div className="py-20 text-center text-zinc-400 border-2 border-dashed border-white/5 rounded-3xl bg-[#010a05]/95 backdrop-blur-3xl/[0.02]">
-        <Building className="mx-auto h-10 w-10 mb-4 opacity-20" />
-        <p className="font-bold uppercase tracking-widest text-[11px]">No Properties Found</p>
-        <p className="text-[10px] opacity-60 mt-1">There are no properties registered in the system yet.</p>
-      </div>
+      <EmptyState
+        icon={Building}
+        title="No Properties Found"
+        description="No properties are registered in the system yet. Create the first one to get started."
+        actionLabel="+ Add Property"
+        onAction={() => setIsCreateOpen(true)}
+      />
     );
 
     return (
@@ -342,7 +395,8 @@ export default function PremisesPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden shadow-xl">
+        {/* overflow-x-auto ensures table scrolls on mobile instead of breaking layout */}
+        <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden shadow-xl overflow-x-auto">
           <Table>
             <TableHeader className="bg-white/5">
               <TableRow className="border-white/5 hover:bg-transparent">
@@ -351,6 +405,7 @@ export default function PremisesPage() {
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">City</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Status</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Owner</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6">Sales Agent</TableHead>
                 <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 py-6 text-right pr-8">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -397,6 +452,16 @@ export default function PremisesPage() {
                       <span className='text-[9px] font-black uppercase tracking-widest text-zinc-300'>No Owner</span>
                     )}
                   </TableCell>
+                  <TableCell>
+                    {p.agent ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className='text-[11px] font-bold text-zinc-300'>{p.agent.name}</span>
+                        <span className='text-[9px] text-zinc-500 font-medium lowercase tracking-tight break-all max-w-[150px]'>{p.agent.email}</span>
+                      </div>
+                    ) : (
+                      <span className='text-[9px] font-black uppercase tracking-widest text-zinc-600'>None</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right pr-8">
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="icon" aria-label="Edit premise" className="h-9 w-9 rounded-lg bg-white/10 border border-white/10 text-zinc-400 hover:text-primary hover:bg-primary/5 transition-all" onClick={() => { setSelectedPremise(p); setIsEditOpen(true); }}><Edit className="h-4 w-4" /></Button>
@@ -409,6 +474,38 @@ export default function PremisesPage() {
             </TableBody>
           </Table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPremises > PAGE_SIZE && (
+          <div className="flex items-center justify-between pt-4">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              Showing {currentPage * PAGE_SIZE + 1}–{Math.min((currentPage + 1) * PAGE_SIZE, totalPremises)} of {totalPremises} properties
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={currentPage === 0 || isLoading}
+                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest h-9 px-4 rounded-xl disabled:opacity-30"
+              >
+                ← Prev
+              </Button>
+              <span className="text-[10px] font-black text-zinc-400 bg-white/5 border border-white/10 rounded-lg px-4 py-2 min-w-[60px] text-center">
+                {currentPage + 1} / {Math.ceil(totalPremises / PAGE_SIZE)}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={(currentPage + 1) * PAGE_SIZE >= totalPremises || isLoading}
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="text-zinc-400 hover:text-white hover:bg-white/5 text-[10px] font-black uppercase tracking-widest h-9 px-4 rounded-xl disabled:opacity-30"
+              >
+                Next →
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -493,6 +590,39 @@ export default function PremisesPage() {
       {isHistoryDialogOpen && (
         <React.Suspense fallback={<div />}><PremiseHistoryDialog premise={selectedPremiseForHistory as any} allUsers={null} open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen} /></React.Suspense>
       )}
+
+      {/* Applications Section */}
+      <Card className="glass-card border-white/10 shadow-xl relative overflow-hidden mt-8">
+        <div className="absolute inset-0 mesh-obsidian opacity-20 pointer-events-none" />
+        <CardHeader className="relative z-10 border-b border-white/5 pb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <ClipboardList className="h-5 w-5 text-amber-400" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-headline font-bold text-white tracking-tight">
+                  Premise <span className="text-amber-400">Applications</span>
+                </CardTitle>
+                <CardDescription className="text-zinc-400 text-[11px] font-medium uppercase tracking-widest mt-1">
+                  Applications submitted by agents — review and approve with one click.
+                </CardDescription>
+              </div>
+            </div>
+            {applications.filter(a => a.status === 'pending').length > 0 && (
+              <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                {applications.filter(a => a.status === 'pending').length} Pending
+              </span>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="relative z-10 pt-8">
+          <PremiseApplicationsPanel
+            applications={applications}
+            onRefresh={fetchPremises}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

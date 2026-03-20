@@ -1,7 +1,9 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { getAdminDb } from '@/lib/supabase/server';
 import { Log } from '@/services/log-service';
+import { LOG_LIST_COLS } from '@/types/database.types';
 
 export type SerializableLog = Omit<Log, 'timestamp' | 'expiresAt'> & { id: string, timestamp: string, expiresAt?: string };
 
@@ -18,7 +20,7 @@ export async function getLogsForActorAction(actorId: string, role?: string): Pro
 
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
-      .select('*')
+      .select(LOG_LIST_COLS)
       .eq('actorId', actorId)
       .order('timestamp', { ascending: false })
       .limit(500);
@@ -45,6 +47,7 @@ export async function getLogsForActorAction(actorId: string, role?: string): Pro
     return { logs: filteredLogs, error: null };
 
   } catch (e: any) {
+    Sentry.captureException(e, { extra: { actorId, role } });
     console.error('Error fetching logs for actor:', e);
     return { logs: null, error: e.message || "An unknown server error occurred." };
   }
@@ -63,7 +66,7 @@ export async function getLogsForPremiseAction(premiseId: string): Promise<{
 
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
-      .select('*')
+      .select(LOG_LIST_COLS)
       .eq('premiseId', premiseId)
       .order('timestamp', { ascending: false })
       .limit(500);
@@ -76,6 +79,7 @@ export async function getLogsForPremiseAction(premiseId: string): Promise<{
     return { logs: logs.filter(l => l.tokenChange != null && l.tokenChange !== 0), error: null };
 
   } catch (e: any) {
+    Sentry.captureException(e, { extra: { premiseId } });
     console.error('Error fetching logs for premise:', e);
     return { logs: null, error: e.message || "An unknown server error occurred." };
   }

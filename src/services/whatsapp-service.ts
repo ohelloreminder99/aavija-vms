@@ -390,3 +390,69 @@ export async function notifyAgentAssigned(p: {
     console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
   }
 }
+
+/**
+ * aavija_new_premise_application [NEW — create in Meta Business Manager]
+ * Category: UTILITY | Language: English (en_US)
+ * Body: "Hi Admin, a new premise application has been submitted.
+ *        Property: {{1}}. Applicant: {{2}} ({{3}}). Owner Email: {{4}}.
+ *        Log in to Aavija to review and approve."
+ */
+export async function notifyAdminNewPremiseApplication(p: {
+  adminPhone: string;
+  premiseName: string;
+  agentName: string;
+  agentEmail: string;
+  ownerEmail: string;
+}): Promise<void> {
+  try {
+    await sendWhatsApp({
+      phone: p.adminPhone,
+      templateName: 'aavija_new_premise_application',
+      params: [p.premiseName, p.agentName, p.agentEmail, p.ownerEmail],
+    });
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyAdminNewPremiseApplication failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
+  }
+}
+
+/**
+ * aavija_premise_approved [NEW — create in Meta Business Manager]
+ * Category: UTILITY | Language: English (en_US)
+ * Body: "Hi {{1}}, great news! Your premise application for \"{{2}}\" has been approved.
+ *        Log in to Aavija to get started."
+ */
+export async function notifyAgentPremiseApproved(p: {
+  agentPhone: string;
+  agentName: string;
+  premiseName: string;
+}): Promise<void> {
+  try {
+    await sendWhatsApp({
+      phone: p.agentPhone,
+      templateName: 'aavija_premise_approved',
+      params: [p.agentName, p.premiseName],
+    });
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyAgentPremiseApproved failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
+  }
+}
+
+/**
+ * Reuses aavija_premise_approved for the owner.
+ */
+export async function notifyOwnerPremiseApproved(p: {
+  ownerPhone: string;
+  ownerName: string;
+  premiseName: string;
+}): Promise<void> {
+  try {
+    await sendWhatsApp({
+      phone: p.ownerPhone,
+      templateName: 'aavija_premise_approved',
+      params: [p.ownerName, p.premiseName],
+    });
+  } catch (e: unknown) {
+    console.error('[WhatsApp] notifyOwnerPremiseApproved failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');
+  }
+}

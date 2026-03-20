@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -113,9 +113,15 @@ export default function PremiseCategoriesPage() {
 
   React.useEffect(() => {
     if (categoryToEdit) {
+      // Ensure the type is valid for the UI enum (industrial | residential)
+      // Legacy data may contain "standard" which should be treated as "industrial"
+      const safeType = (categoryToEdit.type === 'industrial' || categoryToEdit.type === 'residential')
+        ? categoryToEdit.type
+        : 'industrial';
+
       form.reset({
         name: categoryToEdit.name || '',
-        type: categoryToEdit.type || 'industrial',
+        type: safeType,
         deduction_rate_visitor: categoryToEdit.deduction_rate_visitor ?? 0,
         deduction_rate_premise: categoryToEdit.deduction_rate_premise ?? 0,
         pdf_export_cost: categoryToEdit.pdf_export_cost ?? 0,

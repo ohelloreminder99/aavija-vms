@@ -35,12 +35,16 @@ export async function sendWhatsAppOtp(payload: {
     // await verifyAppCheck();
 
     // 2. Rate Limiting Logic
-    const { data: userDoc } = await adminDb.from('users').select('*').eq('id', userId).single();
+    const { data: userDoc } = await adminDb.from('users')
+      .select('id, name, phone, token_balance_visitor, action_timestamps')
+      .eq('id', userId).single();
     if (!userDoc) {
       throw new Error("User profile not found.");
     }
 
-    const { data: settingsDoc } = await adminDb.from('settings').select('*').eq('id', 'global').single();
+    const { data: settingsDoc } = await adminDb.from('settings')
+      .select('otp_request_limit_hourly, mobile_verification_cost')
+      .eq('id', 'global').single();
 
     const otpRequestLimit = settingsDoc?.otp_request_limit_hourly || 3;
 
@@ -130,10 +134,12 @@ export async function verifyWhatsAppOtp(payload: {
     let verificationCost = 0;
     let userName = 'Unknown User';
 
-    const { data: userDoc } = await adminDb.from('users').select('*').eq('id', userId).single();
+    const { data: userDoc } = await adminDb.from('users')
+      .select('id, name, token_balance_visitor')
+      .eq('id', userId).single();
     if (!userDoc) throw new Error('User profile not found.');
 
-    const { data: otpDoc } = await adminDb.from('whatsapp_otps').select('*').eq('id', userId).single();
+    const { data: otpDoc } = await adminDb.from('whatsapp_otps').select('id, otp, expiresAt').eq('id', userId).single();
     if (!otpDoc) throw new Error('No OTP found. Please request a new one.');
 
     const expiresAt = new Date(otpDoc.expiresAt);
@@ -145,7 +151,9 @@ export async function verifyWhatsAppOtp(payload: {
 
     if (otpDoc.otp !== otp) throw new Error('The entered code is incorrect.');
 
-    const { data: settingsDoc } = await adminDb.from('settings').select('*').eq('id', 'global').single();
+    const { data: settingsDoc } = await adminDb.from('settings')
+      .select('mobile_verification_cost')
+      .eq('id', 'global').single();
 
     verificationCost = settingsDoc?.mobile_verification_cost || 0;
     userName = userDoc.name || 'Unknown User';

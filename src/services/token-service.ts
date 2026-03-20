@@ -81,20 +81,26 @@ export async function purchaseTokens(
     }
 
     // --- STEP 1: PERFORM ALL READS FIRST ---
-    const { data: settingsData } = await adminDb.from('settings').select('*').eq('id', 'global').single();
+    const { data: settingsData } = await adminDb.from('settings')
+      .select('checkin_cost, whatsapp_notification_cost, agent_commission_rate, gst_rate, cgst_rate_default, sgst_rate_default, igst_rate_default, starting_token_owner, starting_token_visitor, currency, token_exchange_rate, company_gstin, company_name_billing, company_address_billing, company_state_billing, hsn_sac_code, hide_token_economy, referral_min_payout_amount, log_ttl_days')
+      .eq('id', 'global').single();
     // GUARD: If settings are unavailable, calculations would use 0 as the rate,
     // which would make tokens free and generate incorrect invoices.
     // Fail loudly rather than silently process a broken transaction.
     if (!settingsData) throw new Error('System configuration (settings) is unavailable. Purchase aborted for safety. Please try again.');
 
-    const { data: userData } = await adminDb.from('users').select('*').eq('id', userId).single();
+    const { data: userData } = await adminDb.from('users')
+      .select('id, name, email, phone, city_state, gstNumber, billingAddress, billingState, legalName, token_balance_visitor, premise_roles')
+      .eq('id', userId).single();
     if (!userData) throw new Error("User profile not found.");
 
     let premiseData = null;
     let agentData = null;
 
     if (roleToCredit === 'owner' && premiseId) {
-      const { data: pData } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
+      const { data: pData } = await adminDb.from('premises')
+        .select('id, name, token_balance, agent_id, owner_id, billingState, city_state, gstNumber, billingAddress, legalName')
+        .eq('id', premiseId).single();
       if (!pData) throw new Error("Premise not found.");
       premiseData = pData;
 
@@ -102,7 +108,9 @@ export async function purchaseTokens(
       const commissionRate = settingsData.agent_commission_rate || 0;
 
       if (agentId && commissionRate > 0) {
-        const { data: aData } = await adminDb.from('agents').select('*').eq('id', agentId).single();
+        const { data: aData } = await adminDb.from('agents')
+          .select('id, name, commission_balance')
+          .eq('id', agentId).single();
         agentData = aData;
       }
     }
