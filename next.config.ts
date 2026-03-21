@@ -66,6 +66,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Prevent Next.js from treating Sentry's internal OpenTelemetry packages as
+  // server-external. These exist nested inside @sentry/node at a different version
+  // than the one npm hoisted to the top level, causing the "can't be external" warning.
+  // Excluding them here forces Next.js to bundle them from Sentry's own copy.
+  serverExternalPackages: [
+    '@sentry/node',
+    '@sentry/core',
+    '@sentry/nextjs',
+  ],
 };
 
 export default withSentryConfig(nextConfig, {
