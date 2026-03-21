@@ -19,7 +19,8 @@ import {
     PanelLeftOpen,
     Gift,
     Users,
-    Wallet
+    Wallet,
+    BarChart2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -116,6 +117,7 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                                 Administration
                             </h4>
                             {renderLink('/dashboard/admin', 'Admin Console', roleIcons.admin, 'global-admin')}
+                            {renderLink('/dashboard/admin/analytics', 'Platform Analytics', BarChart2, 'admin-analytics')}
                             {renderLink('/dashboard/admin/referrals', 'Referral Network', Users, 'admin-referrals')}
                         </div>
                     )}
@@ -141,6 +143,9 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                                             const label = role.charAt(0).toUpperCase() + role.slice(1);
                                             return renderLink(href, label, roleIcons[role as keyof typeof roleIcons] || LayoutDashboard, `${premiseId}-${role}`);
                                         })}
+                                        {(roles.includes('owner') || roles.includes('host')) && (
+                                            renderLink(`/dashboard/owner/analytics?premiseId=${premiseId}`, 'Insights', BarChart2, `${premiseId}-analytics`)
+                                        )}
                                     </div>
                                 </div>
                             );

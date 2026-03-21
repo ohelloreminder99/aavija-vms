@@ -196,7 +196,57 @@ ORDER BY routine_name;
 
 ---
 
+## ✅ Step 10B — Verify Your Database (Non-Technical Checklist)
+
+> **Anyone can do this** — no coding knowledge needed.
+
+**How to run:**
+1. Open your new Supabase project → left sidebar → **SQL Editor**
+2. Click **New Query**
+3. Open the file `database_sql_backups/VERIFY_DATABASE.sql` from the project folder
+4. Copy the **entire contents** → paste into the SQL Editor → click **Run**
+5. Read the results table — **every row must say ✅ PASS**
+
+**What it checks automatically:**
+
+| Check | What it verifies |
+|---|---|
+| 📋 TABLE CHECK | All 20 required tables exist |
+| 🔒 SECURITY (RLS) | Data security is ON for every table |
+| 🔧 EXTENSIONS | pgcrypto, uuid-ossp, pg_cron are installed |
+| ⚙️ FUNCTIONS | Critical DB functions exist |
+| ⚙️ SETTINGS | Country settings row is configured |
+| ⏰ CRON JOBS | Scheduled cleanup jobs are registered |
+| 🔄 TRIGGERS | Auto-update triggers are active |
+| 📊 SUMMARY | Total table count |
+
+**If you see ❌ FAIL on any row** — take a screenshot and send to your developer. The error message in the result column tells them exactly what to fix.
+
+---
+
+### 🔐 Advanced: Schema Fingerprint (Hash Comparison)
+
+Want to **100% confirm** that two databases are identical? Run the fingerprint script:
+
+**File:** `database_sql_backups/SCHEMA_FINGERPRINT.sql`
+
+**How to use:**
+1. Run in your **reference (India) database** → you'll see one value called `schema_fingerprint`, e.g.:
+   ```
+   a3f9c82b1d4e7890abcdef1234567890
+   ```
+2. Run in your **new (UAE) database** → compare the value
+3. **Same hash = databases are identical ✅**
+4. **Different hash = something is missing ❌** — send both hashes to your developer
+
+> The hash covers: all tables, column types, data security rules, functions, indexes, triggers, extensions, and cron jobs.
+
+
+
+---
+
 ## Step 11 — Redeploy / Go Live
+
 
 1. Trigger a new Vercel deployment (or `git push`)
 2. Visit your new country URL
@@ -456,5 +506,39 @@ LIMIT 5;
 ```
 
 > ⚠️ If `cron.job_run_details` returns empty, your cleanup jobs haven't run yet — wait 24h after setup or trigger them manually.
+
+---
+
+## 🛠️ Known Fixes & Deployment Quirks
+
+### Sentry + Next.js OpenTelemetry Warning
+After installing `@sentry/nextjs`, you may see on `npm run dev`:
+```
+Package import-in-the-middle can't be external
+```
+
+**Fix — already applied in `next.config.ts`:**
+```typescript
+serverExternalPackages: ['@sentry/node', '@sentry/core', '@sentry/nextjs'],
+```
+Also install the missing peer packages once:
+```bash
+npm install require-in-the-middle import-in-the-middle
+```
+This is caused by Next.js auto-externalising packages that Sentry ships nested at a different version. The `serverExternalPackages` entry forces Next.js to bundle them from Sentry's own copy.
+
+### GitHub Actions — Push Blocked (workflow scope)
+If `git push` fails with *"refusing to allow a PAT to create workflow files"*:
+1. Go to **github.com/settings/tokens**
+2. Regenerate your token with the **`workflow`** scope checked
+3. Clear the old credential: **Credential Manager → Windows Credentials → remove `git:https://github.com`**
+4. `git push origin main` — enter new token when prompted
+
+### Windows PowerShell — npm Scripts Blocked
+If `npm install` fails with *"running scripts is disabled"*, use:
+```bash
+node -e "const {execSync} = require('child_process'); execSync('npm install PACKAGE_NAME', {stdio: 'inherit', shell: true})"
+```
+
 
 

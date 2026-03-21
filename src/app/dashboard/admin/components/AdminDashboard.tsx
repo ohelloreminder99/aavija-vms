@@ -20,6 +20,7 @@ import {
   ShieldAlert,
   Palette,
   Box,
+  BarChart2,
 } from 'lucide-react';
 import * as React from 'react';
 import { DashboardCard } from '@/components/shared/DashboardCard';
@@ -40,6 +41,11 @@ export function AdminDashboard() {
     variant?: 'default' | 'stat' | 'group';
     links?: { title: string; href: string }[];
   }[] = [
+    {
+      title: 'Analytics & Insights',
+      href: '/dashboard/admin/analytics',
+      icon: BarChart2,
+    },
     {
       title: 'Sales Agents',
       href: '/dashboard/admin/referrals',

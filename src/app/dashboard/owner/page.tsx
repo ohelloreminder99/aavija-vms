@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useDoc } from '@/supabase';
 import { Premise } from '@/services/premise-service';
 import { TokenBalanceCard } from './components/TokenBalanceCard';
-import { History, Users, ShieldCheck, UserX, Coins, FileText, DoorOpen, Settings } from 'lucide-react';
+import { History, Users, ShieldCheck, UserX, Coins, FileText, DoorOpen, Settings, BarChart2 } from 'lucide-react';
 import { DashboardCard } from '@/components/shared/DashboardCard';
 import { AnnouncementsCard } from '../visitor/components/AnnouncementsCard';
 import { createClient } from '@/lib/supabase/client';
@@ -55,6 +55,14 @@ export default function OwnerDashboardPage() {
                 {/* Main Stats column */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        {/* Analytics highlight card */}
+                        <DashboardCard
+                            variant="stat"
+                            title="Analytics & Insights"
+                            description="Charts, heatmaps, and trends for this premise"
+                            href={`/dashboard/owner/analytics?premiseId=${premiseId}`}
+                            icon={BarChart2}
+                        />
                         {!settings?.hide_token_economy && <TokenBalanceCard premise={premise} isLoading={isLoadingPremise} />}
                         <DashboardCard
                             variant="stat"
