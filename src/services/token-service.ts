@@ -82,7 +82,7 @@ export async function purchaseTokens(
 
     // --- STEP 1: PERFORM ALL READS FIRST ---
     const { data: settingsData } = await adminDb.from('settings')
-      .select('checkin_cost, whatsapp_notification_cost, agent_commission_rate, gst_rate, cgst_rate_default, sgst_rate_default, igst_rate_default, starting_token_owner, starting_token_visitor, currency, token_exchange_rate, company_gstin, company_name_billing, company_address_billing, company_state_billing, hsn_sac_code, hide_token_economy, referral_min_payout_amount, log_ttl_days')
+      .select('agent_commission_rate, gst_rate, cgst_rate_default, sgst_rate_default, igst_rate_default, starting_token_owner, starting_token_visitor, currency, token_exchange_rate, company_gstin, company_name_billing, company_address_billing, company_state_billing, hsn_sac_code, hide_token_economy, log_ttl_days, payout_threshold_agent')
       .eq('id', 'global').single();
     // GUARD: If settings are unavailable, calculations would use 0 as the rate,
     // which would make tokens free and generate incorrect invoices.
@@ -210,7 +210,7 @@ export async function purchaseTokens(
           .single();
 
         if (updatedAgent?.phone) {
-          const threshold = settingsData?.referral_min_payout_amount || 500; // Reuse same threshold for simplicity or check if there's agent specific one
+          const threshold = settingsData?.payout_threshold_agent ?? 500; // Configurable in Admin > Token Settings
           if (updatedAgent.agent_commission_balance >= threshold && (updatedAgent.agent_commission_balance - commissionAmount) < threshold) {
             void notifyThresholdReached({
               phone: updatedAgent.phone,

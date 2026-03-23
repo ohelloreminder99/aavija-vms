@@ -165,7 +165,7 @@ export interface DbLog {
   created_at: string;
 }
 
-export const LOG_LIST_COLS = 'id, actorId, actorName, actorRole, action, timestamp, description, tokenChange, premiseId, created_at' as const;
+export const LOG_LIST_COLS = 'id, actorId, actorName, actorRole, action, timestamp, description, tokenChange, premiseId, context, created_at' as const;
 
 // ─── CITIES ───────────────────────────────────────────────────────────────────
 

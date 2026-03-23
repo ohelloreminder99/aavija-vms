@@ -49,6 +49,7 @@ import {
   createRazorpayOrder,
   verifyRazorpayPayment,
 } from '@/services/payment-service';
+import { generateInvoicePdf } from '@/services/invoice-service';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import Link from 'next/link';
 import { Premise } from '@/services/premise-service';
@@ -194,9 +195,27 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
             });
 
             if (purchaseResult.success) {
+              // Auto-download PDF invoice (non-fatal)
+              try {
+                const supabase = createClient();
+                const { data: invoiceData } = await supabase
+                  .from('invoices')
+                  .select('*')
+                  .eq('razorpay_order_id', response.razorpay_order_id)
+                  .single();
+                if (invoiceData) {
+                  await generateInvoicePdf(invoiceData as any);
+                }
+              } catch (pdfErr) {
+                console.error('[PDF] Auto-download failed (non-fatal):', pdfErr);
+                toast({
+                  title: 'Invoice Ready',
+                  description: 'Tokens credited! Download your invoice from "Token History & Invoices".',
+                });
+              }
               toast({
                 title: 'Purchase Successful!',
-                description: `${data.quantity.toLocaleString()} tokens added. Check "Token History & Invoices" for your bill.`,
+                description: `${data.quantity.toLocaleString()} tokens added. Your invoice is downloading.`,
               });
               onOpenChange(false);
               form.reset();

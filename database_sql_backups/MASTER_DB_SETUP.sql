@@ -1656,4 +1656,46 @@ GRANT SELECT ON public.premise_members TO authenticated;
 GRANT ALL ON public.premise_gates TO postgres;
 GRANT ALL ON public.premise_members TO postgres;
 
+-- ============================================================
+-- MIGRATION: 20260323_fix_settings_schema.sql
+-- Description: Adds columns defined in application code but missing from DB.
+--              All use IF NOT EXISTS — idempotent, safe to re-run on any DB.
+-- ============================================================
 
+-- WhatsApp sender Phone Number ID
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS whatsapp_phone_number_id TEXT;
+COMMENT ON COLUMN public.settings.whatsapp_phone_number_id IS 'WhatsApp Cloud API Phone Number ID used as the sender for all outbound messages.';
+
+-- Agent/referrer payout thresholds (configurable in Admin > Token Settings)
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS payout_threshold_agent NUMERIC DEFAULT 500;
+COMMENT ON COLUMN public.settings.payout_threshold_agent IS 'Minimum commission balance for agent withdrawal eligibility.';
+
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS payout_threshold_referrer NUMERIC DEFAULT 500;
+COMMENT ON COLUMN public.settings.payout_threshold_referrer IS 'Minimum balance for referrer payout eligibility.';
+
+-- TDS compliance
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS tds_enabled BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS tds_rate NUMERIC DEFAULT 10,
+  ADD COLUMN IF NOT EXISTS tds_annual_exemption NUMERIC DEFAULT 30000;
+
+-- Referral program
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS referral_enabled BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS referral_reward_tokens NUMERIC DEFAULT 10,
+  ADD COLUMN IF NOT EXISTS referral_commission_rate NUMERIC DEFAULT 0.05,
+  ADD COLUMN IF NOT EXISTS referral_min_purchase_tokens NUMERIC DEFAULT 50,
+  ADD COLUMN IF NOT EXISTS referral_first_purchase_only BOOLEAN DEFAULT TRUE;
+
+-- Agent token conversion
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS token_conversion_rate NUMERIC DEFAULT 1;
+
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS payout_method_note TEXT;
+
+-- Reload PostgREST schema cache
+NOTIFY pgrst, 'reload schema';

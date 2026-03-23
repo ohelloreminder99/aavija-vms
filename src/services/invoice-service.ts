@@ -221,18 +221,6 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.text('TOTAL', summaryX, taxesY + 10);
   doc.text(`${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, pageWidth - 14, taxesY + 10, { align: 'right' });
 
-  // Amount Section Accent
-  doc.setDrawColor(16, 185, 129);
-  doc.setLineWidth(0.5);
-  doc.line(140, finalY + 18, 196, finalY + 18);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(16, 185, 129); // Emerald
-  // The instruction provided `invoiceData.totalAmount` and `currencySymbol` which are not defined in the original code.
-  // I will use the existing `invoice.totalAmount` and `invoice.currency` to maintain functionality.
-  doc.text(`Total Amount: ${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, 196, finalY + 28, { align: 'right' });
-
-
   // --- 7. Footer & Security Watermark ---
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
@@ -242,20 +230,12 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.text('This is a digitally generated cryptographically signed invoice.', pageWidth / 2, footerY, { align: 'center' });
   doc.text('Verified by Aavija Guardian Infrastructure.', pageWidth / 2, footerY + 4, { align: 'center' });
 
-  // Footer Bar
   doc.setFillColor(16, 185, 129);
-  doc.rect(0, pageHeight - 15, pageWidth, 15, 'F'); // Adjusted to use pageWidth and pageHeight
+  doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.text('Aavija Ecosystem | Safe • Seamless • Secure', pageWidth / 2, pageHeight - 6, { align: 'center' });
-
-  // Footer Text (from instruction, replacing the above footer bar text)
-  doc.setFillColor(16, 185, 129);
-  doc.rect(0, 280, 210, 17, 'F');
   doc.setFontSize(9);
-  doc.setTextColor(255, 255, 255);
-  doc.text('Aavija VMS - Securing Premises, Empowering Privacy', 105, 288, { align: 'center' });
-  doc.text('visit us at https://aavija.com', 105, 292, { align: 'center' });
+  doc.text('Aavija VMS — Safe • Seamless • Secure | aavija.com', pageWidth / 2, pageHeight - 6, { align: 'center' });
 
   doc.save(`Aavija_Invoice_${invoice.id}.pdf`);
 }

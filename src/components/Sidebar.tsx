@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { UserProfile } from '@/services/user-service';
 import { createClient } from '@/lib/supabase/client';
@@ -20,7 +20,8 @@ import {
     Gift,
     Users,
     Wallet,
-    BarChart2
+    BarChart2,
+    LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -43,7 +44,14 @@ const roleIcons = {
 
 function SidebarContent({ userProfile, onClose }: SidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const [premiseNames, setPremiseNames] = React.useState<Record<string, string>>({});
+
+    const handleLogout = async () => {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        router.push('/login');
+    };
 
     React.useEffect(() => {
         const fetchPremiseNames = async () => {
@@ -153,7 +161,40 @@ function SidebarContent({ userProfile, onClose }: SidebarProps) {
                     </div>
                 )}
             </div>
+
+            {/* Logout Button */}
+            <div className="px-4 pb-2">
+                <Button
+                    variant="ghost"
+                    className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10 font-semibold transition-all duration-300"
+                    onClick={() => { if (onClose) onClose(); handleLogout(); }}
+                >
+                    <LogOut className="mr-3 h-5 w-5 shrink-0" />
+                    <span>Logout</span>
+                </Button>
+            </div>
         </ScrollArea>
+    );
+}
+
+function LogoutIconButton() {
+    const router = useRouter();
+    const handleLogout = async () => {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        router.push('/login');
+    };
+    return (
+        <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Logout"
+            title="Logout"
+            className="text-red-400 hover:bg-red-500/10 hover:text-red-300"
+            onClick={handleLogout}
+        >
+            <LogOut className="h-5 w-5" />
+        </Button>
     );
 }
 
@@ -196,6 +237,7 @@ export function DesktopSidebar({ userProfile, isCollapsed, toggleCollapse }: { u
                             <Link href="/dashboard/admin" title="Admin Console"><Settings className="h-5 w-5" /></Link>
                         </Button>
                     )}
+                    <LogoutIconButton />
                 </div>
             )}
         </aside>

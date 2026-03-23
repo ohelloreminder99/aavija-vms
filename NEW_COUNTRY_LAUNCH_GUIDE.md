@@ -58,10 +58,49 @@ Run the following scripts in the **Supabase SQL Editor** in this EXACT order to 
 11. **`database_sql_backups/09-GLOBAL-REGISTRY.sql`**: Prepares the State/City schema.
 12. **`database_sql_backups/make-admin.sql`**: Run this with the target admin's email to bootstrap the dashboard.
 
-### B. Geography Data (SQL)
-You must populate the geography tables so users can select their locations:
--   **Link**: [09-GLOBAL-REGISTRY.sql](file:///d:/Supabase/antigravity/Aavija-main/Aavija-main/database_sql_backups/09-GLOBAL-REGISTRY.sql)
--   Run custom `INSERT` statements for the `states`, `districts`, and `cities` of the target country.
+#### Phase 4: Settings Schema Fixes (REQUIRED for every new DB)
+13. **`supabase/migrations/20260323_fix_settings_schema.sql`**: **(REQUIRED — run on every new country database)** Adds all settings columns that are referenced in application code but may be absent in older DB versions:
+    - `whatsapp_phone_number_id` — WhatsApp Cloud API phone sender ID
+    - `payout_threshold_agent` — minimum balance for agent withdrawal eligibility (default: 500)
+    - `payout_threshold_referrer` — minimum balance for referrer payout eligibility (default: 500)
+    - `tds_enabled`, `tds_rate`, `tds_annual_exemption` — TDS compliance settings
+    - `referral_enabled`, `referral_reward_tokens`, `referral_commission_rate`, `referral_min_purchase_tokens`, `referral_first_purchase_only` — referral program settings
+    - `token_conversion_rate`, `payout_method_note` — agent token conversion settings
+
+    > All additions use `IF NOT EXISTS` so this script is **idempotent and safe to re-run** on existing databases without causing errors.
+
+---
+
+## 3. Third-Party Service Integration
+
+### A. Razorpay (Payments & Billing)
+1.  **Currency Support**: Ensure your Razorpay account supports the target country's currency (e.g., AED, USD).
+2.  **API Keys**: Update `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in Vercel.
+3.  **Webhooks**: Point Razorpay webhooks to `https://[your-subdomain]/api/webhooks/razorpay` to handle payment failures/successes.
+
+### B. Meta WhatsApp Cloud API
+1.  **Phone Number ID**: Obtain from Meta Developers portal and add to `WHATSAPP_PHONE_NUMBER_ID`.
+2.  **Access Token**: Generate a **Permanent System User Token** in Business Settings.
+3.  **Templates**: Mirror the templates listed in `src/services/whatsapp-service.ts` (e.g., `aavija_payout_approved`, `aavija_referral_commission`) in the Meta Business Manager for the target language/region.
+
+---
+
+## 4. Admin Dashboard Configuration
+
+Once the site is live, log in as Admin and navigate to **Dashboard → Token Settings**:
+
+1.  **Currency**: Set to the local currency code (e.g., `USD`, `AED`).
+2.  **Token Exchange Rate**: Define how much 1 token costs in that currency.
+3.  **Country Code**: Set the `default_country_code` (e.g., `+971`).
+4.  **Phone Length**: Set the expected length (e.g., `9` for UAE mobile numbers).
+5.  **Tax Rates**: Configure `cgst_rate_default`, `sgst_rate_default`, and `igst_rate_default` based on local tax laws (or set to 0 if not applicable).
+6.  **Billing Identity**: Update `company_name_billing` and `company_address_billing` for local legal compliance.
+7.  **Agent Payout Threshold**: Set the **Agent Payout Threshold** (minimum balance before an agent can request a withdrawal). Default is 500 in the local currency. Adjust per country's practical minimum payout amount (e.g., ₹500 for India, AED 50 for UAE).
+8.  **Referral Program**: Toggle on/off via the Referral Program section. Configure commission rate, minimum qualifying purchase, and welcome gift tokens.
+
+Navigate to **Dashboard → Service Configuration** for third-party integrations:
+9.  **WhatsApp Phone Number ID**: Enter the Phone Number ID from Meta Developers portal (overrides the ENV variable if set — useful for per-country WhatsApp numbers).
+10. **WhatsApp Templates**: Update all template names to match the approved templates in Meta Business Manager for the target language/region.
 
 ### C. Storage Buckets
 Ensure the following buckets exist and are set to "Public":
