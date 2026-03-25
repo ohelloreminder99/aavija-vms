@@ -81,14 +81,30 @@ export function AuthForm({ mode }: AuthFormProps) {
   });
 
   const onSubmit = async (data: UserFormValue) => {
-    if (!captchaToken && process.env.NODE_ENV === 'production') {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    const isProd = process.env.NODE_ENV === 'production';
+
+    // Masked log to verify environment status in browser developer tools (F12)
+    if (isProd) {
+      console.log('🛡️ Turnstile Key Status:', siteKey ? `Present (ends with ${siteKey.slice(-4)})` : 'MISSING');
+    }
+
+    if (!captchaToken && isProd) {
+      let title = 'Verification Required';
       let desc = 'Please wait for the security check to complete.';
-      if (captchaStatus === 'error') desc = 'Security check failed to load. Please check your internet or disable ad-blockers.';
-      if (captchaStatus === 'expired') desc = 'Security check expired. Please try again.';
+
+      if (!siteKey) {
+        title = 'System Configuration Error';
+        desc = 'Missing security check configuration (Site Key). Please check your environment variables.';
+      } else if (captchaStatus === 'error') {
+        desc = 'Security check failed to load. Please check your internet or disable ad-blockers.';
+      } else if (captchaStatus === 'expired') {
+        desc = 'Security check expired. Please try again.';
+      }
       
       toast({
         variant: 'destructive',
-        title: 'Verification Required',
+        title: title,
         description: desc,
       });
       return;
