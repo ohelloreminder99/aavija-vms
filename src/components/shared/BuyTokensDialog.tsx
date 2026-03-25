@@ -277,7 +277,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
   return (
     <>
       <Script id="razorpay-checkout-js" src="https://checkout.razorpay.com/v1/checkout.js" />
-      <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent 
            onOpenAutoFocus={(e) => e.preventDefault()} 
            className="bg-[#010a05]/95 border-emerald-500/20 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
