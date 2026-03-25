@@ -93,7 +93,8 @@ export default withSentryConfig(nextConfig, {
   widenClientFileUpload: true,
 
   // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-  tunnelRoute: "/monitoring",
+  // DISABLED to prevent 400 Bad Request tunnel errors in Vercel
+  // tunnelRoute: "/monitoring",
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   // Note: These webpack-specific options are not supported with Turbopack
