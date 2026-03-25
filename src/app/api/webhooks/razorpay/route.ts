@@ -45,6 +45,7 @@ export async function POST(req: Request) {
         const result = await purchaseTokens({
           userId: notes.userId,
           tokenAmount: parseInt(notes.tokenAmount, 10),
+          totalCost: orderEntity.amount / 100,
           currency: orderEntity.currency,
           actorName: 'Webhook Action', // Fallback, will be overridden by token-service DB lookup
           actorRole: 'user', // Fallback
