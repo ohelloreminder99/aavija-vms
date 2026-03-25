@@ -102,6 +102,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
   const { toast } = useToast();
   const [step, setStep] = React.useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [processingPhase, setProcessingPhase] = React.useState<'idle' | 'crediting' | 'generating' | 'done'>('idle');
 
   React.useEffect(() => {
     if (!open) {
@@ -180,6 +181,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
         handler: async function (response: any) {
           try {
             setIsSubmitting(true);
+            setProcessingPhase('crediting');
             const purchaseResult = await purchaseTokens({
               userId: user.id,
               tokenAmount: data.quantity,
@@ -195,6 +197,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
             });
 
             if (purchaseResult.success) {
+              setProcessingPhase('generating');
               // Auto-download PDF invoice (non-fatal)
               try {
                 const supabase = createClient();
@@ -213,12 +216,19 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
                   description: 'Tokens credited! Download your invoice from "Token History & Invoices".',
                 });
               }
+              
+              setProcessingPhase('done');
               toast({
                 title: 'Purchase Successful!',
                 description: `${data.quantity.toLocaleString()} tokens added. Your invoice is downloading.`,
               });
-              onOpenChange(false);
-              form.reset();
+              
+              // Delay closing to show "Done" state
+              setTimeout(() => {
+                onOpenChange(false);
+                form.reset();
+                setProcessingPhase('idle');
+              }, 1500);
             } else {
               throw new Error(purchaseResult.error);
             }
@@ -270,8 +280,48 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
       <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
         <DialogContent 
            onOpenAutoFocus={(e) => e.preventDefault()} 
-           className="bg-[#010a05]/95 border-white/10 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
+           className="bg-[#010a05]/95 border-emerald-500/20 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
         >
+          {/* Processing Overlay */}
+          {isSubmitting && processingPhase !== 'idle' && (
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#010a05]/90 backdrop-blur-md animate-in fade-in duration-300">
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full animate-pulse" />
+                <div className="relative h-20 w-20 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                  {processingPhase === 'done' ? (
+                    <ShieldCheck className="h-10 w-10 text-emerald-500" />
+                  ) : (
+                    <Loader2 className="h-10 w-10 text-emerald-500 animate-spin" />
+                  )}
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-bold text-white mb-2">
+                {processingPhase === 'crediting' && "Securing Tokens..."}
+                {processingPhase === 'generating' && "Preparing Invoice..."}
+                {processingPhase === 'done' && "Success!"}
+              </h3>
+              
+              <div className="flex flex-col items-center gap-1.5 px-8 text-center">
+                <p className="text-zinc-400 text-sm">
+                  {processingPhase === 'crediting' && "Aavija is crediting tokens to your ledger."}
+                  {processingPhase === 'generating' && "We are digitally signing your tax invoice."}
+                  {processingPhase === 'done' && "Tokens added and invoice downloaded."}
+                </p>
+                <div className="w-48 h-1 bg-white/5 rounded-full mt-4 overflow-hidden">
+                  <div 
+                    className={cn(
+                      "h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] transition-all duration-700 ease-in-out",
+                      processingPhase === 'crediting' && "w-1/3",
+                      processingPhase === 'generating' && "w-2/3",
+                      processingPhase === 'done' && "w-full"
+                    )} 
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <DialogHeader className="p-6 border-b border-white/5 bg-[#010a05]/40 relative">
             <div className="flex items-center gap-2">
               {step === 2 && (

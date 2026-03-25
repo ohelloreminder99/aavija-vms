@@ -69,46 +69,57 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.setFont('helvetica', 'bold');
   doc.text('TAX INVOICE', pageWidth - 14, 30, { align: 'right' });
 
-  // --- 3. Metadata Row (Fixed horizontal spacing to prevent overlap) ---
-  doc.setFillColor(248, 250, 252); // Very light blue-gray
-  doc.rect(14, 55, pageWidth - 28, 20, 'F');
+  // --- 3. Metadata Rows (Stacked for better readability and full ID display) ---
+  const metadataStartY = 50;
+  doc.setFillColor(248, 250, 252); 
+  doc.rect(14, metadataStartY, pageWidth - 28, 30, 'F');
   doc.setDrawColor(219, 234, 254);
-  doc.rect(14, 55, pageWidth - 28, 20, 'S');
+  doc.rect(14, metadataStartY, pageWidth - 28, 30, 'S');
 
   doc.setFontSize(8);
   doc.setTextColor(110, 110, 110);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('helvetica', 'normal');
 
-  // Col 1: Invoice ID
-  doc.text('INVOICE NUMBER', 20, 62);
-  // Col 2: Date
-  doc.text('DATE OF ISSUE', pageWidth * 0.45, 62);
-  // Col 3: Status
-  doc.text('STATUS', pageWidth - 20, 62, { align: 'right' });
-
+  // Row 1: Invoice Number
+  doc.text('INVOICE NUMBER:', 20, metadataStartY + 8);
   doc.setFontSize(10);
   doc.setTextColor(30, 30, 30);
   doc.setFont('helvetica', 'bold');
+  doc.text(invoice.id.toUpperCase(), 55, metadataStartY + 8);
 
-  // Cut ID if it's too long
-  const displayId = invoice.id.length > 20 ? invoice.id.substring(0, 20) + '...' : invoice.id;
-  doc.text(displayId, 20, 69);
-
+  // Row 2: Date
+  doc.setFontSize(8);
+  doc.setTextColor(110, 110, 110);
+  doc.setFont('helvetica', 'normal');
+  doc.text('DATE OF ISSUE:', 20, metadataStartY + 16);
+  
   let dateText = 'N/A';
   if (invoice.timestamp) {
     try {
       const d = typeof invoice.timestamp === 'string' ? parseISO(invoice.timestamp) : (invoice.timestamp.toDate?.() || new Date(invoice.timestamp));
-      dateText = format(d, 'dd MMM yyyy, p');
+      dateText = format(d, 'dd MMMM yyyy, hh:mm a');
     } catch (e) { console.error(e); }
   }
-  doc.text(dateText, pageWidth * 0.45, 69);
+  doc.setFontSize(10);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('helvetica', 'bold');
+  doc.text(dateText, 55, metadataStartY + 16);
 
-  const statusColor = invoice.status.toLowerCase() === 'paid' ? [34, 197, 94] : [234, 179, 8];
+  // Row 3: Status
+  doc.setFontSize(8);
+  doc.setTextColor(110, 110, 110);
+  doc.setFont('helvetica', 'normal');
+  doc.text('PAYMENT STATUS:', 20, metadataStartY + 24);
+  
+  const isPaid = invoice.status.toLowerCase() === 'paid';
+  const statusColor = isPaid ? [16, 185, 129] : [234, 179, 8]; // Emerald vs Amber
+  doc.setFontSize(10);
   doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
-  doc.text(invoice.status.toUpperCase(), pageWidth - 20, 69, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.text(invoice.status.toUpperCase(), 55, metadataStartY + 24);
 
   // --- 4. Billing Sections ---
-  const sectionY = 93;
+  const sectionY = 95;
 
   // Blue Divider
   doc.setDrawColor(219, 234, 254);
