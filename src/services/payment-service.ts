@@ -6,6 +6,10 @@ import crypto from 'crypto';
 interface CreateOrderPayload {
   amount: number; // Amount in the smallest currency unit (e.g., paise for INR)
   currency: string;
+  tokenAmount: number;
+  userId: string;
+  roleToCredit: 'owner' | 'visitor';
+  premiseId?: string | null;
   appCheckToken?: string;
 }
 
@@ -14,7 +18,7 @@ export async function createRazorpayOrder(payload: CreateOrderPayload): Promise<
   order?: { id: string; amount: number; currency: string };
   error?: string;
 }> {
-  const { amount, currency } = payload;
+  const { amount, currency, tokenAmount, userId, roleToCredit, premiseId } = payload;
   try {
     const { NEXT_PUBLIC_RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
 
@@ -27,8 +31,15 @@ export async function createRazorpayOrder(payload: CreateOrderPayload): Promise<
 
     const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
-    const { data: settings } = await supabase.from('settings').select('razorpay_key_id').eq('id', 'global').single();
+    
+    // --- SECURITY CHECK: IDOR PREVENTION ---
+    // Ensure the client isn't trying to forge an order for someone else's ID in the notes
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user || authData.user.id !== userId) {
+      return { success: false, error: 'Unauthorized: User ID mismatch during order creation.' };
+    }
 
+    const { data: settings } = await supabase.from('settings').select('razorpay_key_id').eq('id', 'global').single();
     const key_id = settings?.razorpay_key_id || NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
     const razorpay = new Razorpay({
@@ -40,6 +51,12 @@ export async function createRazorpayOrder(payload: CreateOrderPayload): Promise<
       amount,
       currency,
       receipt: `receipt_order_${new Date().getTime()}`,
+      notes: {
+        userId,
+        tokenAmount: String(tokenAmount),
+        roleToCredit,
+        ...(premiseId ? { premiseId } : {})
+      }
     };
 
     const order = await razorpay.orders.create(options);

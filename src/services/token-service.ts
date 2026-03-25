@@ -18,6 +18,7 @@ interface PurchaseTokensPayload {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
+  isWebhook?: boolean;
 }
 
 /**
@@ -38,6 +39,7 @@ export async function purchaseTokens(
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
+    isWebhook,
   } = payload;
 
   console.log(`Starting token purchase fulfillment for user: ${userId}, amount: ${tokenAmount}, order: ${razorpay_order_id}`);
@@ -48,10 +50,12 @@ export async function purchaseTokens(
 
     // --- STEP 0: SECURITY IDENTIFICATION (IDOR PROTECTION) ---
     const { createClient } = await import('@/lib/supabase/server');
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user || authData.user.id !== userId) {
-      throw new Error('Unauthorized: You can only purchase tokens for your own account.');
+    if (!isWebhook) {
+      const supabase = await createClient();
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError || !authData.user || authData.user.id !== userId) {
+        throw new Error('Unauthorized: You can only purchase tokens for your own account.');
+      }
     }
 
     const adminDb = await getAdminDb();
@@ -70,14 +74,16 @@ export async function purchaseTokens(
     }
 
     // --- STEP 0.2: RAZORPAY SIGNATURE VERIFICATION ---
-    const { verifyRazorpayPayment } = await import('./payment-service');
-    const verificationResult = await verifyRazorpayPayment({
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    });
-    if (!verificationResult.success) {
-      throw new Error(verificationResult.error || 'Cryptographic signature mismatch.');
+    if (!isWebhook) {
+      const { verifyRazorpayPayment } = await import('./payment-service');
+      const verificationResult = await verifyRazorpayPayment({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+      });
+      if (!verificationResult.success) {
+        throw new Error(verificationResult.error || 'Cryptographic signature mismatch.');
+      }
     }
 
     // --- STEP 1: PERFORM ALL READS FIRST ---
@@ -124,19 +130,22 @@ export async function purchaseTokens(
     let customerLegalName = '';
     let targetPremiseName = '';
     let logDescription = '';
+    
+    // Webhooks might not have the correct actorName in the payload, so fallback to the DB name
+    const finalActorName = isWebhook ? (userData.name || actorName) : actorName;
 
     if (roleToCredit === 'owner' && premiseData) {
       userState = premiseData.billingState || premiseData.city_state || 'Unknown';
       customerGstin = premiseData.gstNumber || '';
       customerBillingAddress = premiseData.billingAddress || '';
-      customerLegalName = premiseData.legalName || premiseData.name || actorName;
+      customerLegalName = premiseData.legalName || premiseData.name || finalActorName;
       targetPremiseName = premiseData.name || 'Premise';
       logDescription = `Purchased ${tokenAmount.toLocaleString()} tokens for premise "${targetPremiseName}". Invoice: ${invoiceId}`;
     } else {
       userState = userData.billingState || userData.city_state || 'Unknown';
       customerGstin = userData.gstNumber || '';
       customerBillingAddress = userData.billingAddress || '';
-      customerLegalName = userData.legalName || userData.name || actorName;
+      customerLegalName = userData.legalName || userData.name || finalActorName;
       logDescription = `Purchased ${tokenAmount.toLocaleString()} tokens for visitor balance. Invoice: ${invoiceId}`;
     }
 

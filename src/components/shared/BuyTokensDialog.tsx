@@ -157,6 +157,10 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
       const orderResult = await createRazorpayOrder({
         amount: totalInPaise,
         currency,
+        tokenAmount: data.quantity,
+        userId: user.id,
+        roleToCredit: role,
+        premiseId: premiseId || null,
         appCheckToken: '',
       });
 
@@ -277,10 +281,22 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
   return (
     <>
       <Script id="razorpay-checkout-js" src="https://checkout.razorpay.com/v1/checkout.js" />
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      
+      {/* 
+        Manual high-blur backdrop that doesn't block focus/pointer events.
+        Necessary because modal={false} is required for Razorpay interaction.
+      */}
+      {open && (
+        <div 
+          className="fixed inset-0 z-[40] bg-[#010a05]/80 backdrop-blur-xl pointer-events-none animate-in fade-in duration-500" 
+          aria-hidden="true" 
+        />
+      )}
+
+      <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
         <DialogContent 
            onOpenAutoFocus={(e) => e.preventDefault()} 
-           className="bg-[#010a05]/95 border-emerald-500/20 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl"
+           className="bg-[#010a05]/95 border-emerald-500/20 backdrop-blur-3xl shadow-2xl max-w-md p-0 overflow-hidden rounded-2xl z-50"
         >
           {/* Processing Overlay */}
           {isSubmitting && processingPhase !== 'idle' && (

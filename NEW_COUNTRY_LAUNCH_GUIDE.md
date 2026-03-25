@@ -23,6 +23,7 @@ This guide provides a step-by-step technical and operational checklist for launc
     - `SUPABASE_SERVICE_ROLE_KEY` (Private)
     - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
     - `RAZORPAY_KEY_SECRET` (Private)
+    - `RAZORPAY_WEBHOOK_SECRET` (Private - Required for background token fulfillment)
     - `WHATSAPP_PHONE_NUMBER_ID`
     - `WHATSAPP_ACCESS_TOKEN` (Private)
     - `NEXT_PUBLIC_ADMIN_EMAIL` (To bootstrap the first admin)
@@ -76,7 +77,10 @@ Run the following scripts in the **Supabase SQL Editor** in this EXACT order to 
 ### A. Razorpay (Payments & Billing)
 1.  **Currency Support**: Ensure your Razorpay account supports the target country's currency (e.g., AED, USD).
 2.  **API Keys**: Update `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in Vercel.
-3.  **Webhooks**: Point Razorpay webhooks to `https://[your-subdomain]/api/webhooks/razorpay` to handle payment failures/successes.
+3.  **Webhooks (CRITICAL)**: Point Razorpay webhooks to `https://[your-subdomain]/api/webhooks/razorpay` to guarantee token fulfillment.
+    - Select the `order.paid` event.
+    - Create a secure random Webhook Secret string in the Razorpay dashboard.
+    - Add that identical secret as `RAZORPAY_WEBHOOK_SECRET` in your Vercel Environment Variables.
 
 ### B. Meta WhatsApp Cloud API
 1.  **Phone Number ID**: Obtain from Meta Developers portal and add to `WHATSAPP_PHONE_NUMBER_ID`.
@@ -109,36 +113,7 @@ Ensure the following buckets exist and are set to "Public":
 - `premises` (Premise branding)
 - `bills` (Invoices/Receipts)
 
----
-
-## 3. Third-Party Service Integration
-
-### A. Razorpay (Payments & Billing)
-1.  **Currency Support**: Ensure your Razorpay account supports the target country's currency (e.g., AED, USD).
-2.  **API Keys**: Update `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in Vercel.
-3.  **Webhooks**: Point Razorpay webhooks to `https://[your-subdomain]/api/webhooks/razorpay` to handle payment failures/successes.
-
-### B. Meta WhatsApp Cloud API
-1.  **Phone Number ID**: Obtain from Meta Developers portal and add to `WHATSAPP_PHONE_NUMBER_ID`.
-2.  **Access Token**: Generate a **Permanent System User Token** in Business Settings.
-3.  **Templates**: Mirror the templates listed in `src/services/whatsapp-service.ts` (e.g., `aavija_payout_approved`, `aavija_referral_commission`) in the Meta Business Manager for the target language/region.
-
----
-
-## 4. Admin Dashboard Configuration
-
-Once the site is live, log in as Admin and navigate to **Dashboard -> Token Settings**:
-
-1.  **Currency**: Set to the local currency code (e.g., `USD`, `AED`).
-2.  **Token Exchange Rate**: Define how much 1 token costs in that currency.
-3.  **Country Code**: Set the `default_country_code` (e.g., `+971`).
-4.  **Phone Length**: Set the expected length (e.g., `9` for UAE mobile numbers).
-5.  **Tax Rates**: Configure `cgst_rate_default`, `sgst_rate_default`, and `igst_rate_default` based on local tax laws (or set to 0 if not applicable).
-6.  **Billing Identity**: Update `company_name_billing` and `company_address_billing` for local legal compliance.
-
----
-
-## 6. Architectural Hardening (100-Year Scalability)
+## 5. Architectural Hardening (100-Year Scalability)
 
 To ensure the system remains fast and automated over years of operation, you must run the following hardening steps:
 
