@@ -71,12 +71,12 @@ import {
 import { useUserProfile } from '@/services/user-service';
 import { useUser, useDoc } from '@/supabase';
 import { Premise, usePremiseMembers, usePremiseGates, PremiseMember } from '@/services/premise-service';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { createGatekeeper, assignGatekeeperRoleByEmail, removeGatekeeperFromPremise, toggleGatekeeperStatus } from './actions';
-import { useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -99,6 +99,7 @@ type AssignFormValues = z.infer<typeof assignSchema>;
 
 
 export default function GatekeepersPage() {
+    const router = useRouter();
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
@@ -149,6 +150,7 @@ export default function GatekeepersPage() {
             });
             if (result.success) {
                 toast({ title: 'Success', description: `Gatekeeper account for ${data.name} has been created.` });
+                router.refresh();
                 setIsFormOpen(false);
                 createForm.reset();
             } else {
@@ -177,6 +179,7 @@ export default function GatekeepersPage() {
             });
             if (result.success) {
                 toast({ title: 'Success', description: `Role assigned to ${data.email}.` });
+                router.refresh();
                 setIsFormOpen(false);
                 assignForm.reset();
             } else {
@@ -200,6 +203,7 @@ export default function GatekeepersPage() {
             });
             if (result.success) {
                 toast({ title: 'Success', description: `Gatekeeper ${gatekeeperToRemove.user?.name} removed from premise.` });
+                router.refresh();
                 setGatekeeperToRemove(null);
             } else {
                 toast({ variant: 'destructive', title: 'Error', description: result.error });
@@ -224,6 +228,7 @@ export default function GatekeepersPage() {
             });
             if (result.success) {
                 toast({ title: 'Status Updated', description: `Gatekeeper ${gatekeeperToToggle.user?.name} is now ${newStatus ? 'active' : 'inactive'}.` });
+                router.refresh();
                 setGatekeeperToToggle(null);
             } else {
                 toast({ variant: 'destructive', title: 'Error', description: result.error });

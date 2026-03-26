@@ -16,7 +16,10 @@ export default function OwnerDashboardPage() {
     const searchParams = useSearchParams();
     const premiseId = searchParams.get('premiseId') ?? undefined;
     const [visitCount, setVisitCount] = React.useState<number | null>(null);
-    const [isVisitCountLoading, setIsVisitCountLoading] = React.useState(true);
+    const [hostCount, setHostCount] = React.useState<number | null>(null);
+    const [gatekeeperCount, setGatekeeperCount] = React.useState<number | null>(null);
+    const [gateCount, setGateCount] = React.useState<number | null>(null);
+    const [isStatsLoading, setIsStatsLoading] = React.useState(true);
     const { data: settings } = useSettings();
 
     const docRef = React.useMemo(() => {
@@ -28,29 +31,47 @@ export default function OwnerDashboardPage() {
 
     React.useEffect(() => {
         if (!premiseId) return;
-
-        const fetchCount = async () => {
-            setIsVisitCountLoading(true);
+ 
+        const fetchStats = async () => {
+            setIsStatsLoading(true);
             try {
                 const supabase = createClient();
-                const { count, error } = await supabase.from('visits').select('*', { count: 'exact', head: true }).eq('premise_id', premiseId);
-                if (error) { throw error; }
-                setVisitCount(count);
+                
+                const [visitsRes, hostsRes, gatekeepersRes, gatesRes] = await Promise.all([
+                    supabase.from('visits').select('*', { count: 'exact', head: true }).eq('premise_id', premiseId),
+                    supabase.from('premise_members').select('*', { count: 'exact', head: true }).eq('premise_id', premiseId).eq('role', 'host'),
+                    supabase.from('premise_members').select('*', { count: 'exact', head: true }).eq('premise_id', premiseId).eq('role', 'gatekeeper'),
+                    supabase.from('premise_gates').select('*', { count: 'exact', head: true }).eq('premise_id', premiseId)
+                ]);
+
+                setVisitCount(visitsRes.count);
+                setHostCount(hostsRes.count);
+                setGatekeeperCount(gatekeepersRes.count);
+                setGateCount(gatesRes.count);
+
             } catch (error) {
-                console.error("Failed to fetch visit count:", error);
-                setVisitCount(0); // Set to 0 on error
+                console.error("Failed to fetch dashboard stats:", error);
             } finally {
-                setIsVisitCountLoading(false);
+                setIsStatsLoading(false);
             }
         }
-        fetchCount();
-
+        fetchStats();
     }, [premiseId]);
+
+    const computedPremise = React.useMemo(() => {
+        if (!premise) return null;
+        return {
+            ...premise,
+            host_count: hostCount ?? premise.host_count ?? 0,
+            gatekeeper_count: gatekeeperCount ?? premise.gatekeeper_count ?? 0,
+            gate_count: gateCount ?? premise.gate_count ?? 0,
+        };
+    }, [premise, hostCount, gatekeeperCount, gateCount]);
 
 
     return (
         <div className="container py-10">
-            <OnboardingChecklist premise={premise || undefined} isLoading={isLoadingPremise} />
+            <OnboardingChecklist premise={computedPremise || undefined} isLoading={isLoadingPremise || isStatsLoading} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Stats column */}
                 <div className="lg:col-span-2 space-y-6">
@@ -71,7 +92,7 @@ export default function OwnerDashboardPage() {
                             href={`/dashboard/owner/history?premiseId=${premiseId}`}
                             icon={History}
                             value={visitCount ?? 0}
-                            isLoading={isVisitCountLoading}
+                            isLoading={isStatsLoading}
                         />
                         <DashboardCard
                             variant="stat"
@@ -79,8 +100,8 @@ export default function OwnerDashboardPage() {
                             description="Manage your hosts"
                             href={`/dashboard/owner/hosts?premiseId=${premiseId}`}
                             icon={Users}
-                            value={premise?.host_count ?? 0}
-                            isLoading={isLoadingPremise}
+                            value={hostCount ?? premise?.host_count ?? 0}
+                            isLoading={isStatsLoading}
                         />
                         <DashboardCard
                             variant="stat"
@@ -88,8 +109,8 @@ export default function OwnerDashboardPage() {
                             description="Manage your gatekeepers"
                             href={`/dashboard/owner/gatekeepers?premiseId=${premiseId}`}
                             icon={ShieldCheck}
-                            value={premise?.gatekeeper_count ?? 0}
-                            isLoading={isLoadingPremise}
+                            value={gatekeeperCount ?? premise?.gatekeeper_count ?? 0}
+                            isLoading={isStatsLoading}
                         />
                         <DashboardCard
                             variant="stat"
@@ -97,8 +118,8 @@ export default function OwnerDashboardPage() {
                             description="Configure premise entry nodes"
                             href={`/dashboard/owner/gates?premiseId=${premiseId}`}
                             icon={DoorOpen}
-                            value={premise?.gate_count ?? 0}
-                            isLoading={isLoadingPremise}
+                            value={gateCount ?? premise?.gate_count ?? 0}
+                            isLoading={isStatsLoading}
                         />
                     </div>
 

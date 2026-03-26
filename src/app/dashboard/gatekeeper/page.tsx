@@ -78,7 +78,10 @@ function ScannerDialog({
 
         html5QrCode.start(
           { facingMode: 'environment' },
-          { fps: 10 },
+          { 
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+          },
           onScanSuccess,
           () => { } // Optional error callback
         ).catch(err => {

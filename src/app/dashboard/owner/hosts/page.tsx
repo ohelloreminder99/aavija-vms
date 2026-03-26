@@ -80,7 +80,7 @@ import { createHost, toggleHostStatus, removeHostFromPremise, assignHostRoleByEm
 import { bulkEnrollHosts, BulkMemberData } from '@/services/bulk-member-service';
 import { usePremiseMembers, usePremiseGates, PremiseMember } from '@/services/premise-service';
 import { Badge } from '@/components/ui/badge';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { createClient } from '@/lib/supabase/client';
@@ -103,6 +103,7 @@ const assignSchema = z.object({
 type AssignFormValues = z.infer<typeof assignSchema>;
 
 export default function HostsPage() {
+    const router = useRouter();
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
@@ -165,6 +166,7 @@ export default function HostsPage() {
             const result = await createHost({ ...data, premiseId, premiseCity: premise.city, actor: { id: user.id, name: userProfile.name, role: 'owner' } });
             if (result.success) {
                 toast({ title: 'Success', description: `Host account for ${data.name} has been created.` });
+                router.refresh();
                 setIsCreateFormOpen(false);
                 createForm.reset();
             } else {
@@ -191,6 +193,7 @@ export default function HostsPage() {
             const result = await assignHostRoleByEmail({ email: data.email, identity: data.identity, premiseId, actor: { id: user.id, name: userProfile.name, role: 'owner' } });
             if (result.success) {
                 toast({ title: 'Success', description: `Role assigned to ${data.email}.` });
+                router.refresh();
                 setIsCreateFormOpen(false);
                 assignForm.reset();
             } else {
@@ -238,6 +241,7 @@ export default function HostsPage() {
                 if (result.success) {
                     setBulkProgress(100);
                     toast({ title: 'Bulk Enrollment Complete', description: `Successfully processed ${result.count} hosts.` });
+                    router.refresh();
                     setIsBulkImportOpen(false);
                 } else {
                     toast({ variant: 'destructive', title: 'Bulk Enrollment Failed', description: result.errors.join(', ') || 'Unknown error' });
@@ -265,6 +269,7 @@ export default function HostsPage() {
             });
             if (result.success) {
                 toast({ title: 'Success', description: `Host ${hostToToggle.user?.name || 'Unknown'} has been ${newStatus ? 'activated' : 'deactivated'}.` });
+                router.refresh();
             } else {
                 toast({ variant: 'destructive', title: 'Action Failed', description: result.error });
             }
@@ -288,6 +293,7 @@ export default function HostsPage() {
             });
             if (result.success) {
                 toast({ title: 'Host Removed', description: `${hostToRemove.user?.name || 'Unknown'} has been removed from this premise.` });
+                router.refresh();
             } else {
                 toast({ variant: 'destructive', title: 'Removal Failed', description: result.error });
             }

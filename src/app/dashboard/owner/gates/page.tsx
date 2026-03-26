@@ -61,7 +61,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserProfile } from '@/services/user-service';
 import { useUser, useDoc } from '@/supabase';
 import { usePremiseGates, Premise, PremiseGate } from '@/services/premise-service';
@@ -77,6 +77,7 @@ const gateSchema = z.object({
 type GateFormValues = z.infer<typeof gateSchema>;
 
 export default function GatesPage() {
+    const router = useRouter();
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
@@ -134,6 +135,7 @@ export default function GatesPage() {
 
             if (result.success) {
                 toast({ title: 'Success', description: `Gate ${values.name} has been ${gateToEdit ? 'updated' : 'created'}.` });
+                router.refresh();
                 setIsCreateDialogOpen(false);
                 setGateToEdit(null);
             } else {
@@ -158,6 +160,7 @@ export default function GatesPage() {
             });
             if (result.success) {
                 toast({ title: 'Success', description: `Gate ${gateToDelete.name} deleted.` });
+                router.refresh();
                 setGateToDelete(null);
             } else {
                 toast({ variant: 'destructive', title: 'Error', description: result.error });
