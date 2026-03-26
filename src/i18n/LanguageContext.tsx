@@ -64,7 +64,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
     const t = (key: string): string => {
         // Return translation, fallback to English, fallback to raw key
-        return dict[key] || en[key] || key;
+        return dict[key] || (en as any)[key] || key;
     };
 
     return (

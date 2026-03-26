@@ -87,7 +87,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
                     city: selectedCityObj?.name || 'Unknown',
                     city_state: selectedCityObj?.stateName || 'Unknown',
                     is_verified: false,
-                });
+                } as any);
 
                 // 2. Request OTP
                 const res = await sendWhatsAppOtp({
