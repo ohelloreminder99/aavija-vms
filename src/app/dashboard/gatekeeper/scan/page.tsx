@@ -59,7 +59,12 @@ export default function ScanPage() {
         return;
       }
 
-      html5QrCode = new Html5Qrcode(scannerId);
+      html5QrCode = new Html5Qrcode(scannerId, {
+        verbose: false,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        }
+      });
       const onScanSuccess = (decodedText: string) => {
         if (!didScan && html5QrCode?.isScanning) {
           didScan = true;
@@ -74,7 +79,8 @@ export default function ScanPage() {
         { facingMode: 'environment' },
         { 
           fps: 10,
-          qrbox: { width: 250, height: 250 }
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
         },
         onScanSuccess,
         () => { } // Optional error callback

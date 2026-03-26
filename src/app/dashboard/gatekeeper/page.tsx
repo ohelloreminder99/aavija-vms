@@ -65,7 +65,12 @@ function ScannerDialog({
           return;
         }
 
-        html5QrCode = new Html5Qrcode(scannerRegionId);
+        html5QrCode = new Html5Qrcode(scannerRegionId, {
+          verbose: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
+        });
         const onScanSuccess = (decodedText: string) => {
           if (!didScan && html5QrCode?.isScanning) {
             didScan = true;
@@ -80,7 +85,8 @@ function ScannerDialog({
           { facingMode: 'environment' },
           { 
             fps: 10,
-            qrbox: { width: 250, height: 250 }
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
           },
           onScanSuccess,
           () => { } // Optional error callback
