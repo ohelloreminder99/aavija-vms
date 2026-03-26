@@ -295,7 +295,7 @@ export default function AgentLedgerPage() {
               <div className="space-y-2 text-sm">
                 <p className="text-lg font-bold capitalize">{agent?.name}</p>
                 <p className="text-muted-foreground">{agent?.phone}</p>
-                <p className="text-muted-foreground capitalize">{agent?.city}</p>
+                <p className="text-muted-foreground capitalize">{(agent as any)?.city}</p>
               </div>
             )}
           </CardContent>
@@ -307,7 +307,7 @@ export default function AgentLedgerPage() {
           <CardContent>
             {isLoadingAgent ? <Loader2 className='animate-spin' /> : (
               <p className="text-4xl font-bold font-mono">
-                {(agent?.commission_balance ?? 0).toFixed(2)}
+                {((agent as any)?.commission_balance ?? 0).toFixed(2)}
                 <span className='text-lg font-sans text-muted-foreground ml-2'>{currency}</span>
               </p>
             )}

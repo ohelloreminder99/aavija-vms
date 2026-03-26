@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -258,15 +258,15 @@ export default function ConfirmPage() {
               <div className="flex items-center gap-4">
                 <Phone className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">{visitor?.countryCode ? `(${visitor.countryCode}) ` : ''}{visitor?.phone}</p>
+                  <p className="font-medium">{(visitor as any)?.countryCode ? `(${(visitor as any).countryCode}) ` : ''}{(visitor as any)?.phone}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <Car className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                 <div>
                   <p className="font-medium">
-                    {visitor?.selected_vehicle_number && visitor?.vehicles?.find(v => v.number === visitor.selected_vehicle_number)
-                      ? `${visitor.selected_vehicle_number} (${visitor.vehicles.find(v => v.number === visitor.selected_vehicle_number)?.type})`
+                    {visitor?.selected_vehicle_number && (visitor as any)?.vehicles?.find((v: any) => v.number === visitor.selected_vehicle_number)
+                      ? `${visitor.selected_vehicle_number} (${(visitor as any).vehicles.find((v: any) => v.number === visitor.selected_vehicle_number)?.type})`
                       : 'N/A'}
                   </p>
                 </div>

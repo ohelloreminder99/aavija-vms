@@ -14,7 +14,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { adminProcessPayout, adminRejectPayout, getPayoutRequestsForAdmin, type PayoutRequest } from '@/services/agent-service';
 import Link from 'next/link';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 type EnrichedRequest = PayoutRequest & { userName: string; userEmail: string; userPhoto: string };
@@ -104,18 +103,29 @@ export default function AdminPayoutsPage() {
                 {pendingCount > 0 && <Badge variant="destructive" className="ml-auto">{pendingCount} Pending</Badge>}
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-4">
-                    <TabsTrigger value="pending">Pending {pendingCount > 0 && `(${pendingCount})`}</TabsTrigger>
-                    <TabsTrigger value="processing">Processing</TabsTrigger>
-                    <TabsTrigger value="paid">Paid</TabsTrigger>
-                    <TabsTrigger value="rejected">Rejected</TabsTrigger>
-                    <TabsTrigger value="all">All</TabsTrigger>
-                </TabsList>
+            <div className="mb-4 flex flex-wrap gap-2">
+                {[
+                    { id: 'pending', label: `Pending ${pendingCount > 0 ? `(${pendingCount})` : ''}` },
+                    { id: 'processing', label: 'Processing' },
+                    { id: 'paid', label: 'Paid' },
+                    { id: 'rejected', label: 'Rejected' },
+                    { id: 'all', label: 'All' },
+                ].map((tab) => (
+                    <Button
+                        key={tab.id}
+                        variant={activeTab === tab.id ? 'default' : 'secondary'}
+                        size="sm"
+                        onClick={() => setActiveTab(tab.id)}
+                        className="rounded-lg shadow-sm"
+                    >
+                        {tab.label}
+                    </Button>
+                ))}
+            </div>
 
-                <TabsContent value={activeTab}>
-                    <Card>
-                        <CardContent className="p-0">
+            <div>
+                <Card>
+                    <CardContent className="p-0">
                             {isLoading ? (
                                 <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin" /></div>
                             ) : filtered.length === 0 ? (
@@ -192,8 +202,7 @@ export default function AdminPayoutsPage() {
                             )}
                         </CardContent>
                     </Card>
-                </TabsContent>
-            </Tabs>
+            </div>
 
             {/* Approve Dialog */}
             <Dialog open={!!approveTarget} onOpenChange={open => !open && setApproveTarget(null)}>
