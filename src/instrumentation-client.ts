@@ -28,3 +28,5 @@ Sentry.init({
         'ResizeObserver loop limit exceeded',
     ],
 });
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
