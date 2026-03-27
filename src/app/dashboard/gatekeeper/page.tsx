@@ -62,11 +62,9 @@ function ScannerDialog({
         const instance = scannerRef.current;
         scannerRef.current = null;
         isInitializingRef.current = false;
-        if (instance.isScanning) {
-          instance.stop().then(() => { try { instance.clear(); } catch(e) {} }).catch(console.error);
-        } else {
-          try { instance.clear(); } catch(e) {}
-        }
+        instance.stop()
+          .then(() => { try { instance.clear(); } catch(e) {} })
+          .catch(() => { try { instance.clear(); } catch(e) {} });
       }
       setIsProcessing(false);
       return;
@@ -88,32 +86,40 @@ function ScannerDialog({
         return;
       }
 
-      const scanner = new Html5Qrcode(scannerRegionId, { verbose: false });
+      const scanner = new Html5Qrcode(scannerRegionId, {
+        verbose: false,
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      });
       scannerRef.current = scanner;
 
       const onScanSuccess = (decodedText: string) => {
-        if (!didScan && scannerRef.current?.isScanning) {
-          didScan = true;
-          setIsProcessing(true);
-          scannerRef.current.stop().finally(() => {
-            scannerRef.current = null;
-            isInitializingRef.current = false;
-            onScan(decodedText);
-          });
+        // Use only `didScan` as the guard — avoids the isScanning race condition
+        if (didScan) return;
+        didScan = true;
+        setIsProcessing(true);
+        const instance = scannerRef.current;
+        scannerRef.current = null;
+        isInitializingRef.current = false;
+        if (instance) {
+          instance.stop()
+            .catch(() => {})
+            .finally(() => onScan(decodedText));
+        } else {
+          onScan(decodedText);
         }
       };
 
       scanner.start(
         { facingMode: 'environment' },
         {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
+          fps: 15,
+          qrbox: { width: 260, height: 260 },
         },
         onScanSuccess,
         () => {} // silent error callback for frame-by-frame scan failures (normal)
       ).then(() => {
         isInitializingRef.current = false;
-      }).catch(err => {
+      }).catch(() => {
         scannerRef.current = null;
         isInitializingRef.current = false;
         toast({
@@ -137,19 +143,38 @@ function ScannerDialog({
         <DialogHeader className="p-8 border-b border-white/10 bg-white/5">
           <DialogTitle className="text-2xl font-bold text-white tracking-tight">Scan <span className="text-primary/80">QR Code</span></DialogTitle>
           <DialogDescription className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mt-2">
-            Position the visitor's QR code in front of the camera.
+            Point the camera at the visitor&apos;s QR code to scan automatically.
           </DialogDescription>
         </DialogHeader>
         <div className="relative min-h-[400px] p-8">
           {isProcessing && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white">Processing Data...</p>
+              <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white">Processing Visitor Data...</p>
             </div>
           )}
-          <div id={scannerRegionId} className="w-full rounded-2xl overflow-hidden border border-white/10 shadow-inner" />
+          <div className="relative">
+            <div id={scannerRegionId} className="w-full rounded-2xl overflow-hidden border border-white/10 shadow-inner" />
+            {/* Animated scan line overlay */}
+            {!isProcessing && (
+              <div
+                className="absolute left-0 right-0 h-0.5 bg-primary/70 shadow-[0_0_8px_2px_rgba(var(--primary),0.6)] rounded-full"
+                style={{
+                  animation: 'scanLine 2s ease-in-out infinite',
+                  top: '20%',
+                }}
+              />
+            )}
+          </div>
+          <style>{`
+            @keyframes scanLine {
+              0%, 100% { top: 20%; }
+              50% { top: 75%; }
+            }
+          `}</style>
         </div>
-        <div className="p-6 border-t border-white/5 bg-white/[0.02] flex justify-end">
+        <div className="p-6 border-t border-white/5 bg-white/[0.02] flex items-center justify-between">
+          <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Hold steady · Auto-detects</p>
           <Button variant="outline" onClick={() => onOpenChange(false)} className="bg-white/5 border-white/10 text-zinc-400 hover:text-white">Close Scanner</Button>
         </div>
       </DialogContent>

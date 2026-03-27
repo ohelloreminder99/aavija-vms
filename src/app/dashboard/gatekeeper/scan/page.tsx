@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, RefreshCw, ShieldAlert } from 'lucide-react';
@@ -71,26 +71,36 @@ export default function ScanPage() {
         return;
       }
 
-      const scanner = new Html5Qrcode(SCANNER_ID, { verbose: false });
+      const scanner = new Html5Qrcode(SCANNER_ID, {
+        verbose: false,
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      });
       scannerRef.current = scanner;
 
       const onScanSuccess = (decodedText: string) => {
-        if (!didScan && scannerRef.current?.isScanning) {
-          didScan = true;
-          setIsProcessing(true);
-          scannerRef.current.stop().finally(() => {
-            scannerRef.current = null;
-            isInitializingRef.current = false;
-            router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
-          });
+        // Use only `didScan` as the guard — avoids race condition with isScanning
+        if (didScan) return;
+        didScan = true;
+        setIsProcessing(true);
+        const instance = scannerRef.current;
+        scannerRef.current = null;
+        isInitializingRef.current = false;
+        if (instance) {
+          instance.stop()
+            .catch(() => {})
+            .finally(() => {
+              router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
+            });
+        } else {
+          router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
         }
       };
 
       scanner.start(
         { facingMode: 'environment' },
         {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
+          fps: 15,
+          qrbox: { width: 260, height: 260 },
         },
         onScanSuccess,
         () => {} // silent per-frame failure callback (normal)
@@ -116,11 +126,9 @@ export default function ScanPage() {
       if (scannerRef.current) {
         const instance = scannerRef.current;
         scannerRef.current = null;
-        if (instance.isScanning) {
-          instance.stop().then(() => { try { instance.clear(); } catch(e) {} }).catch(console.error);
-        } else {
-          try { instance.clear(); } catch(e) {}
-        }
+        instance.stop()
+          .then(() => { try { instance.clear(); } catch(e) {} })
+          .catch(() => { try { instance.clear(); } catch(e) {} });
       }
     };
   }, [shouldScan, router, toast, premiseId]);
