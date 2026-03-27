@@ -35,9 +35,13 @@ export async function sendWhatsAppOtp(payload: {
     // await verifyAppCheck();
 
     // 2. Rate Limiting Logic
-    const { data: userDoc } = await adminDb.from('users')
+    const { data: userDoc, error: userDocErr } = await adminDb.from('users')
       .select('id, name, phone, token_balance_visitor, action_timestamps')
       .eq('id', userId).single();
+    
+    if (userDocErr) {
+      throw new Error(`Database error fetching profile: ${userDocErr.message}`);
+    }
     if (!userDoc) {
       throw new Error("User profile not found.");
     }
@@ -72,7 +76,7 @@ export async function sendWhatsAppOtp(payload: {
       .select('id')
       .eq('phone', exactMatchPhone)
       .eq('is_verified', true)
-      .single();
+      .maybeSingle();
 
     if (existingVerifiedUser && existingVerifiedUser.id !== userId) {
       throw new Error("This phone number is already registered and verified by another user. Please use a different number or contact support.");
@@ -82,7 +86,7 @@ export async function sendWhatsAppOtp(payload: {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    const { data: existingOtp } = await adminDb.from('whatsapp_otps').select('id').eq('id', userId).single();
+    const { data: existingOtp } = await adminDb.from('whatsapp_otps').select('id').eq('id', userId).maybeSingle();
 
     if (existingOtp) {
       await adminDb.from('whatsapp_otps').update({ otp, expiresAt }).eq('id', userId);

@@ -10,7 +10,7 @@ import { z } from 'zod';
 const SignupSchema = z.object({
   userId: z.string().uuid(),
   email: z.string().email(),
-  name: z.string().min(1).max(100).optional(),
+  name: z.string().optional(),
   refCode: z.string().nullable().optional(),
 });
 

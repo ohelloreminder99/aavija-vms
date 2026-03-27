@@ -54,14 +54,23 @@ export async function createGatekeeper(
     const gatekeeperUid = authData.user!.id;
 
     // 2. Create User Profile
-    await adminDb.from('users').upsert({
+    const { error: userError } = await adminDb.from('users').upsert({
       id: gatekeeperUid,
       name,
       email,
       role: 'visitor',
+      premise_roles: {
+        [premiseId]: ['gatekeeper']
+      },
       is_active: true,
       is_verified: false,
     });
+
+    if (userError) {
+      // rollback auth creation
+      await adminDb.auth.admin.deleteUser(gatekeeperUid);
+      throw new Error(`Profile creation failed: ${userError.message}`);
+    }
 
     // 3. Add to Premise Members (Relational)
     const { error: memberError } = await adminDb.from('premise_members').insert({
@@ -120,8 +129,15 @@ export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperPaylo
       if (!permCheck || permCheck.owner_id !== authUser.id) throw new Error('Unauthorized');
     }
 
-    const { data: userDoc } = await adminDb.from('users').select('id, name').eq('email', email).single();
+    const { data: userDoc } = await adminDb.from('users').select('id, name, premise_roles').eq('email', email).single();
     if (!userDoc) return { success: false, error: 'No user found with that email address.' };
+
+    const currentRoles = userDoc.premise_roles || {};
+    const premiseRoles = currentRoles[premiseId] || [];
+    if (!premiseRoles.includes('gatekeeper')) premiseRoles.push('gatekeeper');
+    currentRoles[premiseId] = premiseRoles;
+
+    await adminDb.from('users').update({ premise_roles: currentRoles }).eq('id', userDoc.id);
 
     const { error: memberError } = await adminDb.from('premise_members').upsert({
       premise_id: premiseId,
@@ -162,6 +178,19 @@ export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: 
     if (error) throw error;
 
     await adminDb.rpc('decrement_gatekeeper_count', { premise_id_param: premiseId });
+
+    const { data: userDoc } = await adminDb.from('users').select('*').eq('id', userId).single();
+    if (userDoc) {
+      const currentRoles = userDoc.premise_roles || {};
+      const premiseRoles = currentRoles[premiseId] || [];
+      const newPremiseRoles = premiseRoles.filter((r: string) => r !== 'gatekeeper');
+      if (newPremiseRoles.length === 0) {
+        delete currentRoles[premiseId];
+      } else {
+        currentRoles[premiseId] = newPremiseRoles;
+      }
+      await adminDb.from('users').update({ premise_roles: currentRoles }).eq('id', userId);
+    }
 
     await createLogEntry({
       actorId: actor.id,
