@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, RefreshCw, ShieldAlert } from 'lucide-react';
@@ -12,12 +12,18 @@ import { useDoc } from '@/supabase';
 import { usePremiseCategories } from '@/services/premise-category-service';
 import { useSettings } from '@/services/settings-service';
 
+const SCANNER_ID = 'qr-scanner-fallback';
+
 export default function ScanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const premiseId = searchParams.get('premiseId');
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
+
+  // Ref-based singleton guard — prevents StrictMode double-init and dual scanner issue
+  const scannerRef = React.useRef<Html5Qrcode | null>(null);
+  const isInitializingRef = React.useRef(false);
 
   const docRef = React.useMemo(() => {
     if (!premiseId) return null;
@@ -40,80 +46,84 @@ export default function ScanPage() {
 
   const hasSufficientPremiseTokens = React.useMemo(() => {
     if (settings?.hide_token_economy) return true;
-    if (!premise || !currentCategory) return true; // Default allow while loading
-    if (categoryType === 'residential') return true; // Residential doesn't lock scanner
+    if (!premise || !currentCategory) return true;
+    if (categoryType === 'residential') return true;
     return (premise.token_balance || 0) >= premiseDeduction;
   }, [premise, currentCategory, categoryType, premiseDeduction, settings]);
 
+  const shouldScan = hasSufficientPremiseTokens && !isPremiseLoading && !areCategoriesLoading;
+
   React.useEffect(() => {
-    if (!hasSufficientPremiseTokens && !isPremiseLoading && !areCategoriesLoading) return;
+    if (!shouldScan) return;
 
-    let html5QrCode: Html5Qrcode | null = null;
+    // Guard: bail if already initializing or running
+    if (isInitializingRef.current || scannerRef.current) return;
+    isInitializingRef.current = true;
+
     let didScan = false;
-    let scanPromise: Promise<any> | null = null;
-    let isMounted = true;
-    const scannerId = 'qr-scanner-fallback';
 
-    const startScannerWithPolling = () => {
-      if (!isMounted) return;
-      const scannerElement = document.getElementById(scannerId);
-      if (!scannerElement) {
-        setTimeout(startScannerWithPolling, 100); // Poll until element exists
+    const startScanner = () => {
+      if (scannerRef.current || !isInitializingRef.current) return;
+
+      const element = document.getElementById(SCANNER_ID);
+      if (!element) {
+        setTimeout(startScanner, 150);
         return;
       }
 
-      html5QrCode = new Html5Qrcode(scannerId, {
-        verbose: false,
-        formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
-      });
-      
+      const scanner = new Html5Qrcode(SCANNER_ID, { verbose: false });
+      scannerRef.current = scanner;
+
       const onScanSuccess = (decodedText: string) => {
-        if (!didScan && html5QrCode?.isScanning) {
+        if (!didScan && scannerRef.current?.isScanning) {
           didScan = true;
           setIsProcessing(true);
-          html5QrCode.stop().then(() => {
+          scannerRef.current.stop().finally(() => {
+            scannerRef.current = null;
+            isInitializingRef.current = false;
             router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
           });
         }
       };
 
-      scanPromise = html5QrCode.start(
+      scanner.start(
         { facingMode: 'environment' },
-        { 
+        {
           fps: 10,
-          qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            return { width: minEdge * 0.7, height: minEdge * 0.7 };
-          }
+          qrbox: { width: 250, height: 250 },
         },
         onScanSuccess,
-        () => { } // Optional error callback
-      ).catch(err => {
-        if (isMounted) {
-          toast({
-            variant: 'destructive',
-            title: 'Camera Error',
-            description: 'Failed to start camera. Please ensure permissions are granted and try refreshing the page.',
-          });
-        }
+        () => {} // silent per-frame failure callback (normal)
+      ).then(() => {
+        isInitializingRef.current = false;
+      }).catch(() => {
+        scannerRef.current = null;
+        isInitializingRef.current = false;
+        toast({
+          variant: 'destructive',
+          title: 'Camera Error',
+          description: 'Failed to start camera. Please ensure permissions are granted and try refreshing.',
+        });
       });
     };
 
-    startScannerWithPolling();
+    // Delay to ensure the DOM element is rendered before querying
+    const timer = setTimeout(startScanner, 300);
 
     return () => {
-      isMounted = false;
-      if (scanPromise) {
-        scanPromise.then(() => {
-          if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().then(() => html5QrCode?.clear()).catch(console.error);
-          }
-        }).catch(() => {});
-      } else if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().catch(console.error);
+      clearTimeout(timer);
+      isInitializingRef.current = false;
+      if (scannerRef.current) {
+        const instance = scannerRef.current;
+        scannerRef.current = null;
+        if (instance.isScanning) {
+          instance.stop().then(() => { try { instance.clear(); } catch(e) {} }).catch(console.error);
+        } else {
+          try { instance.clear(); } catch(e) {}
+        }
       }
     };
-  }, [router, toast, premiseId, hasSufficientPremiseTokens, isPremiseLoading, areCategoriesLoading]);
+  }, [shouldScan, router, toast, premiseId]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
@@ -126,7 +136,7 @@ export default function ScanPage() {
         </Button>
       </div>
 
-      <h1 className="mb-4 text-2xl font-bold">Alternative Scanner</h1>
+      <h1 className="mb-4 text-2xl font-bold">QR Scanner</h1>
       <p className="mb-6 max-w-sm text-center text-muted-foreground">
         Position the visitor's QR code in front of the camera. The scan will be processed automatically.
       </p>
@@ -145,7 +155,7 @@ export default function ScanPage() {
             <p className="mt-2 text-sm text-muted-foreground">This premise has insufficient tokens. Scanner is locked.</p>
           </div>
         ) : (
-          <div id="qr-scanner-fallback" className="w-full min-h-[300px]" />
+          <div id={SCANNER_ID} className="w-full min-h-[300px]" />
         )}
       </div>
 
@@ -156,4 +166,3 @@ export default function ScanPage() {
     </div>
   );
 }
-

@@ -51,76 +51,84 @@ function ScannerDialog({
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
   const scannerRegionId = 'primary-scanner-region';
+  // Ref-based guard ensures only ONE instance ever exists, even in React StrictMode
+  const scannerRef = React.useRef<Html5Qrcode | null>(null);
+  const isInitializingRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (open) {
-      setIsProcessing(false); // Reset on open
-      let html5QrCode: Html5Qrcode | null = null;
-      let didScan = false;
-      let scanPromise: Promise<any> | null = null;
-      let isMounted = true;
-
-      const startScannerWithPolling = () => {
-        if (!isMounted) return;
-        const scannerElement = document.getElementById(scannerRegionId);
-        if (!scannerElement) {
-          setTimeout(startScannerWithPolling, 100); // Poll until element exists
-          return;
+    if (!open) {
+      // When dialog closes, clean up any running instance
+      if (scannerRef.current) {
+        const instance = scannerRef.current;
+        scannerRef.current = null;
+        isInitializingRef.current = false;
+        if (instance.isScanning) {
+          instance.stop().then(() => { try { instance.clear(); } catch(e) {} }).catch(console.error);
+        } else {
+          try { instance.clear(); } catch(e) {}
         }
-
-        html5QrCode = new Html5Qrcode(scannerRegionId, {
-          verbose: false,
-          formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
-        });
-        
-        const onScanSuccess = (decodedText: string) => {
-          if (!didScan && html5QrCode?.isScanning) {
-            didScan = true;
-            setIsProcessing(true);
-            html5QrCode.stop().finally(() => {
-              onScan(decodedText);
-            });
-          }
-        };
-
-        scanPromise = html5QrCode.start(
-          { facingMode: 'environment' },
-          { 
-            fps: 10,
-            qrbox: (viewfinderWidth, viewfinderHeight) => {
-              const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-              return { width: minEdge * 0.7, height: minEdge * 0.7 };
-            }
-          },
-          onScanSuccess,
-          () => { } // Optional error callback
-        ).catch(err => {
-          if (isMounted) {
-            toast({
-              variant: 'destructive',
-              title: 'Camera Error',
-              description: 'Could not start camera. Please check permissions and try again.',
-            });
-            onOpenChange(false);
-          }
-        });
-      };
-
-      startScannerWithPolling();
-
-      return () => {
-        isMounted = false;
-        if (scanPromise) {
-          scanPromise.then(() => {
-            if (html5QrCode && html5QrCode.isScanning) {
-              html5QrCode.stop().then(() => html5QrCode?.clear()).catch(console.error);
-            }
-          }).catch(() => {});
-        } else if (html5QrCode && html5QrCode.isScanning) {
-          html5QrCode.stop().catch(console.error);
-        }
-      };
+      }
+      setIsProcessing(false);
+      return;
     }
+
+    // Guard: If already initializing or running, bail out immediately
+    if (isInitializingRef.current || scannerRef.current) return;
+    isInitializingRef.current = true;
+
+    let didScan = false;
+
+    const startScanner = () => {
+      // Double-check guard after async delay
+      if (scannerRef.current || !isInitializingRef.current) return;
+      
+      const element = document.getElementById(scannerRegionId);
+      if (!element) {
+        setTimeout(startScanner, 150);
+        return;
+      }
+
+      const scanner = new Html5Qrcode(scannerRegionId, { verbose: false });
+      scannerRef.current = scanner;
+
+      const onScanSuccess = (decodedText: string) => {
+        if (!didScan && scannerRef.current?.isScanning) {
+          didScan = true;
+          setIsProcessing(true);
+          scannerRef.current.stop().finally(() => {
+            scannerRef.current = null;
+            isInitializingRef.current = false;
+            onScan(decodedText);
+          });
+        }
+      };
+
+      scanner.start(
+        { facingMode: 'environment' },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+        },
+        onScanSuccess,
+        () => {} // silent error callback for frame-by-frame scan failures (normal)
+      ).then(() => {
+        isInitializingRef.current = false;
+      }).catch(err => {
+        scannerRef.current = null;
+        isInitializingRef.current = false;
+        toast({
+          variant: 'destructive',
+          title: 'Camera Error',
+          description: 'Could not start camera. Please check permissions and try again.',
+        });
+        onOpenChange(false);
+      });
+    };
+
+    // Small delay to allow Dialog CSS animation to complete before querying element size
+    const timer = setTimeout(startScanner, 300);
+    return () => clearTimeout(timer);
+
   }, [open, onScan, onOpenChange, toast]);
 
   return (

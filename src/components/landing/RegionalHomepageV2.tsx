@@ -142,13 +142,7 @@ export function RegionalHomepageV2() {
             {/* Nav */}
             <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#010a05]/50 backdrop-blur-xl transition-colors">
                 <div className="container max-w-7xl h-20 flex items-center justify-between px-6">
-                    <div className="flex items-center gap-4">
-                        <AavijaLogo />
-                        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
-                            <img src="https://flagcdn.com/w20/in.png" width="16" alt="India" className="rounded-sm" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">India</span>
-                        </div>
-                    </div>
+                    <AavijaLogo />
                     <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
                         <Link href="#features" className="hover:text-white transition-colors">Features</Link>
                         <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
@@ -173,9 +167,15 @@ export function RegionalHomepageV2() {
                         transition={{ duration: 0.8 }}
                         style={{ opacity, scale }}
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs font-semibold mb-8">
-                            <Zap className="w-3 h-3" />
-                            <span>Next-Gen Visitor Management for India</span>
+                        <div className="inline-flex flex-col items-center gap-4 mb-8">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs font-semibold">
+                                <Zap className="w-3 h-3" />
+                                <span>Next-Gen Visitor Management for India</span>
+                            </div>
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
+                                <img src="https://flagcdn.com/w40/in.png" width="22" alt="India" className="rounded-sm shadow-sm" />
+                                <span className="text-xs font-bold tracking-widest text-white">🇮🇳 India Hub</span>
+                            </div>
                         </div>
 
                         <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 leading-[1.1]">
