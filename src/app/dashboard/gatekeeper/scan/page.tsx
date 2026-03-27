@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, RefreshCw, ShieldAlert } from 'lucide-react';
@@ -50,9 +50,12 @@ export default function ScanPage() {
 
     let html5QrCode: Html5Qrcode | null = null;
     let didScan = false;
+    let scanPromise: Promise<any> | null = null;
+    let isMounted = true;
     const scannerId = 'qr-scanner-fallback';
 
     const startScannerWithPolling = () => {
+      if (!isMounted) return;
       const scannerElement = document.getElementById(scannerId);
       if (!scannerElement) {
         setTimeout(startScannerWithPolling, 100); // Poll until element exists
@@ -61,10 +64,9 @@ export default function ScanPage() {
 
       html5QrCode = new Html5Qrcode(scannerId, {
         verbose: false,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
+        formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
       });
+      
       const onScanSuccess = (decodedText: string) => {
         if (!didScan && html5QrCode?.isScanning) {
           didScan = true;
@@ -75,31 +77,40 @@ export default function ScanPage() {
         }
       };
 
-      html5QrCode.start(
+      scanPromise = html5QrCode.start(
         { facingMode: 'environment' },
         { 
           fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            return { width: minEdge * 0.7, height: minEdge * 0.7 };
+          }
         },
         onScanSuccess,
         () => { } // Optional error callback
       ).catch(err => {
-        toast({
-          variant: 'destructive',
-          title: 'Camera Error',
-          description: 'Failed to start camera. Please ensure permissions are granted and try refreshing the page.',
-        });
+        if (isMounted) {
+          toast({
+            variant: 'destructive',
+            title: 'Camera Error',
+            description: 'Failed to start camera. Please ensure permissions are granted and try refreshing the page.',
+          });
+        }
       });
     };
 
     startScannerWithPolling();
 
     return () => {
-      if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().catch(err => {
-          console.error("Error stopping scanner on unmount:", err);
-        });
+      isMounted = false;
+      if (scanPromise) {
+        scanPromise.then(() => {
+          if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => html5QrCode?.clear()).catch(console.error);
+          }
+        }).catch(() => {});
+      } else if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(console.error);
       }
     };
   }, [router, toast, premiseId, hasSufficientPremiseTokens, isPremiseLoading, areCategoriesLoading]);

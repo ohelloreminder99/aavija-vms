@@ -142,7 +142,13 @@ export function RegionalHomepageV2() {
             {/* Nav */}
             <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#010a05]/50 backdrop-blur-xl transition-colors">
                 <div className="container max-w-7xl h-20 flex items-center justify-between px-6">
-                    <AavijaLogo />
+                    <div className="flex items-center gap-4">
+                        <AavijaLogo />
+                        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                            <img src="https://flagcdn.com/w20/in.png" width="16" alt="India" className="rounded-sm" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">India</span>
+                        </div>
+                    </div>
                     <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
                         <Link href="#features" className="hover:text-white transition-colors">Features</Link>
                         <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>

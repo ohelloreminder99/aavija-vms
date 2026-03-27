@@ -33,7 +33,7 @@ import { useUser, useDoc } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import { useSettings } from '@/services/settings-service';
 import { usePremiseCategories } from '@/services/premise-category-service';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { DashboardActionCard } from '../visitor/components/DashboardActionCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { saveCachedHosts } from '@/lib/offline-store';
@@ -57,8 +57,11 @@ function ScannerDialog({
       setIsProcessing(false); // Reset on open
       let html5QrCode: Html5Qrcode | null = null;
       let didScan = false;
+      let scanPromise: Promise<any> | null = null;
+      let isMounted = true;
 
       const startScannerWithPolling = () => {
+        if (!isMounted) return;
         const scannerElement = document.getElementById(scannerRegionId);
         if (!scannerElement) {
           setTimeout(startScannerWithPolling, 100); // Poll until element exists
@@ -67,10 +70,9 @@ function ScannerDialog({
 
         html5QrCode = new Html5Qrcode(scannerRegionId, {
           verbose: false,
-          experimentalFeatures: {
-            useBarCodeDetectorIfSupported: true
-          }
+          formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
         });
+        
         const onScanSuccess = (decodedText: string) => {
           if (!didScan && html5QrCode?.isScanning) {
             didScan = true;
@@ -81,32 +83,41 @@ function ScannerDialog({
           }
         };
 
-        html5QrCode.start(
+        scanPromise = html5QrCode.start(
           { facingMode: 'environment' },
           { 
             fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0
+            qrbox: (viewfinderWidth, viewfinderHeight) => {
+              const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+              return { width: minEdge * 0.7, height: minEdge * 0.7 };
+            }
           },
           onScanSuccess,
           () => { } // Optional error callback
         ).catch(err => {
-          toast({
-            variant: 'destructive',
-            title: 'Camera Error',
-            description: 'Could not start camera. Please check permissions and try again.',
-          });
-          onOpenChange(false);
+          if (isMounted) {
+            toast({
+              variant: 'destructive',
+              title: 'Camera Error',
+              description: 'Could not start camera. Please check permissions and try again.',
+            });
+            onOpenChange(false);
+          }
         });
       };
 
       startScannerWithPolling();
 
       return () => {
-        if (html5QrCode && html5QrCode.isScanning) {
-          html5QrCode.stop().catch(err => {
-            console.error("Failed to stop scanner on cleanup:", err);
-          });
+        isMounted = false;
+        if (scanPromise) {
+          scanPromise.then(() => {
+            if (html5QrCode && html5QrCode.isScanning) {
+              html5QrCode.stop().then(() => html5QrCode?.clear()).catch(console.error);
+            }
+          }).catch(() => {});
+        } else if (html5QrCode && html5QrCode.isScanning) {
+          html5QrCode.stop().catch(console.error);
         }
       };
     }

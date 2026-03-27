@@ -79,7 +79,7 @@ function LoginContent() {
             <div className="flex items-start gap-3">
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-xs mt-0.5 shrink-0">3</div>
               <div className="text-gray-300">
-                <strong className="text-white">iOS (iPhone/iPad):</strong> Tap the "Share" icon <ArrowUpRightFromSquare className="inline-block h-4 w-4 text-gray-400" /> in Safari's toolbar, then find and tap "Add to Home Screen".
+                <strong className="text-white">iOS (iPhone/iPad):</strong> Tap the "Share" icon <ArrowUpRightFromSquare className="inline-block h-4 w-4 text-gray-400" /> in Safari's toolbar, find and tap "Add to Home Screen", then toggle on for use as an app at the last step.
               </div>
             </div>
           </div>
