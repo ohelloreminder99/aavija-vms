@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import jsQR from 'jsqr';
+import { Html5Qrcode } from 'html5-qrcode';
 
 interface QrScannerProps {
   /** Called once when a QR code is successfully decoded */
@@ -17,205 +17,138 @@ interface QrScannerProps {
 }
 
 /**
- * A lightweight QR-code scanner built on getUserMedia + jsQR.
- * Replaces html5-qrcode for reliability.
+ * A resilient and mobile-first HTML5 QR Code scanner.
+ * Uses the Polling Initialization Pattern to avoid DOM rendering timing issues.
  */
 export default function QrScanner({
   onScan,
   onError,
-  qrBoxSize = 260,
+  qrBoxSize = 250,
   fps = 10,
   className,
 }: QrScannerProps) {
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const streamRef = React.useRef<MediaStream | null>(null);
-  const rafRef = React.useRef<number>(0);
-  const didScanRef = React.useRef(false);
-  const lastScanTimeRef = React.useRef(0);
+  const scannerId = React.useId().replace(/:/g, ''); // creates a safe DOM id
+  const regionId = `scanner-region-${scannerId}`;
   
-  // Debug counter to prove the frame loop is actually running
-  const [frameCount, setFrameCount] = React.useState(0);
+  const didScanRef = React.useRef(false);
+  const scannerRef = React.useRef<Html5Qrcode | null>(null);
 
   React.useEffect(() => {
     let mounted = true;
-    const interval = 1000 / fps;
 
-    const startCamera = async () => {
+    // Reset scan state on mount
+    didScanRef.current = false;
+
+    // DOM Polling Initialization Pattern
+    const initializeScanner = () => {
+      if (!mounted) return;
+      
+      const el = document.getElementById(regionId);
+      if (!el) {
+        // Not in DOM yet, poll again
+        setTimeout(initializeScanner, 100);
+        return;
+      }
+
+      // Element exists, safely initialize
       try {
-        // Request an ideal resolution to ensure we get a quality feed without forcing 4K.
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
+        const scanner = new Html5Qrcode(regionId);
+        scannerRef.current = scanner;
+
+        const config = {
+          fps: fps,
+          qrbox: { width: qrBoxSize, height: qrBoxSize },
+          aspectRatio: 1.0, 
+        };
+
+        scanner.start(
+          { facingMode: 'environment' }, // Hardware targeting for rear camera
+          config,
+          (decodedText) => {
+            // Race Condition Guard
+            if (!didScanRef.current) {
+              didScanRef.current = true; // Flip immediately
+              
+              // Clean-up Lifecycle: Stop hardware immediately upon successful scan
+              try {
+                 scanner.stop().then(() => {
+                   scanner.clear();
+                 }).catch(console.warn);
+              } catch (e) {
+                 // ignore stop errors
+              }
+
+              // Route to application logic
+              onScan(decodedText);
+            }
           },
-          audio: false,
+          (errorMessage) => {
+            // This fires on every frame without a QR code, which is noisy, so we usually ignore it.
+            // But we can log if it's a fatal camera error
+          }
+        ).catch((err) => {
+          if (mounted && onError) {
+            onError(err?.message || 'Failed to start camera');
+          }
         });
-        if (!mounted) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current = stream;
-        const video = videoRef.current;
-        if (video) {
-          video.srcObject = stream;
-          video.setAttribute('playsinline', 'true'); // Required for iOS
-          await video.play();
-          scanLoop();
-        }
+
       } catch (err: any) {
-        if (mounted) {
-          onError?.(err.message || 'Camera access denied or unavailable.');
+        if (mounted && onError) {
+          onError(err?.message || 'Failed to initialize scanner');
         }
       }
     };
 
-    const scanLoop = () => {
-      if (!mounted || didScanRef.current) return;
+    // Start polling loop
+    initializeScanner();
 
-      const now = performance.now();
-      if (now - lastScanTimeRef.current < interval) {
-        rafRef.current = requestAnimationFrame(scanLoop);
-        return;
-      }
-      lastScanTimeRef.current = now;
-
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      
-      // Ensure video has metadata loaded and dimensions are > 0
-      if (!video || !canvas || video.readyState < video.HAVE_ENOUGH_DATA || !video.videoWidth) {
-        rafRef.current = requestAnimationFrame(scanLoop);
-        return;
-      }
-
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      if (!ctx) {
-        rafRef.current = requestAnimationFrame(scanLoop);
-        return;
-      }
-
-      // Limit resolution to ~800px to ensure jsQR runs fast enough
-      const MAX_SIZE = 800;
-      let targetW = video.videoWidth;
-      let targetH = video.videoHeight;
-      
-      if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
-        const ratio = targetW / targetH;
-        if (ratio > 1) {
-          targetW = MAX_SIZE;
-          targetH = Math.floor(MAX_SIZE / ratio);
-        } else {
-          targetH = MAX_SIZE;
-          targetW = Math.floor(MAX_SIZE * ratio);
-        }
-      }
-
-      // ONLY set dimensions if they changed. Reassigning width/height clears the canvas.
-      if (canvas.width !== targetW || canvas.height !== targetH) {
-        canvas.width = targetW;
-        canvas.height = targetH;
-      }
-
-      // Draw current video frame to the hidden canvas at the reduced size
-      ctx.drawImage(video, 0, 0, targetW, targetH);
-
-      // Get the pixel data and run jsQR on it
-      const imageData = ctx.getImageData(0, 0, targetW, targetH);
-      const code = jsQR(imageData.data, imageData.width, imageData.height, {
-        inversionAttempts: 'dontInvert', // Our tokens are explicitly black on white, so we don't need inversion which is 2x slower
-      });
-
-      setFrameCount(prev => prev + 1);
-
-      if (code && code.data && !didScanRef.current) {
-        didScanRef.current = true;
-        // Stop the camera immediately
-        streamRef.current?.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-        onScan(code.data);
-        return; // Don't schedule the next frame
-      }
-
-      rafRef.current = requestAnimationFrame(scanLoop);
-    };
-
-    startCamera();
-
+    // Clean-up Lifecycle
     return () => {
       mounted = false;
-      didScanRef.current = true; // Prevent further scanning
-      cancelAnimationFrame(rafRef.current);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
+      didScanRef.current = true; // prevent any pending callbacks
+      
+      const cleanupScanner = async () => {
+        if (scannerRef.current) {
+          try {
+            if (scannerRef.current.isScanning) {
+              await scannerRef.current.stop();
+            }
+            scannerRef.current.clear();
+          } catch (e) {
+            console.warn('Scanner cleanup error:', e);
+          }
+        }
+      };
+      
+      cleanupScanner();
     };
-  }, [onScan, onError, fps]);
+  }, [regionId, fps, qrBoxSize, onScan, onError]);
 
   return (
-    <div className={className} style={{ position: 'relative', overflow: 'hidden' }}>
-      {/* Live camera feed */}
-      <video
-        ref={videoRef}
-        style={{ width: '100%', display: 'block', borderRadius: '1rem', objectFit: 'cover' }}
-        muted
-        playsInline
-      />
-      {/* Hidden canvas for frame capture */}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-      {/* Scan region overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: qrBoxSize,
-          height: qrBoxSize,
-          transform: 'translate(-50%, -50%)',
-          border: '2px solid rgba(255,255,255,0.5)',
-          borderRadius: '1rem',
-          boxShadow: '0 0 0 9999px rgba(0,0,0,0.4)',
-          pointerEvents: 'none',
-        }}
-      />
-      {/* Animated scan line */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '50%',
-          width: qrBoxSize - 20,
-          height: 2,
-          transform: 'translateX(-50%)',
-          background: 'linear-gradient(90deg, transparent, var(--primary, #22c55e), transparent)',
-          borderRadius: 4,
-          animation: 'qrScanLine 2s ease-in-out infinite',
-          top: '30%',
-          boxShadow: '0 0 8px 2px rgba(34, 197, 94, 0.4)',
-          pointerEvents: 'none',
-        }}
-      />
-      {/* Debug overlay to prove scanning loop is running */}
-      <div style={{
-        position: 'absolute',
-        bottom: 8,
-        right: 8,
-        background: 'rgba(0,0,0,0.6)',
-        color: '#0f0',
-        padding: '2px 6px',
-        borderRadius: 4,
-        fontSize: '10px',
-        fontFamily: 'monospace',
-        pointerEvents: 'none',
-        zIndex: 50
-      }}>
-        frames: {frameCount}
-      </div>
+    <div className={className} style={{ position: 'relative', overflow: 'hidden', minHeight: '300px' }}>
+      {/* Scanner binding region */}
+      <div 
+        id={regionId} 
+        style={{ width: '100%', height: '100%', borderRadius: '1rem', overflow: 'hidden' }}
+      ></div>
+      
+      {/* CSS overlay to hide the default html5-qrcode UI if desired, but html5-qrcode provides its own UI 
+          Often we want to style the scanner using the ID itself. */}
       <style>{`
-        @keyframes qrScanLine {
-          0%, 100% { top: calc(50% - ${qrBoxSize / 2 - 10}px); }
-          50% { top: calc(50% + ${qrBoxSize / 2 - 10}px); }
+        #${regionId} {
+          border-radius: 1rem;
+          overflow: hidden;
+        }
+        #${regionId} video {
+          border-radius: 1rem;
+          object-fit: cover !important;
+        }
+        /* Hide the default start/stop buttons from the library if it injects any */
+        #${regionId} button {
+           display: none !important;
+        }
+        #${regionId}__status_span {
+           display: none !important;
         }
       `}</style>
     </div>
