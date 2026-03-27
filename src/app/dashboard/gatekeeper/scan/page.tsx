@@ -3,7 +3,6 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, RefreshCw, ShieldAlert } from 'lucide-react';
@@ -11,27 +10,7 @@ import Link from 'next/link';
 import { useDoc } from '@/supabase';
 import { usePremiseCategories } from '@/services/premise-category-service';
 import { useSettings } from '@/services/settings-service';
-
-const SCANNER_ID = 'qr-scanner-fallback';
-
-/** Safely stop an html5-qrcode instance — handles the synchronous throw from stop() */
-function safeStopScanner(instance: Html5Qrcode): Promise<void> {
-  return new Promise<void>((resolve) => {
-    try {
-      instance.stop().then(resolve).catch(() => resolve());
-    } catch {
-      // stop() throws synchronously if state manager says "not scanning"
-      resolve();
-    }
-  });
-}
-
-/** Safely clean up an html5-qrcode instance */
-function safeCleanupScanner(instance: Html5Qrcode): Promise<void> {
-  return safeStopScanner(instance).then(() => {
-    try { instance.clear(); } catch { /* ignore */ }
-  });
-}
+import QrScanner from '@/components/QrScanner';
 
 export default function ScanPage() {
   const router = useRouter();
@@ -39,10 +18,6 @@ export default function ScanPage() {
   const premiseId = searchParams.get('premiseId');
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
-
-  // Ref-based singleton guard — prevents StrictMode double-init and dual scanner issue
-  const scannerRef = React.useRef<Html5Qrcode | null>(null);
-  const isInitializingRef = React.useRef(false);
 
   const docRef = React.useMemo(() => {
     if (!premiseId) return null;
@@ -72,85 +47,18 @@ export default function ScanPage() {
 
   const shouldScan = hasSufficientPremiseTokens && !isPremiseLoading && !areCategoriesLoading;
 
-  React.useEffect(() => {
-    if (!shouldScan) return;
+  const handleScan = React.useCallback((data: string) => {
+    setIsProcessing(true);
+    router.push(`/dashboard/gatekeeper/confirm?token=${data}&premiseId=${premiseId}`);
+  }, [router, premiseId]);
 
-    // Guard: bail if already initializing or running
-    if (isInitializingRef.current || scannerRef.current) return;
-    isInitializingRef.current = true;
-
-    let didScan = false;
-
-    const startScanner = () => {
-      if (scannerRef.current || !isInitializingRef.current) return;
-
-      const element = document.getElementById(SCANNER_ID);
-      if (!element) {
-        setTimeout(startScanner, 150);
-        return;
-      }
-
-      const scanner = new Html5Qrcode(SCANNER_ID, {
-        verbose: false,
-        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-        // CRITICAL: Disable native BarcodeDetector API — it silently fails on
-        // some mobile browsers/WebViews. Forces the reliable ZXing-js decoder.
-        useBarCodeDetectorIfSupported: false,
-      });
-      scannerRef.current = scanner;
-
-      const onScanSuccess = (decodedText: string) => {
-        // Single closure-flag guard — no isScanning race condition
-        if (didScan) return;
-        didScan = true;
-        setIsProcessing(true);
-        const instance = scannerRef.current;
-        scannerRef.current = null;
-        isInitializingRef.current = false;
-        if (instance) {
-          // stop() may throw synchronously — safeStopScanner handles this
-          safeStopScanner(instance).then(() => {
-            router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
-          });
-        } else {
-          router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
-        }
-      };
-
-      scanner.start(
-        { facingMode: 'environment' },
-        {
-          fps: 15,
-          qrbox: { width: 260, height: 260 },
-        },
-        onScanSuccess,
-        () => {} // silent per-frame failure callback (normal)
-      ).then(() => {
-        isInitializingRef.current = false;
-      }).catch(() => {
-        scannerRef.current = null;
-        isInitializingRef.current = false;
-        toast({
-          variant: 'destructive',
-          title: 'Camera Error',
-          description: 'Failed to start camera. Please ensure permissions are granted and try refreshing.',
-        });
-      });
-    };
-
-    // Delay to ensure the DOM element is rendered before querying
-    const timer = setTimeout(startScanner, 300);
-
-    return () => {
-      clearTimeout(timer);
-      isInitializingRef.current = false;
-      if (scannerRef.current) {
-        const instance = scannerRef.current;
-        scannerRef.current = null;
-        safeCleanupScanner(instance);
-      }
-    };
-  }, [shouldScan, router, toast, premiseId]);
+  const handleError = React.useCallback((error: string) => {
+    toast({
+      variant: 'destructive',
+      title: 'Camera Error',
+      description: error || 'Failed to start camera. Please ensure permissions are granted and try refreshing.',
+    });
+  }, [toast]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
@@ -181,8 +89,16 @@ export default function ScanPage() {
             <p className="text-lg font-semibold text-destructive">Premise Balance Low</p>
             <p className="mt-2 text-sm text-muted-foreground">This premise has insufficient tokens. Scanner is locked.</p>
           </div>
+        ) : shouldScan && !isProcessing ? (
+          <QrScanner
+            onScan={handleScan}
+            onError={handleError}
+            className="w-full min-h-[300px]"
+          />
         ) : (
-          <div id={SCANNER_ID} className="w-full min-h-[300px]" />
+          <div className="flex h-64 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
         )}
       </div>
 

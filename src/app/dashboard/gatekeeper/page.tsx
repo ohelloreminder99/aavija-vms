@@ -33,30 +33,11 @@ import { useUser, useDoc } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import { useSettings } from '@/services/settings-service';
 import { usePremiseCategories } from '@/services/premise-category-service';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import QrScanner from '@/components/QrScanner';
 import { DashboardActionCard } from '../visitor/components/DashboardActionCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { saveCachedHosts } from '@/lib/offline-store';
 import { SerializableCheckinHost } from './actions';
-
-/** Safely stop an html5-qrcode instance — handles the synchronous throw from stop() */
-function safeStopScanner(instance: Html5Qrcode): Promise<void> {
-  return new Promise<void>((resolve) => {
-    try {
-      instance.stop().then(resolve).catch(() => resolve());
-    } catch {
-      // stop() throws synchronously if state manager says "not scanning"
-      resolve();
-    }
-  });
-}
-
-/** Safely clean up an html5-qrcode instance */
-function safeCleanupScanner(instance: Html5Qrcode): Promise<void> {
-  return safeStopScanner(instance).then(() => {
-    try { instance.clear(); } catch { /* ignore */ }
-  });
-}
 
 function ScannerDialog({
   open,
@@ -69,92 +50,25 @@ function ScannerDialog({
 }) {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const scannerRegionId = 'primary-scanner-region';
-  // Ref-based guard ensures only ONE instance ever exists, even in React StrictMode
-  const scannerRef = React.useRef<Html5Qrcode | null>(null);
-  const isInitializingRef = React.useRef(false);
 
+  const handleScan = React.useCallback((data: string) => {
+    setIsProcessing(true);
+    onScan(data);
+  }, [onScan]);
+
+  const handleError = React.useCallback((error: string) => {
+    toast({
+      variant: 'destructive',
+      title: 'Camera Error',
+      description: error || 'Could not start camera. Please check permissions.',
+    });
+    onOpenChange(false);
+  }, [toast, onOpenChange]);
+
+  // Reset processing state when dialog closes
   React.useEffect(() => {
-    if (!open) {
-      // When dialog closes, clean up any running instance
-      if (scannerRef.current) {
-        const instance = scannerRef.current;
-        scannerRef.current = null;
-        isInitializingRef.current = false;
-        safeCleanupScanner(instance);
-      }
-      setIsProcessing(false);
-      return;
-    }
-
-    // Guard: If already initializing or running, bail out immediately
-    if (isInitializingRef.current || scannerRef.current) return;
-    isInitializingRef.current = true;
-
-    let didScan = false;
-
-    const startScanner = () => {
-      // Double-check guard after async delay
-      if (scannerRef.current || !isInitializingRef.current) return;
-      
-      const element = document.getElementById(scannerRegionId);
-      if (!element) {
-        setTimeout(startScanner, 150);
-        return;
-      }
-
-      const scanner = new Html5Qrcode(scannerRegionId, {
-        verbose: false,
-        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-        // CRITICAL: Disable native BarcodeDetector API — it silently fails on
-        // some mobile browsers/WebViews. Forces the reliable ZXing-js decoder.
-        useBarCodeDetectorIfSupported: false,
-      });
-      scannerRef.current = scanner;
-
-      const onScanSuccess = (decodedText: string) => {
-        // Single closure-flag guard — no isScanning race condition
-        if (didScan) return;
-        didScan = true;
-        setIsProcessing(true);
-        const instance = scannerRef.current;
-        scannerRef.current = null;
-        isInitializingRef.current = false;
-        if (instance) {
-          // stop() may throw synchronously — safeStopScanner handles this
-          safeStopScanner(instance).then(() => onScan(decodedText));
-        } else {
-          onScan(decodedText);
-        }
-      };
-
-      scanner.start(
-        { facingMode: 'environment' },
-        {
-          fps: 15,
-          qrbox: { width: 260, height: 260 },
-        },
-        onScanSuccess,
-        () => {} // silent error callback for frame-by-frame scan failures (normal)
-      ).then(() => {
-        isInitializingRef.current = false;
-      }).catch(() => {
-        scannerRef.current = null;
-        isInitializingRef.current = false;
-        toast({
-          variant: 'destructive',
-          title: 'Camera Error',
-          description: 'Could not start camera. Please check permissions and try again.',
-        });
-        onOpenChange(false);
-      });
-    };
-
-    // Small delay to allow Dialog CSS animation to complete before querying element size
-    const timer = setTimeout(startScanner, 300);
-    return () => clearTimeout(timer);
-
-  }, [open, onScan, onOpenChange, toast]);
+    if (!open) setIsProcessing(false);
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -172,25 +86,14 @@ function ScannerDialog({
               <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white">Processing Visitor Data...</p>
             </div>
           )}
-          <div className="relative">
-            <div id={scannerRegionId} className="w-full rounded-2xl overflow-hidden border border-white/10 shadow-inner" />
-            {/* Animated scan line overlay */}
-            {!isProcessing && (
-              <div
-                className="absolute left-0 right-0 h-0.5 bg-primary/70 shadow-[0_0_8px_2px_rgba(var(--primary),0.6)] rounded-full"
-                style={{
-                  animation: 'scanLine 2s ease-in-out infinite',
-                  top: '20%',
-                }}
-              />
-            )}
-          </div>
-          <style>{`
-            @keyframes scanLine {
-              0%, 100% { top: 20%; }
-              50% { top: 75%; }
-            }
-          `}</style>
+          {/* Only mount scanner when dialog is open and not processing */}
+          {open && !isProcessing && (
+            <QrScanner
+              onScan={handleScan}
+              onError={handleError}
+              className="w-full rounded-2xl overflow-hidden border border-white/10 shadow-inner"
+            />
+          )}
         </div>
         <div className="p-6 border-t border-white/5 bg-white/[0.02] flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Hold steady · Auto-detects</p>
