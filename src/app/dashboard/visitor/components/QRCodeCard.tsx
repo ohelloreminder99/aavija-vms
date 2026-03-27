@@ -319,7 +319,7 @@ export function QRCodeCard() {
                   size={240}
                   bgColor="white"
                   fgColor="black"
-                  level="H"
+                  level="M"
                 />
               </div>
             ) : (

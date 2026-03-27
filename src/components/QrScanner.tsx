@@ -10,7 +10,7 @@ interface QrScannerProps {
   onError?: (error: string) => void;
   /** Width/height of the detection region (px). Default 260. */
   qrBoxSize?: number;
-  /** Scan frequency in Hz. Default 15. */
+  /** Scan frequency in Hz. Default 10. */
   fps?: number;
   /** CSS class for the wrapper */
   className?: string;
@@ -19,15 +19,12 @@ interface QrScannerProps {
 /**
  * A lightweight QR-code scanner built on getUserMedia + jsQR.
  * Replaces html5-qrcode for reliability.
- *
- * Usage:
- *   <QrScanner onScan={(text) => console.log(text)} />
  */
 export default function QrScanner({
   onScan,
   onError,
   qrBoxSize = 260,
-  fps = 15,
+  fps = 10,
   className,
 }: QrScannerProps) {
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -36,6 +33,9 @@ export default function QrScanner({
   const rafRef = React.useRef<number>(0);
   const didScanRef = React.useRef(false);
   const lastScanTimeRef = React.useRef(0);
+  
+  // Debug counter to prove the frame loop is actually running
+  const [frameCount, setFrameCount] = React.useState(0);
 
   React.useEffect(() => {
     let mounted = true;
@@ -43,8 +43,13 @@ export default function QrScanner({
 
     const startCamera = async () => {
       try {
+        // Request an ideal resolution to ensure we get a quality feed without forcing 4K.
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: { 
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
           audio: false,
         });
         if (!mounted) {
@@ -78,7 +83,9 @@ export default function QrScanner({
 
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      if (!video || !canvas || video.readyState < video.HAVE_ENOUGH_DATA) {
+      
+      // Ensure video has metadata loaded and dimensions are > 0
+      if (!video || !canvas || video.readyState < video.HAVE_ENOUGH_DATA || !video.videoWidth) {
         rafRef.current = requestAnimationFrame(scanLoop);
         return;
       }
@@ -89,18 +96,38 @@ export default function QrScanner({
         return;
       }
 
-      // Set canvas to the video's natural resolution
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      // Limit resolution to ~800px to ensure jsQR runs fast enough
+      const MAX_SIZE = 800;
+      let targetW = video.videoWidth;
+      let targetH = video.videoHeight;
+      
+      if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
+        const ratio = targetW / targetH;
+        if (ratio > 1) {
+          targetW = MAX_SIZE;
+          targetH = Math.floor(MAX_SIZE / ratio);
+        } else {
+          targetH = MAX_SIZE;
+          targetW = Math.floor(MAX_SIZE * ratio);
+        }
+      }
 
-      // Draw current video frame to the hidden canvas
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // ONLY set dimensions if they changed. Reassigning width/height clears the canvas.
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+
+      // Draw current video frame to the hidden canvas at the reduced size
+      ctx.drawImage(video, 0, 0, targetW, targetH);
 
       // Get the pixel data and run jsQR on it
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, targetW, targetH);
       const code = jsQR(imageData.data, imageData.width, imageData.height, {
-        inversionAttempts: 'dontInvert',
+        inversionAttempts: 'dontInvert', // Our tokens are explicitly black on white, so we don't need inversion which is 2x slower
       });
+
+      setFrameCount(prev => prev + 1);
 
       if (code && code.data && !didScanRef.current) {
         didScanRef.current = true;
@@ -132,7 +159,7 @@ export default function QrScanner({
       {/* Live camera feed */}
       <video
         ref={videoRef}
-        style={{ width: '100%', display: 'block', borderRadius: '1rem' }}
+        style={{ width: '100%', display: 'block', borderRadius: '1rem', objectFit: 'cover' }}
         muted
         playsInline
       />
@@ -169,6 +196,22 @@ export default function QrScanner({
           pointerEvents: 'none',
         }}
       />
+      {/* Debug overlay to prove scanning loop is running */}
+      <div style={{
+        position: 'absolute',
+        bottom: 8,
+        right: 8,
+        background: 'rgba(0,0,0,0.6)',
+        color: '#0f0',
+        padding: '2px 6px',
+        borderRadius: 4,
+        fontSize: '10px',
+        fontFamily: 'monospace',
+        pointerEvents: 'none',
+        zIndex: 50
+      }}>
+        frames: {frameCount}
+      </div>
       <style>{`
         @keyframes qrScanLine {
           0%, 100% { top: calc(50% - ${qrBoxSize / 2 - 10}px); }
