@@ -53,6 +53,7 @@ type WhatsAppPayload = {
   templateName: string;
   params: string[];    // positional {{1}}, {{2}}... values
   buttonParams?: string[]; // for the first button if any
+  languageCode?: string;   // optional, defaults to en_US
 };
 
 // ─── PHONE NORMALIZER ─────────────────────────────────────────────────────────
@@ -96,27 +97,39 @@ async function sendWhatsApp(payload: WhatsAppPayload): Promise<void> {
     settings?.phone_number_length || 10
   );
 
+  // ─── DYNAMIC PAYLOAD CONSTRUCTION (Deep Fix) ─────────────────────────────
+  // We build components based on template requirements. 
+  // Authentication templates WITH 'Copy code' buttons REQUIRE a data parameter 
+  // in BOTH the body and the button.
+  
+  const components: any[] = [];
+
+  // 1. Body Components
+  if (payload.params && payload.params.length > 0) {
+    components.push({
+      type: 'body',
+      parameters: payload.params.map(text => ({ type: 'text', text })),
+    });
+  }
+
+  // 2. Button Components (Crucial for AUTHENTICATION category)
+  if (payload.buttonParams && payload.buttonParams.length > 0) {
+    components.push({
+      type: 'button',
+      sub_type: 'url',
+      index: 0,
+      parameters: payload.buttonParams.map(text => ({ type: 'text', text })),
+    });
+  }
+
   const body = {
     messaging_product: 'whatsapp',
     to,
     type: 'template',
     template: {
       name: payload.templateName,
-      language: { code: 'en_US' },
-      components: [
-        {
-          type: 'body',
-          parameters: payload.params.map(text => ({ type: 'text', text })),
-        } as TemplateComponent,
-        ...(payload.buttonParams ? [
-          {
-            type: 'button',
-            sub_type: 'url',
-            index: 0,
-            parameters: payload.buttonParams.map(text => ({ type: 'text', text })),
-          } as TemplateComponent
-        ] : []),
-      ],
+      language: { code: payload.languageCode || 'en_US' },
+      ...(components.length > 0 ? { components } : {}),
     },
   };
 
@@ -134,9 +147,10 @@ async function sendWhatsApp(payload: WhatsAppPayload): Promise<void> {
 
   if (!res.ok) {
     const errText = await res.text();
+    // Log the FULL details including fbtrace_id for more help
     const errorMsg = `WhatsApp Cloud API error ${res.status} when sending to ${to}: ${errText}`;
     console.error(`[WhatsApp] API Failure (${res.status}):`, errText);
-    console.error(`[WhatsApp] Payload sent:`, JSON.stringify(body));
+    console.error(`[WhatsApp] Payload sent:`, JSON.stringify(body, null, 2));
     throw new Error(errorMsg);
   }
 }

@@ -62,13 +62,6 @@ export async function sendWhatsAppOtp(payload: {
       throw new Error("You have requested too many OTPs. Please try again in an hour.");
     }
 
-    recentRequests.push(new Date().toISOString());
-    actionTimestamps.whatsapp_otp_requests = recentRequests;
-
-    await adminDb.from('users').update({
-      action_timestamps: actionTimestamps
-    }).eq('id', userId);
-
     // 2.5 Ensure the phone number is not already verified by another user
     const exactMatchPhone = phone; // Ensure exact text matching or format normalized matching if needed
     const { data: existingVerifiedUser } = await adminDb
@@ -102,6 +95,14 @@ export async function sendWhatsAppOtp(payload: {
      if (!result.success) {
        throw new Error(result.error || 'Failed to send OTP.');
      }
+
+    // 4. Rate Limiting Update (ONLY if send succeeded)
+    recentRequests.push(new Date().toISOString());
+    actionTimestamps.whatsapp_otp_requests = recentRequests;
+
+    await adminDb.from('users').update({
+      action_timestamps: actionTimestamps
+    }).eq('id', userId);
 
     return { success: true };
 
