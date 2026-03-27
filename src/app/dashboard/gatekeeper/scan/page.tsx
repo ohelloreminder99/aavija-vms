@@ -14,6 +14,25 @@ import { useSettings } from '@/services/settings-service';
 
 const SCANNER_ID = 'qr-scanner-fallback';
 
+/** Safely stop an html5-qrcode instance — handles the synchronous throw from stop() */
+function safeStopScanner(instance: Html5Qrcode): Promise<void> {
+  return new Promise<void>((resolve) => {
+    try {
+      instance.stop().then(resolve).catch(() => resolve());
+    } catch {
+      // stop() throws synchronously if state manager says "not scanning"
+      resolve();
+    }
+  });
+}
+
+/** Safely clean up an html5-qrcode instance */
+function safeCleanupScanner(instance: Html5Qrcode): Promise<void> {
+  return safeStopScanner(instance).then(() => {
+    try { instance.clear(); } catch { /* ignore */ }
+  });
+}
+
 export default function ScanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -74,11 +93,14 @@ export default function ScanPage() {
       const scanner = new Html5Qrcode(SCANNER_ID, {
         verbose: false,
         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        // CRITICAL: Disable native BarcodeDetector API — it silently fails on
+        // some mobile browsers/WebViews. Forces the reliable ZXing-js decoder.
+        useBarCodeDetectorIfSupported: false,
       });
       scannerRef.current = scanner;
 
       const onScanSuccess = (decodedText: string) => {
-        // Use only `didScan` as the guard — avoids race condition with isScanning
+        // Single closure-flag guard — no isScanning race condition
         if (didScan) return;
         didScan = true;
         setIsProcessing(true);
@@ -86,11 +108,10 @@ export default function ScanPage() {
         scannerRef.current = null;
         isInitializingRef.current = false;
         if (instance) {
-          instance.stop()
-            .catch(() => {})
-            .finally(() => {
-              router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
-            });
+          // stop() may throw synchronously — safeStopScanner handles this
+          safeStopScanner(instance).then(() => {
+            router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
+          });
         } else {
           router.push(`/dashboard/gatekeeper/confirm?token=${decodedText}&premiseId=${premiseId}`);
         }
@@ -126,9 +147,7 @@ export default function ScanPage() {
       if (scannerRef.current) {
         const instance = scannerRef.current;
         scannerRef.current = null;
-        instance.stop()
-          .then(() => { try { instance.clear(); } catch(e) {} })
-          .catch(() => { try { instance.clear(); } catch(e) {} });
+        safeCleanupScanner(instance);
       }
     };
   }, [shouldScan, router, toast, premiseId]);

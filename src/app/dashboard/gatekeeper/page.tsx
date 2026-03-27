@@ -39,6 +39,25 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { saveCachedHosts } from '@/lib/offline-store';
 import { SerializableCheckinHost } from './actions';
 
+/** Safely stop an html5-qrcode instance — handles the synchronous throw from stop() */
+function safeStopScanner(instance: Html5Qrcode): Promise<void> {
+  return new Promise<void>((resolve) => {
+    try {
+      instance.stop().then(resolve).catch(() => resolve());
+    } catch {
+      // stop() throws synchronously if state manager says "not scanning"
+      resolve();
+    }
+  });
+}
+
+/** Safely clean up an html5-qrcode instance */
+function safeCleanupScanner(instance: Html5Qrcode): Promise<void> {
+  return safeStopScanner(instance).then(() => {
+    try { instance.clear(); } catch { /* ignore */ }
+  });
+}
+
 function ScannerDialog({
   open,
   onOpenChange,
@@ -62,9 +81,7 @@ function ScannerDialog({
         const instance = scannerRef.current;
         scannerRef.current = null;
         isInitializingRef.current = false;
-        instance.stop()
-          .then(() => { try { instance.clear(); } catch(e) {} })
-          .catch(() => { try { instance.clear(); } catch(e) {} });
+        safeCleanupScanner(instance);
       }
       setIsProcessing(false);
       return;
@@ -89,11 +106,14 @@ function ScannerDialog({
       const scanner = new Html5Qrcode(scannerRegionId, {
         verbose: false,
         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        // CRITICAL: Disable native BarcodeDetector API — it silently fails on
+        // some mobile browsers/WebViews. Forces the reliable ZXing-js decoder.
+        useBarCodeDetectorIfSupported: false,
       });
       scannerRef.current = scanner;
 
       const onScanSuccess = (decodedText: string) => {
-        // Use only `didScan` as the guard — avoids the isScanning race condition
+        // Single closure-flag guard — no isScanning race condition
         if (didScan) return;
         didScan = true;
         setIsProcessing(true);
@@ -101,9 +121,8 @@ function ScannerDialog({
         scannerRef.current = null;
         isInitializingRef.current = false;
         if (instance) {
-          instance.stop()
-            .catch(() => {})
-            .finally(() => onScan(decodedText));
+          // stop() may throw synchronously — safeStopScanner handles this
+          safeStopScanner(instance).then(() => onScan(decodedText));
         } else {
           onScan(decodedText);
         }
