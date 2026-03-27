@@ -23,7 +23,7 @@ BEGIN
     END IF;
     RETURN encode(pgp_sym_encrypt(p_data, public.get_encryption_key()), 'base64');
 END;
-$$ LANGUAGE plpgsql IMMUTABLE SET search_path = public;
+$$ LANGUAGE plpgsql IMMUTABLE SET search_path = public, extensions;
 
 CREATE OR REPLACE FUNCTION public.decrypt_pii(p_encoded_data TEXT) RETURNS TEXT AS $$
 BEGIN
@@ -36,4 +36,4 @@ BEGIN
         RETURN p_encoded_data;
     END;
 END;
-$$ LANGUAGE plpgsql IMMUTABLE SET search_path = public;
+$$ LANGUAGE plpgsql IMMUTABLE SET search_path = public, extensions;
