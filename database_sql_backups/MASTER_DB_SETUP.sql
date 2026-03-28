@@ -95,7 +95,7 @@ BEGIN
         ALTER TABLE public.premise_blocked_visitors ENABLE ROW LEVEL SECURITY;
         -- Simple policies (will be refined by consolidated setup if needed)
         CREATE POLICY "Owners can view blocks for their premises" ON public.premise_blocked_visitors
-            FOR SELECT USING (EXISTS (SELECT 1 FROM public.premises p WHERE p.id = premise_id AND p.owner_id = auth.uid()));
+            FOR SELECT USING (EXISTS (SELECT 1 FROM public.premises p WHERE p.id = premise_id AND p.owner_id = (SELECT auth.uid())));
     END IF;
 
     -- 2. Ensure host_blocked_visitors exists
@@ -115,7 +115,7 @@ BEGIN
         ALTER TABLE public.host_blocked_visitors ENABLE ROW LEVEL SECURITY;
         -- Simple policies
         CREATE POLICY "Hosts can view their own blocks" ON public.host_blocked_visitors
-            FOR SELECT USING (auth.uid() = host_id);
+            FOR SELECT USING ((SELECT auth.uid()) = host_id);
     END IF;
 
 END $$;
@@ -1269,7 +1269,7 @@ ALTER TABLE public.premise_applications ENABLE ROW LEVEL SECURITY;
 --  Agents can submit and view their own applications
 CREATE POLICY "app_insert_authed"
     ON public.premise_applications FOR INSERT
-    WITH CHECK (auth.uid() IS NOT NULL);
+    WITH CHECK ((SELECT auth.uid()) IS NOT NULL);
 
 CREATE POLICY "app_select_own_or_admin"
     ON public.premise_applications FOR SELECT
@@ -1303,6 +1303,8 @@ ALTER TABLE public.premises
 CREATE OR REPLACE FUNCTION public.set_updated_at()
 RETURNS trigger
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   NEW.updated_at = NOW();

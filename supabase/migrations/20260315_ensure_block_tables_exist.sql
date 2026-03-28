@@ -20,7 +20,7 @@ BEGIN
         ALTER TABLE public.premise_blocked_visitors ENABLE ROW LEVEL SECURITY;
         -- Simple policies (will be refined by consolidated setup if needed)
         CREATE POLICY "Owners can view blocks for their premises" ON public.premise_blocked_visitors
-            FOR SELECT USING (EXISTS (SELECT 1 FROM public.premises p WHERE p.id = premise_id AND p.owner_id = auth.uid()));
+            FOR SELECT USING (EXISTS (SELECT 1 FROM public.premises p WHERE p.id = premise_id AND p.owner_id = (SELECT auth.uid())));
     END IF;
 
     -- 2. Ensure host_blocked_visitors exists
@@ -40,7 +40,7 @@ BEGIN
         ALTER TABLE public.host_blocked_visitors ENABLE ROW LEVEL SECURITY;
         -- Simple policies
         CREATE POLICY "Hosts can view their own blocks" ON public.host_blocked_visitors
-            FOR SELECT USING (auth.uid() = host_id);
+            FOR SELECT USING ((SELECT auth.uid()) = host_id);
     END IF;
 
 END $$;

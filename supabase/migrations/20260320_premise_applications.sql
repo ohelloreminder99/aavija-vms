@@ -45,7 +45,7 @@ ALTER TABLE public.premise_applications ENABLE ROW LEVEL SECURITY;
 --  Agents can submit and view their own applications
 CREATE POLICY "app_insert_authed"
     ON public.premise_applications FOR INSERT
-    WITH CHECK (auth.uid() IS NOT NULL);
+    WITH CHECK ((SELECT auth.uid()) IS NOT NULL);
 
 CREATE POLICY "app_select_own_or_admin"
     ON public.premise_applications FOR SELECT
