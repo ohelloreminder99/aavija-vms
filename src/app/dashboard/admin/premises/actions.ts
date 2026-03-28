@@ -280,6 +280,16 @@ export async function createPremiseAndNewOwner(
         premiseId: premiseId,
         context: { premiseId },
       });
+
+      // Add initial invoice
+      await adminDb.from('invoices').insert({
+        userId: ownerUid,
+        amount: 0,
+        status: 'paid',
+        gstAmount: 0,
+        totalAmount: 0,
+        paidAt: new Date().toISOString(),
+      });
     }
 
     revalidatePath('/dashboard/admin/premises');
@@ -368,6 +378,16 @@ export async function createPremiseForExistingUser(
         premiseId: premiseId,
         context: { premiseId },
       });
+
+      // Add initial invoice
+      await adminDb.from('invoices').insert({
+        userId: ownerId,
+        amount: 0,
+        status: 'paid',
+        gstAmount: 0,
+        totalAmount: 0,
+        paidAt: new Date().toISOString(),
+      });
     }
 
     revalidatePath('/dashboard/admin/premises');
@@ -390,20 +410,28 @@ export async function deletePremise(
 
   try {
     const { error: deleteError } = await adminDb.from('premises').delete().eq('id', premiseId);
-    if (deleteError) throw deleteError;
+    if (deleteError) {
+      console.error(`Foreign key block or DB error deleting premise ${premiseId}:`, deleteError.message);
+      return { success: false, error: `Delete failed: ${deleteError.message}. Ensure all related visit records and logs are cascaded or manually removed.` };
+    }
 
-    const { data: userDoc } = await adminDb.from('users').select('premise_roles').eq('id', ownerId).single();
-    if (userDoc) {
-      const currentRoles = (userDoc.premise_roles || {}) as Record<string, string[]>;
-      const { [premiseId]: removedRole, ...updatedRoles } = currentRoles;
-      await adminDb.from('users').update({ premise_roles: updatedRoles }).eq('id', ownerId);
+    // Attempt to update the user's roles, but don't fail the entire delete if this non-critical step fails (e.g. if the user is missing)
+    try {
+      const { data: userDoc } = await adminDb.from('users').select('premise_roles').eq('id', ownerId).single();
+      if (userDoc) {
+        const currentRoles = (userDoc.premise_roles || {}) as Record<string, string[]>;
+        const { [premiseId]: _, ...updatedRoles } = currentRoles;
+        await adminDb.from('users').update({ premise_roles: updatedRoles }).eq('id', ownerId);
+      }
+    } catch (syncError) {
+      console.warn('Non-critical: Failed to sync user premise_roles after premise delete:', syncError);
     }
 
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
-  } catch (error: unknown) {
-    console.error('Error deleting premise:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'An unknown server error occurred during deletion.' };
+  } catch (error: any) {
+    console.error('Unexpected error deleting premise:', error);
+    return { success: false, error: `An unexpected error occurred: ${error.message || error}` };
   }
 }
 

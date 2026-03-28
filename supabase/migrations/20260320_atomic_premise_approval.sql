@@ -110,7 +110,36 @@ BEGIN
   SET premise_roles = v_updated_roles
   WHERE id = v_owner.id;
 
-  -- ── 8. Mark application as approved ───────────────────────────────────────
+  -- ── 8. Log initial token allocation ───────────────────────────────────────
+  IF COALESCE(v_settings.starting_token_owner, 0) > 0 THEN
+    INSERT INTO logs (
+      "actorId", "actorName", "actorRole", action,
+      description, "tokenChange", "premiseId", context
+    ) VALUES (
+      p_admin_id,
+      p_admin_name,
+      'admin',
+      'INITIAL_TOKEN_ALLOCATION',
+      'Welcome Bonus: Premise "' || v_app.premise_name || '" received ' || v_settings.starting_token_owner || ' tokens.',
+      v_settings.starting_token_owner,
+      v_premise_id,
+      jsonb_build_object('premiseId', v_premise_id, 'applicationId', p_application_id)
+    );
+
+    -- ── 8B. Create initial invoice (Welcome Bonus) ──────────────────────────
+    INSERT INTO invoices (
+      "userId", amount, status, "gstAmount", "totalAmount", "paidAt"
+    ) VALUES (
+      v_owner.id,
+      0,
+      'paid',
+      0,
+      0,
+      NOW()
+    );
+  END IF;
+
+  -- ── 9. Mark application as approved ───────────────────────────────────────
   UPDATE premise_applications
   SET
     status = 'approved',
