@@ -107,6 +107,8 @@ export interface Settings {
   wa_template_threshold_reached?: string;
   wa_template_phone_verify?: string;
   wa_template_agent_assigned?: string;
+  wa_template_premise_approved?: string;
+  wa_template_new_premise_application?: string;
   // Security & Keys
   razorpay_key_id?: string;
 }

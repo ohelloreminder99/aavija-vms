@@ -128,14 +128,20 @@ BEGIN
 
     -- ── 8B. Create initial invoice (Welcome Bonus) ──────────────────────────
     INSERT INTO invoices (
-      "userId", amount, status, "gstAmount", "totalAmount", "paidAt"
+      id, "userId", "userName", "userEmail", "userPhone", "userState",
+      "premiseId", "tokenAmount", subtotal, "totalAmount", status
     ) VALUES (
+      'INV-' || v_premise_id::text,
       v_owner.id,
+      v_owner.name,
+      v_owner.email,
+      COALESCE(v_owner.phone, ''),
+      COALESCE(v_app.city_state, 'Unknown'),
+      v_premise_id,
+      v_settings.starting_token_owner,
       0,
-      'paid',
       0,
-      0,
-      NOW()
+      'paid'
     );
   END IF;
 
@@ -152,11 +158,9 @@ BEGIN
   RETURN jsonb_build_object(
     'success', true,
     'premise_id', v_premise_id,
-    'owner_id', v_owner.id,
+    'premise_name', v_app.premise_name,
+    'owner_name', v_owner.name,
     'owner_phone', v_owner.phone,
-    'agent_user_id', v_agent_id,
-    'agent_name', v_app.agent_name,
-    'agent_email', v_app.agent_email,
     'premise_name', v_app.premise_name
   );
 

@@ -250,6 +250,31 @@ export async function approvePremiseApplication(
       return { success: false, error: result?.error || 'Approval transaction failed.' };
     }
 
+    // ─── NOTIFY OWNER & AGENT (non-fatal, after successful RPC) ───────────────
+    try {
+      const { notifyAgentPremiseApproved, notifyOwnerPremiseApproved } = await import('@/services/whatsapp-service');
+      
+      // Notify Owner
+      if (result.owner_phone) {
+        await notifyOwnerPremiseApproved({
+          ownerName: result.owner_name || 'Owner',
+          ownerPhone: result.owner_phone,
+          premiseName: result.premise_name || 'Premise'
+        });
+      }
+
+      // Notify Agent (if application was submitted by one)
+      if (result.agent_id && result.agent_phone) {
+        await notifyAgentPremiseApproved({
+          agentName: result.agent_name || 'Agent',
+          agentPhone: result.agent_phone,
+          premiseName: result.premise_name || 'Premise'
+        });
+      }
+    } catch (notifyErr: any) {
+      console.error('[PremiseApp] Notification trigger failed:', notifyErr.message);
+    }
+
     // ─── LOG (non-fatal, after successful RPC) ────────────────────────────────
     createLogEntry({
       actorId: profile.id,
@@ -258,47 +283,8 @@ export async function approvePremiseApplication(
       action: LogAction.PREMISE_CREATED,
       description: `Admin approved premise application: "${result.premise_name}" (owner approved via atomic transaction).`,
       premiseId: result.premise_id,
-      context: { applicationId, premiseId: result.premise_id },
+      context: { premiseId: result.premise_id, applicationId }
     }).catch(err => console.error('[PremiseApp] Log write failed (non-fatal):', err));
-
-    // ─── NOTIFICATIONS (fire-and-forget, after successful RPC) ───────────────
-    const notificationPromises: Promise<void>[] = [];
-
-    if (result.owner_phone) {
-      notificationPromises.push(
-        notifyOwnerPremiseApproved({
-          ownerPhone: result.owner_phone,
-          ownerName: result.premise_name,
-          premiseName: result.premise_name,
-        }).catch(err => console.error('[PremiseApp] Owner notification failed:', err))
-      );
-    }
-
-    if (result.agent_user_id) {
-      notificationPromises.push(
-        (async () => {
-          const { data: agentUser } = await adminDb
-            .from('users')
-            .select('phone')
-            .eq('id', result.agent_user_id)
-            .single();
-
-          if (agentUser?.phone) {
-            await notifyAgentPremiseApproved({
-              agentPhone: agentUser.phone,
-              agentName: result.agent_name || 'Agent',
-              premiseName: result.premise_name,
-            });
-          }
-        })().catch(err => console.error('[PremiseApp] Agent notification failed:', err))
-      );
-    }
-
-    if (notificationPromises.length > 0) {
-      Promise.all(notificationPromises).then(() =>
-        console.log(`[PremiseApp] ${notificationPromises.length} notification(s) sent.`)
-      );
-    }
 
     revalidatePath('/dashboard/admin/premises');
     return { success: true };

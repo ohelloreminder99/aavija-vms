@@ -16,10 +16,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { type Premise } from '@/services/premise-service';
-import Link from 'next/link';
-import { useCollection } from '@/supabase/firestore/use-collection';
 import { WithId, useUser } from '@/supabase';
+import { usePremises, usePremiseApplications, type Premise } from '@/services/premise-service';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -91,13 +90,18 @@ export default function PremisesPage() {
   const { data: categories } = usePremiseCategories();
   const { toast } = useToast();
 
-  const [premises, setPremises] = React.useState<SerializablePremiseWithDetails[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-  const [applications, setApplications] = React.useState<PremiseApplication[]>([]);
   const [currentPage, setCurrentPage] = React.useState(0);
-  const [totalPremises, setTotalPremises] = React.useState(0);
   const PAGE_SIZE = 25;
+
+  // Real-time hooks for both premises and applications
+  const { data: premisesData, isLoading: isPremisesLoading, error: premisesError } = usePremises({ page: currentPage, pageSize: PAGE_SIZE });
+  const { data: applicationsData, isLoading: isAppsLoading } = usePremiseApplications();
+
+  const premises = (premisesData || []) as any[];
+  const applications = applicationsData || [];
+  const isLoading = isPremisesLoading || isAppsLoading;
+  const error = premisesError ? premisesError.message : null;
+  const totalPremises = 0; 
 
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -131,31 +135,9 @@ export default function PremisesPage() {
   const editForm = useForm<EditFormValues>({ resolver: zodResolver(editFormSchema), });
 
   const fetchPremises = React.useCallback(async (page = 0) => {
-    setIsLoading(true);
-    setError(null);
-    const [premisesResult, appsResult] = await Promise.all([
-      getPremisesForAdmin(page, PAGE_SIZE),
-      getPremiseApplications(),
-    ]);
-    if (premisesResult.success && premisesResult.data) {
-      setPremises(premisesResult.data);
-      setTotalPremises(premisesResult.total ?? 0);
-    } else {
-      setError(premisesResult.error || 'Failed to load premises data.');
-    }
-    if (appsResult.success && appsResult.data) {
-      setApplications(appsResult.data);
-    }
-    setIsLoading(false);
-  }, [PAGE_SIZE]);
-
-  // Realtime Pulse: Whenever the premises table broadcasts a mutation, this will update and trigger a refetch.
-  const { data: realtimePulse } = useCollection({ table: 'premises', __memo: true });
-  const pulseHash = realtimePulse ? realtimePulse.length : 0;
-
-  React.useEffect(() => {
-    fetchPremises(currentPage);
-  }, [fetchPremises, pulseHash, currentPage]);
+    // Legacy refresh kept for manual triggers if needed, though hooks should handle it.
+    // In this refactor, we rely on the hooks.
+  }, []);
 
   const hasLogged = React.useRef(false);
   React.useEffect(() => {

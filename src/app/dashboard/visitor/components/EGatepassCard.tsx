@@ -60,6 +60,12 @@ export function EGatepassCard({ checkinId }: EGatepassCardProps) {
             {/* The E-Gatepass Glassmorphism Card */}
             <div className="relative overflow-hidden rounded-[2rem] bg-black/40 p-[1px] shadow-2xl border border-white/5 group">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/5 group-hover:from-primary/30 transition-all duration-500" />
+                
+                {/* High-tech Scanning Pattern Overlay */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+                
+                {/* Moving Scan Line Animation */}
+                <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent top-0 animate-scan-line pointer-events-none" />
 
                 <div className="relative z-10 backdrop-blur-3xl rounded-[2rem] p-8 h-full border border-white/5 overflow-hidden">
                     {/* Security Watermark */}

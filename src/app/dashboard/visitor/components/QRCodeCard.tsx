@@ -11,7 +11,7 @@ import {
 import { useUser } from '@/supabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ShieldAlert, QrCode, Loader2 } from 'lucide-react';
+import { ShieldAlert, QrCode, Loader2, ShieldCheck } from 'lucide-react';
 import { useUserProfile } from '@/services/user-service';
 import QRCode from 'react-qr-code';
 import {
@@ -62,6 +62,7 @@ export function QRCodeCard() {
   } | null>(null);
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -140,13 +141,17 @@ export function QRCodeCard() {
 
   // Effect to automatically close the dialog when a check-in is successful
   useEffect(() => {
-    // If the user profile shows an active check-in has just occurred,
-    // and the QR dialog is still open, we must close it to prevent it
-    // from re-appearing later.
     if (userProfile && userProfile.active_checkin_id && isDialogOpen) {
-      // This call will set isDialogOpen to false and also trigger the cleanup
-      // of the token via deleteCheckinToken.
-      handleDialogClose(false);
+      // Show success animation first
+      setShowSuccessOverlay(true);
+      
+      // After a short delay, close the dialog and transition
+      const timer = setTimeout(() => {
+        setShowSuccessOverlay(false);
+        handleDialogClose(false);
+      }, 1500);
+
+      return () => clearTimeout(timer);
     }
   }, [userProfile?.active_checkin_id, isDialogOpen, handleDialogClose]);
 
@@ -340,6 +345,16 @@ export function QRCodeCard() {
                   }
                   className="h-1.5 bg-white/10"
                 />
+              </div>
+            )}
+
+            {showSuccessOverlay && (
+              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#010a05]/90 backdrop-blur-xl animate-in fade-in duration-300 rounded-2xl">
+                <div className="h-20 w-20 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center mb-4">
+                   <ShieldCheck className="h-10 w-10 text-primary animate-bounce" />
+                </div>
+                <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Check-in Verified</h3>
+                <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest mt-1">Generating E-Gatepass...</p>
               </div>
             )}
           </div>

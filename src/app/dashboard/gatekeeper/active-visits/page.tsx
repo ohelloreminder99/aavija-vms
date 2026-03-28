@@ -36,7 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { checkoutVisitor, getEmergencyContactInfo } from '../actions';
 import { useTransition } from 'react';
 import { useCollection, WithId, useUser, useDoc } from '@/supabase';
-import { Visit } from '@/services/visit-service';
+import { Visit, useActiveVisitsForPremise } from '@/services/visit-service';
 import { Premise } from '@/services/premise-service';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -61,23 +61,7 @@ export default function ActiveVisitsPage() {
   const [isFetchingEmergency, setIsFetchingEmergency] = React.useState(false);
 
   // Real-time query for active visits
-  const activeVisitsQuery = React.useMemo(() => {
-    if (!premiseId) return null;
-
-    return {
-      table: 'visits',
-      filters: [
-        { column: 'premise_id', operator: 'eq' as const, value: premiseId },
-        { column: 'status', operator: 'eq' as const, value: 'active' }
-      ],
-      orderBy: { column: 'checkin_time', ascending: false },
-      __memo: true
-    };
-  }, [premiseId]);
-
-  const { data: visits, isLoading, error } = useCollection<Visit>(
-    activeVisitsQuery
-  );
+  const { data: visits, isLoading, error } = useActiveVisitsForPremise(premiseId || '', 100);
 
   const premiseDocRef = React.useMemo(() => premiseId ? { table: 'premises', id: premiseId } : null, [premiseId]);
   const { data: premise } = useDoc<Premise>(premiseDocRef as any);
@@ -143,7 +127,7 @@ export default function ActiveVisitsPage() {
     if (!visits) return [];
     const lowercasedFilter = searchTerm.toLowerCase();
     return visits.filter(
-      (v) =>
+      (v: WithId<Visit>) =>
         v.visitor_name.toLowerCase().includes(lowercasedFilter) ||
         (v.host_name || '').toLowerCase().includes(lowercasedFilter)
     );
@@ -201,7 +185,7 @@ export default function ActiveVisitsPage() {
           </TableRow>
         </TableHeader>
           <TableBody>
-            {filteredVisits.map((visit) => (
+            {filteredVisits.map((visit: WithId<Visit>) => (
               <TableRow key={visit.id} className="border-white/5 hover:bg-white/5">
                 <TableCell className="font-bold text-white tracking-tight pl-8">
                   {visit.visitor_name}

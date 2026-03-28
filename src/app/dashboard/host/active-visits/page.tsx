@@ -24,7 +24,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useCollection, WithId, useUser } from '@/supabase';
-import { Visit } from '@/services/visit-service';
+import { Visit, useVisitsForHost } from '@/services/visit-service';
 import { verifyVisitByHost } from '../actions';
 
 export default function HostActiveVisitsPage() {
@@ -35,22 +35,7 @@ export default function HostActiveVisitsPage() {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [isVerifying, setIsVerifying] = React.useState<string | null>(null);
 
-    const activeVisitsQuery = React.useMemo(() => {
-        if (!premiseId || !user) return null;
-
-        return {
-            table: 'visits',
-            filters: [
-                { column: 'premise_id', operator: 'eq' as const, value: premiseId },
-                { column: 'host_id', operator: 'eq' as const, value: user.id },
-                { column: 'status', operator: 'eq' as const, value: 'active' }
-            ],
-            orderBy: { column: 'checkin_time', ascending: false },
-            __memo: true
-        };
-    }, [premiseId, user]);
-
-    const { data: visits, isLoading, error } = useCollection<Visit>(activeVisitsQuery);
+    const { data: visits, isLoading, error } = useVisitsForHost(premiseId || undefined, user?.id);
 
     const handleVerify = async (visitId: string) => {
         if (!premiseId || !user) return;

@@ -50,11 +50,38 @@ export function useVisitByIdForUser(userId: string | undefined, visitId: string 
 
 /**
  * Hook to fetch visits for a specific premise, ordered by check-in time.
- * Paginated — returns the most recent `pageSize` visits (default 50).
+ * Real-time enabled.
  * @param premiseId The ID of the premise to fetch visits for.
  * @param pageSize Number of visits to fetch per page (default 50).
  */
 export function useVisitsByPremise(premiseId: string | undefined, pageSize: number = 50) {
+    const [refreshKey, setRefreshKey] = React.useState(0);
+
+    React.useEffect(() => {
+        if (!premiseId) return;
+        
+        const supabase = createClient();
+        const channel = supabase
+            .channel(`visits-premise-realtime-${premiseId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'visits',
+                    filter: `premise_id=eq.${premiseId}`
+                },
+                () => {
+                    setRefreshKey(prev => prev + 1);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [premiseId]);
+
     const query = React.useMemo(() => {
         if (!premiseId) return null;
         return {
@@ -62,21 +89,49 @@ export function useVisitsByPremise(premiseId: string | undefined, pageSize: numb
             filters: [{ column: 'premise_id', operator: 'eq' as const, value: premiseId }],
             orderBy: { column: 'checkin_time', ascending: false },
             limit: pageSize,
-            __memo: true
+            __memo: true,
+            __refresh: refreshKey
         };
-    }, [premiseId, pageSize]);
+    }, [premiseId, pageSize, refreshKey]);
 
-    return useCollection<Visit>(query);
+    return useCollection<Visit>(query as any);
 }
 
 /**
  * Hook to fetch visits for a specific host at a specific premise.
- * Paginated — returns the most recent `pageSize` visits (default 50).
+ * Real-time enabled.
  * @param hostId The ID of the host to fetch visits for.
  * @param premiseId The ID of the premise to fetch visits from.
  * @param pageSize Number of visits to fetch per page (default 50).
  */
 export function useVisitsForHost(hostId: string | undefined, premiseId: string | undefined, pageSize: number = 50) {
+    const [refreshKey, setRefreshKey] = React.useState(0);
+
+    React.useEffect(() => {
+        if (!hostId || !premiseId) return;
+        
+        const supabase = createClient();
+        const channel = supabase
+            .channel(`visits-host-realtime-${hostId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'visits',
+                    filter: `host_id=eq.${hostId}`
+                },
+                () => {
+                    setRefreshKey(prev => prev + 1);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [hostId, premiseId]);
+
     const query = React.useMemo(() => {
         if (!hostId || !premiseId) return null;
         return {
@@ -87,9 +142,112 @@ export function useVisitsForHost(hostId: string | undefined, premiseId: string |
             ],
             orderBy: { column: 'checkin_time', ascending: false },
             limit: pageSize,
-            __memo: true
+            __memo: true,
+            __refresh: refreshKey
         };
-    }, [hostId, premiseId, pageSize]);
+    }, [hostId, premiseId, pageSize, refreshKey]);
+
+    return useCollection<Visit>(query as any);
+}
+
+/**
+ * Hook to fetch a user's single active visit.
+ * Real-time enabled.
+ * @param userId The ID of the user.
+ */
+export function useUserActiveVisit(userId: string | undefined) {
+    const [refreshKey, setRefreshKey] = React.useState(0);
+
+    React.useEffect(() => {
+        if (!userId) return;
+        
+        const supabase = createClient();
+        const channel = supabase
+            .channel(`user-active-visit-realtime-${userId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'visits',
+                    filter: `visitor_id=eq.${userId}`
+                },
+                () => {
+                    setRefreshKey(prev => prev + 1);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [userId]);
+
+    const query = React.useMemo(() => {
+        if (!userId) return null;
+        return {
+            table: 'visits',
+            filters: [
+                { column: 'visitor_id', operator: 'eq' as const, value: userId },
+                { column: 'status', operator: 'eq' as const, value: 'active' }
+            ],
+            orderBy: { column: 'checkin_time', ascending: false },
+            limit: 1,
+            __memo: true,
+            __refresh: refreshKey
+        };
+    }, [userId, refreshKey]);
+
+    const { data, isLoading, error } = useCollection<Visit>(query as any);
+    return { data: data?.[0] || null, isLoading, error };
+}
+
+/**
+ * Hook to fetch only ACTIVE visits for a specific premise.
+ * Real-time enabled.
+ */
+export function useActiveVisitsForPremise(premiseId: string | undefined, pageSize: number = 50) {
+    const [refreshKey, setRefreshKey] = React.useState(0);
+
+    React.useEffect(() => {
+        if (!premiseId) return;
+        
+        const supabase = createClient();
+        const channel = supabase
+            .channel(`active-visits-realtime-${premiseId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'visits',
+                    filter: `premise_id=eq.${premiseId}`
+                },
+                () => {
+                    setRefreshKey(prev => prev + 1);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [premiseId]);
+
+    const query = React.useMemo(() => {
+        if (!premiseId) return null;
+        return {
+            table: 'visits',
+            filters: [
+                { column: 'premise_id', operator: 'eq' as const, value: premiseId },
+                { column: 'status', operator: 'eq' as const, value: 'active' }
+            ],
+            orderBy: { column: 'checkin_time', ascending: false },
+            limit: pageSize,
+            __memo: true,
+            __refresh: refreshKey
+        };
+    }, [premiseId, pageSize, refreshKey]);
 
     return useCollection<Visit>(query as any);
 }

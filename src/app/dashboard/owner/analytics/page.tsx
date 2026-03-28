@@ -99,6 +99,7 @@ export default function OwnerAnalyticsPage() {
       setError('No premise selected. Please go back and select a premise.');
       return;
     }
+
     setIsLoading(true);
     setError(null);
     fetch(`/api/analytics/owner?premiseId=${premiseId}`)
@@ -109,6 +110,29 @@ export default function OwnerAnalyticsPage() {
       .then((d) => setData(d))
       .catch((e) => setError(e.message))
       .finally(() => setIsLoading(false));
+
+    // ─── REAL-TIME SYNC ──────────────────────────────────────────────────────
+    const { createClient } = require('@/lib/supabase/client');
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`analytics-realtime-${premiseId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'visits',
+          filter: `premise_id=eq.${premiseId}`
+        },
+        () => {
+          setRefreshKey(k => k + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [premiseId, refreshKey]);
 
   const fmtDuration = (minutes: number | string) => {

@@ -50,7 +50,7 @@ export interface Premise {
   name: string;
   address: string;
   city: string;
-  cityId?: string; // New field for robust location matching
+  cityId?: string;
   city_state?: string;
   is_active: boolean;
   owner_id: string;
@@ -59,30 +59,71 @@ export interface Premise {
   agent_id?: string | null;
   categoryId?: string | null;
   categoryName?: string | null;
-  staff?: StaffMember[]; // Deprecated: use premise_members table
+  staff?: StaffMember[]; 
   host_count?: number;
   gatekeeper_count?: number;
   gate_count?: number;
-  // GST Details for Invoicing
   gstNumber?: string;
   billingAddress?: string;
   legalName?: string;
   billingState?: string;
   require_host_verification?: boolean;
+  
+  // Joined relations for UI convenience
+  owner?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    photo_url: string;
+  };
+  agent?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  category?: {
+    id: string;
+    name: string;
+  };
 }
 
 // === REPOSITORY FUNCTIONS (HOOKS) ===
 
 /**
- * Hook to fetch all premises once.
- * @returns The same result as useStaticCollection: { data, isLoading, error }
+ * Hook to fetch all premises with real-time updates.
  */
-export function usePremises() {
-  const query = React.useMemo(() => {
-    return { table: 'premises', __memo: true };
+export function usePremises(options?: { pageSize?: number; page?: number }) {
+  const [refreshKey, setRefreshKey] = React.useState(0);
+  const { pageSize = 50, page = 0 } = options || {};
+
+  React.useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel('premises-global-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'premises' },
+        () => setRefreshKey(prev => prev + 1)
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  return useStaticCollection<Premise>(query as any);
+  const query = React.useMemo(() => {
+    return { 
+      table: 'premises', 
+      limit: pageSize,
+      offset: page * pageSize,
+      __memo: true,
+      __refresh: refreshKey 
+    };
+  }, [pageSize, page, refreshKey]);
+
+  return useCollection<Premise>(query as any);
 }
 
 /**
@@ -116,15 +157,43 @@ export async function updatePremise(_db: any, id: string, data: Partial<Premise>
  * Hook to fetch gates for a specific premise.
  */
 export function usePremiseGates(premiseId: string | undefined) {
+  const [refreshKey, setRefreshKey] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!premiseId) return;
+    
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`gates-realtime-${premiseId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'premise_gates',
+          filter: `premise_id=eq.${premiseId}`
+        },
+        () => {
+          setRefreshKey(prev => prev + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [premiseId]);
+
   const query = React.useMemo(() => {
     if (!premiseId) return null;
     return {
       table: 'premise_gates',
       filters: [{ column: 'premise_id', operator: 'eq' as const, value: premiseId }],
       orderBy: { column: 'name', ascending: true },
-      __memo: true
+      __memo: true,
+      __refresh: refreshKey // Force useCollection to re-evaluate
     };
-  }, [premiseId]);
+  }, [premiseId, refreshKey]);
 
   return useCollection<PremiseGate>(query as any);
 }
@@ -196,4 +265,41 @@ export function usePremiseMembers(
   }, [rawData]);
 
   return { data, isLoading, error };
+}
+
+/**
+ * Hook to fetch all premise applications in real-time.
+ */
+export function usePremiseApplications(options?: { pageSize?: number; page?: number }) {
+  const [refreshKey, setRefreshKey] = React.useState(0);
+  const { pageSize = 50, page = 0 } = options || {};
+
+  React.useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel('premise-apps-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'premise_applications' },
+        () => setRefreshKey(prev => prev + 1)
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const query = React.useMemo(() => {
+    return { 
+      table: 'premise_applications', 
+      orderBy: { column: 'created_at', ascending: false },
+      limit: pageSize,
+      offset: page * pageSize,
+      __memo: true,
+      __refresh: refreshKey 
+    };
+  }, [pageSize, page, refreshKey]);
+
+  return useCollection<any>(query as any);
 }

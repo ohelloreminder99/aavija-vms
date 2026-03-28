@@ -25,6 +25,7 @@ import {
 import * as React from 'react';
 import { DashboardCard } from '@/components/shared/DashboardCard';
 import { useSettings } from '@/services/settings-service';
+import { AdminStatusPulse } from './AdminStatusPulse';
 
 const locationLinks = [
   { title: 'States', href: '/dashboard/admin/states' },
@@ -170,17 +171,20 @@ export function AdminDashboard() {
   ].sort((a, b) => a.title.localeCompare(b.title));
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {dashboardItems.map((item) => (
-        <DashboardCard
-          key={item.title}
-          title={item.title}
-          href={item.href}
-          icon={item.icon}
-          variant={item.variant}
-          links={item.links}
-        />
-      ))}
+    <div className="space-y-6">
+      <AdminStatusPulse />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {dashboardItems.map((item) => (
+          <DashboardCard
+            key={item.title}
+            title={item.title}
+            href={item.href}
+            icon={item.icon}
+            variant={item.variant}
+            links={item.links}
+          />
+        ))}
+      </div>
     </div>
   );
 }

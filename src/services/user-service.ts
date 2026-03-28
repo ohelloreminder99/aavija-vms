@@ -228,6 +228,33 @@ export interface HostBlock {
  * @param userId The UID of the owner querying their blocks.
  */
 export function usePremiseBlocks(premiseId: string | undefined, userId: string | undefined) {
+  const [refreshKey, setRefreshKey] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!premiseId) return;
+    
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`blocked-realtime-${premiseId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'premise_blocked_visitors',
+          filter: `premise_id=eq.${premiseId}`
+        },
+        () => {
+          setRefreshKey(prev => prev + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [premiseId]);
+
   const query = React.useMemo(() => {
     if (!premiseId || !userId) return null;
     return {
@@ -236,9 +263,10 @@ export function usePremiseBlocks(premiseId: string | undefined, userId: string |
         { column: 'premise_id', operator: 'eq' as const, value: premiseId },
         { column: 'blocked_by', operator: 'eq' as const, value: userId }
       ],
-      __memo: true
+      __memo: true,
+      __refresh: refreshKey
     };
-  }, [premiseId, userId]);
+  }, [premiseId, userId, refreshKey]);
 
-  return useCollection<PremiseBlock>(query);
+  return useCollection<PremiseBlock>(query as any);
 }

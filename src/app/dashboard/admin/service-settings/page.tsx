@@ -39,6 +39,8 @@ const serviceSettingsSchema = z.object({
   wa_template_referral_commission: z.string().min(1),
   wa_template_threshold_reached: z.string().min(1),
   wa_template_agent_assigned: z.string().min(1),
+  wa_template_premise_approved: z.string().min(1),
+  wa_template_new_premise_application: z.string().min(1),
   razorpay_key_id: z.string().optional().or(z.literal('')),
 });
 
@@ -62,6 +64,8 @@ export default function ServiceSettingsPage() {
       wa_template_threshold_reached: 'aavija_threshold_reached',
       wa_template_phone_verify: 'aavija_phone_verify',
       wa_template_agent_assigned: 'aavija_agent_assigned',
+      wa_template_premise_approved: 'aavija_premise_approved',
+      wa_template_new_premise_application: 'aavija_new_premise_application',
       razorpay_key_id: '',
     },
   });
@@ -79,6 +83,8 @@ export default function ServiceSettingsPage() {
         wa_template_referral_commission: settings.wa_template_referral_commission || 'aavija_referral_commission',
         wa_template_threshold_reached: settings.wa_template_threshold_reached || 'aavija_threshold_reached',
         wa_template_agent_assigned: settings.wa_template_agent_assigned || 'aavija_agent_assigned',
+        wa_template_premise_approved: settings.wa_template_premise_approved || 'aavija_premise_approved',
+        wa_template_new_premise_application: settings.wa_template_new_premise_application || 'aavija_new_premise_application',
         razorpay_key_id: settings.razorpay_key_id || '',
       });
     }
@@ -198,6 +204,18 @@ export default function ServiceSettingsPage() {
                   <FormField control={form.control} name="wa_template_agent_assigned" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Agent Assigned Template</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="wa_template_premise_approved" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Premise Approved Template</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="wa_template_new_premise_application" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Premise Application Template</FormLabel>
                       <FormControl><Input {...field} /></FormControl>
                     </FormItem>
                   )} />

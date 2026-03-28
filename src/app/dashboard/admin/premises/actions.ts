@@ -282,13 +282,20 @@ export async function createPremiseAndNewOwner(
       });
 
       // Add initial invoice
+      // Add initial invoice (Free welcome bonus)
       await adminDb.from('invoices').insert({
+        id: `INV-${premiseId}`,
         userId: ownerUid,
-        amount: 0,
-        status: 'paid',
-        gstAmount: 0,
+        userName: ownerName,
+        userEmail: ownerEmail,
+        userPhone: '',
+        userState: city_state || 'Unknown',
+        premiseId: premiseId,
+        tokenAmount: startingOwnerTokens,
+        subtotal: 0,
         totalAmount: 0,
-        paidAt: new Date().toISOString(),
+        status: 'paid',
+        created_at: new Date().toISOString(),
       });
     }
 
@@ -380,13 +387,20 @@ export async function createPremiseForExistingUser(
       });
 
       // Add initial invoice
+      // Add initial invoice (Free welcome bonus)
       await adminDb.from('invoices').insert({
+        id: `INV-${premiseId}`,
         userId: ownerId,
-        amount: 0,
-        status: 'paid',
-        gstAmount: 0,
+        userName: ownerName,
+        userEmail: ownerEmail,
+        userPhone: userDoc.phone || '',
+        userState: userDoc.billingState || userDoc.city_state || 'Unknown',
+        premiseId: premiseId,
+        tokenAmount: startingOwnerTokens,
+        subtotal: 0,
         totalAmount: 0,
-        paidAt: new Date().toISOString(),
+        status: 'paid',
+        created_at: new Date().toISOString(),
       });
     }
 
