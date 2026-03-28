@@ -22,6 +22,7 @@ DECLARE
   v_category      premise_categories%ROWTYPE;
   v_settings      settings%ROWTYPE;
   v_premise_id    UUID := gen_random_uuid();
+  v_agent_id      UUID;
   v_current_roles JSONB;
   v_updated_roles JSONB;
 BEGIN
@@ -34,6 +35,10 @@ BEGIN
   IF NOT FOUND THEN
     RETURN jsonb_build_object('success', false, 'error', 'Application not found or already processed.');
   END IF;
+
+  -- Initialize v_agent_id after v_app is fetched
+  v_agent_id := COALESCE(v_app.agent_user_id, v_app.submitted_by);
+
 
   -- ── 2. Fetch and validate category ────────────────────────────────────────
   SELECT * INTO v_category
@@ -57,10 +62,10 @@ BEGIN
   SELECT * INTO v_settings FROM settings WHERE id = 'global';
 
   -- ── 5. Ensure agent exists in shadow table (upsert) ───────────────────────
-  IF v_app.agent_user_id IS NOT NULL THEN
+  IF v_agent_id IS NOT NULL THEN
     INSERT INTO agents (id, name, phone, city, commission_balance)
     VALUES (
-      v_app.agent_user_id,
+      v_agent_id,
       COALESCE(v_app.agent_name, 'Unknown Agent'),
       '',
       COALESCE(v_app.city_name, 'Unknown'),
@@ -84,8 +89,8 @@ BEGIN
     true,
     v_owner.id,
     v_owner.name,
-    v_app.agent_user_id,
-    v_category.id::TEXT,
+    v_agent_id,
+    v_category.id,
     v_category.name,
     '[]'::JSONB,
     0,
@@ -109,9 +114,9 @@ BEGIN
   UPDATE premise_applications
   SET
     status = 'approved',
-    reviewed_by = p_admin_id::TEXT,
+    reviewed_by = p_admin_id,
     reviewed_at = NOW(),
-    created_premise_id = v_premise_id::TEXT
+    created_premise_id = v_premise_id
   WHERE id = p_application_id;
 
   -- ── 9. Return success with the new premise ID ──────────────────────────────
@@ -120,7 +125,7 @@ BEGIN
     'premise_id', v_premise_id,
     'owner_id', v_owner.id,
     'owner_phone', v_owner.phone,
-    'agent_user_id', v_app.agent_user_id,
+    'agent_user_id', v_agent_id,
     'agent_name', v_app.agent_name,
     'agent_email', v_app.agent_email,
     'premise_name', v_app.premise_name

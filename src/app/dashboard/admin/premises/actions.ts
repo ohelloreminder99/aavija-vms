@@ -257,6 +257,7 @@ export async function createPremiseAndNewOwner(
       cityId: cityId,
       city_state: city_state || 'Unknown',
       is_active: true,
+      owner_id: ownerUid,
       ownerName: ownerName,
       agent_id: (agentId && agentId.trim()) ? agentId : null,
       categoryId: categoryId,
@@ -336,6 +337,7 @@ export async function createPremiseForExistingUser(
       cityId: cityId,
       city_state: city_state || 'Unknown',
       is_active: true,
+      owner_id: ownerId,
       ownerName: ownerName,
       agent_id: (agentId && agentId.trim()) ? agentId : null,
       categoryId: categoryId,
@@ -537,13 +539,18 @@ export async function updatePremiseAdmin(
     if (typeof updateData.address === 'string') updateData.address = sanitizeText(updateData.address);
     if (typeof updateData.city === 'string')    updateData.city    = sanitizeText(updateData.city);
 
-    // The premises table uses camelCase (agent_id, categoryId).
-    // Normalize any camelCase agent field to the correct snake_case agent_id
+    // The premises table uses camelCase (agent_id, categoryId, etc. are inconsistent in DB).
+    // Normalize any client-side fields to match the database column names precisely.
     if ('agentId' in updateData) {
       updateData.agent_id = updateData.agentId;
-      delete updateData.agentId;
+      delete (updateData as any).agentId;
     }
-    // categoryId is the actual column name in DB — no remapping needed
+    // Note: PostgREST respects camelCase if configured/matching the schema, 
+    // but we ensure owner_id is present if it was changed recently.
+    if ('ownerId' in updateData) {
+      updateData.owner_id = updateData.ownerId;
+      delete (updateData as any).ownerId;
+    }
 
     // ── Optimistic Locking ────────────────────────────────────────────────────
     // Check whether the row has been modified since the admin last loaded it.

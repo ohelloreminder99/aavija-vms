@@ -125,7 +125,7 @@ export async function submitPremiseApplication(
         category_id: data.category_id || null,
         category_name: data.category_name || null,
         owner_email: data.owner_email.toLowerCase().trim(),
-        agent_user_id: profile.is_agent ? user.id : null,
+        agent_user_id: user.id,
         agent_name: profile.name || null,
         agent_email: profile.email || null,
         submitted_by: user.id,
