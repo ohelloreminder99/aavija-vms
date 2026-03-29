@@ -321,10 +321,10 @@ export function QRCodeCard() {
               >
                 <QRCode
                   value={tokenData.token}
-                  size={240}
+                  size={260}
                   bgColor="white"
                   fgColor="black"
-                  level="M"
+                  level="H"
                 />
               </div>
             ) : (

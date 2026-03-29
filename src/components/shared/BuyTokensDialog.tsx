@@ -44,10 +44,8 @@ import { useUserProfile } from '@/services/user-service';
 import { useUser, useDoc } from '@/supabase';
 import { Separator } from '../ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { purchaseTokens } from '@/services/token-service';
 import {
   createRazorpayOrder,
-  verifyRazorpayPayment,
 } from '@/services/payment-service';
 import { generateInvoicePdf } from '@/services/invoice-service';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
@@ -192,8 +190,8 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
             // table and wait for the record to appear.
             
             const supabase = createClient();
-            let pollTimer: NodeJS.Timeout;
-            let channel: any;
+            let pollTimer: any = null;
+            let channel: any = null;
 
             const cleanup = () => {
               if (pollTimer) clearTimeout(pollTimer);
@@ -261,6 +259,9 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
               });
               onOpenChange(false);
             }, 30000);
+
+            // 4. Update the outer pollTimer reference if needed
+            // (already handled by local scope assignment if used correctly)
 
           } catch (handlerError: any) {
             console.error("Payment Fulfillment Error:", handlerError);

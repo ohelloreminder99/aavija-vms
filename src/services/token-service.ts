@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { LogAction } from './log-actions';
 import { fireReferralCommission } from './referral-service';
 import { notifyThresholdReached } from './whatsapp-service';
-import crypto from 'crypto';
+import nodeCrypto from 'crypto';
 
 interface PurchaseTokensPayload {
   userId: string;
@@ -83,7 +83,7 @@ export async function purchaseTokens(
     // --- STEP 0.2: RAZORPAY SIGNATURE VERIFICATION ---
     if (!isWebhook) {
       const body = razorpay_order_id + '|' + razorpay_payment_id;
-      const expectedSignature = crypto
+      const expectedSignature = nodeCrypto
         .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
         .update(body.toString())
         .digest('hex');
@@ -128,7 +128,7 @@ export async function purchaseTokens(
       }
     }
 
-    const invoiceId = `INV-${crypto.randomUUID()}`;
+    const invoiceId = `INV-${nodeCrypto.randomUUID()}`;
 
     // --- STEP 2: CALCULATIONS & ANTI-SPOOFING VERIFICATION ---
     let userState = 'Unknown';
