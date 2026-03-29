@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { LogAction } from './log-actions';
 import { fireReferralCommission } from './referral-service';
 import { notifyThresholdReached } from './whatsapp-service';
+import crypto from 'crypto';
 
 interface PurchaseTokensPayload {
   userId: string;
@@ -27,7 +28,7 @@ interface PurchaseTokensPayload {
  */
 export async function purchaseTokens(
   payload: PurchaseTokensPayload
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; alreadyFulfilled?: boolean; message?: string }> {
   const {
     userId,
     tokenAmount,
