@@ -68,21 +68,27 @@ export async function purchaseTokens(
     }
 
     // --- STEP 0.1: REPLAY PROTECTION ---
-    const { data: existingInvoice } = await adminDb.from('invoices').select('id').eq('razorpay_order_id', razorpay_order_id).single();
+    const { data: existingInvoice } = await adminDb
+      .from('invoices')
+      .select('id')
+      .eq('razorpay_order_id', razorpay_order_id)
+      .maybeSingle();
+
     if (existingInvoice) {
-      throw new Error('This order has already been fulfilled. Replay attack detected.');
+      console.log(`[Tokens] Order ${razorpay_order_id} already fulfilled. Skipping.`);
+      return { success: true, alreadyFulfilled: true };
     }
 
     // --- STEP 0.2: RAZORPAY SIGNATURE VERIFICATION ---
     if (!isWebhook) {
-      const { verifyRazorpayPayment } = await import('./payment-service');
-      const verificationResult = await verifyRazorpayPayment({
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-      });
-      if (!verificationResult.success) {
-        throw new Error(verificationResult.error || 'Cryptographic signature mismatch.');
+      const body = razorpay_order_id + '|' + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+        .update(body.toString())
+        .digest('hex');
+
+      if (expectedSignature !== razorpay_signature) {
+        return { success: false, error: 'Invalid payment signature. Potential fraud detected.' };
       }
     }
 

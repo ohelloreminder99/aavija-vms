@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 
 interface QrScannerProps {
   /** Called once when a QR code is successfully decoded */
@@ -23,8 +23,8 @@ interface QrScannerProps {
 export default function QrScanner({
   onScan,
   onError,
-  qrBoxSize = 250,
-  fps = 10,
+  qrBoxSize = 300,
+  fps = 25,
   className,
 }: QrScannerProps) {
   const scannerId = React.useId().replace(/:/g, ''); // creates a safe DOM id
@@ -57,8 +57,13 @@ export default function QrScanner({
 
         const config = {
           fps: fps,
-          qrbox: { width: qrBoxSize, height: qrBoxSize },
+          qrbox: (vWidth: number, vHeight: number) => {
+            const size = Math.min(vWidth, vHeight) * 0.8;
+            return { width: size, height: size };
+          },
           aspectRatio: 1.0, 
+          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+          rememberLastUsedCamera: true,
         };
 
         scanner.start(
@@ -126,14 +131,20 @@ export default function QrScanner({
 
   return (
     <div className={className} style={{ position: 'relative', overflow: 'hidden', minHeight: '300px' }}>
-      {/* Scanner binding region */}
+      {/* Binding region */}
       <div 
         id={regionId} 
-        style={{ width: '100%', height: '100%', borderRadius: '1rem', overflow: 'hidden' }}
+        className="w-full h-full rounded-2xl overflow-hidden"
       ></div>
+
+      {/* Scanning Line Animation Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
+         <div className="relative w-[80%] aspect-square border-2 border-emerald-500/30 rounded-2xl overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] animate-scan-line" />
+            <div className="absolute inset-0 bg-emerald-500/5" />
+         </div>
+      </div>
       
-      {/* CSS overlay to hide the default html5-qrcode UI if desired, but html5-qrcode provides its own UI 
-          Often we want to style the scanner using the ID itself. */}
       <style>{`
         #${regionId} {
           border-radius: 1rem;
@@ -142,13 +153,23 @@ export default function QrScanner({
         #${regionId} video {
           border-radius: 1rem;
           object-fit: cover !important;
+          transform: scale(1.1); /* Slight zoom to help focus */
         }
-        /* Hide the default start/stop buttons from the library if it injects any */
         #${regionId} button {
            display: none !important;
         }
         #${regionId}__status_span {
            display: none !important;
+        }
+        
+        @keyframes scan-line {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .animate-scan-line {
+          animation: scan-line 2.5s ease-in-out infinite;
         }
       `}</style>
     </div>

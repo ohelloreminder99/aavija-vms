@@ -177,7 +177,7 @@ export function useCollection<T = Record<string, any>>(
           if (timeoutRef.current) clearTimeout(timeoutRef.current);
           timeoutRef.current = setTimeout(() => {
             if (isMounted) fetchCollection();
-          }, 1500);
+          }, 300);
         }
       )
       .subscribe();

@@ -186,56 +186,82 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
           try {
             setIsSubmitting(true);
             setProcessingPhase('crediting');
-            const purchaseResult = await purchaseTokens({
-              userId: user.id,
-              tokenAmount: data.quantity,
-              totalCost: totalPayable,
-              currency: currency,
-              actorName: userProfile.name,
-              actorRole: userProfile.role,
-              roleToCredit: role,
-              premiseId: premiseId,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
+            
+            // WE NOW RELY ON THE WEBHOOK FOR FULFILLMENT (TAMPER-PROOF)
+            // Instead of calling purchaseTokens here, we subscribe to the invoices 
+            // table and wait for the record to appear.
+            
+            const supabase = createClient();
+            let pollTimer: NodeJS.Timeout;
+            let channel: any;
 
-            if (purchaseResult.success) {
+            const cleanup = () => {
+              if (pollTimer) clearTimeout(pollTimer);
+              if (channel) supabase.removeChannel(channel);
+            };
+
+            const handleSuccess = async (invoiceData: any) => {
+              cleanup();
               setProcessingPhase('generating');
-              // Auto-download PDF invoice (non-fatal)
               try {
-                const supabase = createClient();
-                const { data: invoiceData } = await supabase
-                  .from('invoices')
-                  .select('*')
-                  .eq('razorpay_order_id', response.razorpay_order_id)
-                  .single();
-                if (invoiceData) {
-                  await generateInvoicePdf(invoiceData as any);
-                }
+                await generateInvoicePdf(invoiceData);
               } catch (pdfErr) {
-                console.error('[PDF] Auto-download failed (non-fatal):', pdfErr);
-                toast({
-                  title: 'Invoice Ready',
-                  description: 'Tokens credited! Download your invoice from "Token History & Invoices".',
-                });
+                console.error('[PDF] Auto-download failed:', pdfErr);
               }
-              
               setProcessingPhase('done');
               toast({
                 title: 'Purchase Successful!',
                 description: `${data.quantity.toLocaleString()} tokens added. Your invoice is downloading.`,
               });
-              
-              // Delay closing to show "Done" state
               setTimeout(() => {
                 onOpenChange(false);
                 form.reset();
                 setProcessingPhase('idle');
+                setIsSubmitting(false);
               }, 1500);
-            } else {
-              throw new Error(purchaseResult.error);
+            };
+
+            // 1. Subscribe to Real-time
+            channel = supabase
+              .channel(`verify_payment_${response.razorpay_order_id}`)
+              .on(
+                'postgres_changes',
+                {
+                  event: 'INSERT',
+                  schema: 'public',
+                  table: 'invoices',
+                  filter: `razorpay_order_id=eq.${response.razorpay_order_id}`,
+                },
+                (payload) => {
+                  handleSuccess(payload.new);
+                }
+              )
+              .subscribe();
+
+            // 2. Immediate check (in case webhook beat us to it)
+            const { data: existingInvoice } = await supabase
+              .from('invoices')
+              .select('*')
+              .eq('razorpay_order_id', response.razorpay_order_id)
+              .maybeSingle();
+
+            if (existingInvoice) {
+              handleSuccess(existingInvoice);
+              return;
             }
+
+            // 3. Fallback Timeout (30 seconds)
+            pollTimer = setTimeout(() => {
+              cleanup();
+              setIsSubmitting(false);
+              setProcessingPhase('idle');
+              toast({
+                title: 'Payment Received',
+                description: 'Your payment is being processed. Tokens will appear in your history shortly.',
+              });
+              onOpenChange(false);
+            }, 30000);
+
           } catch (handlerError: any) {
             console.error("Payment Fulfillment Error:", handlerError);
             toast({
