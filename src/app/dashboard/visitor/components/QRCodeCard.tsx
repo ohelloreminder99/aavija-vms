@@ -319,13 +319,15 @@ export function QRCodeCard() {
               <div
                 className="p-4 bg-[#010a05]/95 backdrop-blur-3xl rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-transform animate-in fade-in zoom-in duration-500"
               >
-                <QRCode
-                  value={tokenData.token}
-                  size={260}
-                  bgColor="white"
-                  fgColor="black"
-                  level="H"
-                />
+                <div className="bg-white p-2 rounded-lg">
+                  <QRCode
+                    value={tokenData.token}
+                    size={240}
+                    bgColor="white"
+                    fgColor="black"
+                    level="Q"
+                  />
+                </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-[240px] gap-4">
