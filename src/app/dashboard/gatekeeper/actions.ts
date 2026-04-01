@@ -107,7 +107,7 @@ export async function processScannedToken(
     if (userError || !visitorData) throw new Error('Visitor profile not found for the user associated with this QR code.');
 
     const { data: premiseData, error: premiseError } = await adminDb.from('premises')
-      .select('id, name, address, city, cityId, is_active, owner_id, agent_id, categoryId, token_balance, require_host_verification, staff')
+      .select('id, name, address, city, cityId, is_active, owner_id, agent_id, categoryId, token_balance, require_host_verification')
       .eq('id', premiseId).single();
     if (premiseError || !premiseData) throw new Error('The premise you are scanning for could not be found.');
 
@@ -134,32 +134,25 @@ export async function processScannedToken(
       }
     }
 
-    const staffList = premiseData.staff || [];
-    const activeHosts = staffList.filter((s: StaffMember) => {
-      return s && s.role === 'host' && s.is_active === true && s.availability !== 'do-not-disturb' && s.uid && s.name && s.identity;
-    });
+    const { data: hostMembers, error: memberError } = await adminDb
+      .from('premise_members')
+      .select('user_id, identity, availability, users!inner(name, photo_url, token_balance_visitor)')
+      .eq('premise_id', premiseId)
+      .eq('role', 'host')
+      .eq('is_active', true)
+      .neq('availability', 'do-not-disturb');
 
-    const hostIds = activeHosts.map((h: StaffMember) => h.uid);
-    const hostBalances: Record<string, number> = {};
+    if (memberError) throw memberError;
 
-    if (hostIds.length > 0) {
-      const { data: usersData } = await adminDb.from('users').select('id, token_balance_visitor').in('id', hostIds);
-      if (usersData) {
-        usersData.forEach((u: any) => {
-          hostBalances[u.id] = u.token_balance_visitor || 0;
-        });
-      }
-    }
-
-    const hosts: SerializableCheckinHost[] = activeHosts.map((h: StaffMember) => {
-      const balance = hostBalances[h.uid] || 0;
+    const hosts: SerializableCheckinHost[] = (hostMembers || []).map((m: any) => {
+      const balance = m.users?.token_balance_visitor || 0;
       const isDisabled = categoryType === 'residential' && balance < requiredTokensPremiseSide;
       return {
-        id: h.uid,
-        name: h.name,
-        identity: h.identity!,
-        photo_url: h.photo_url || '',
-        availability: h.availability || 'available',
+        id: m.user_id,
+        name: m.users?.name || 'Unknown Host',
+        identity: m.identity || '',
+        photo_url: m.users?.photo_url || '',
+        availability: m.availability || 'available',
         token_balance: balance,
         isDisabled: isDisabled,
       };

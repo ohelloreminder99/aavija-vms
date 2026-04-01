@@ -37,6 +37,7 @@ export interface PremiseMember {
   identity: string;
   gate_id?: string;
   is_active: boolean;
+  availability: HostAvailability;
   user?: {
     name: string;
     email: string;
@@ -255,6 +256,7 @@ export function usePremiseMembers(
       identity: row.identity,
       gate_id: row.gate_id,
       is_active: row.is_active,
+      availability: row.availability as HostAvailability,
       created_at: row.created_at,
       user: {
         name: row.user_name,

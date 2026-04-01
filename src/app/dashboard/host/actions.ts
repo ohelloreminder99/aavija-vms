@@ -230,21 +230,23 @@ export async function setHostAvailability(payload: { hostId: string; premiseId: 
       throw new Error('Unauthorized: You cannot change availability for another host.');
     }
 
-    const { data: premiseDoc, error: fetchError } = await adminDb.from('premises').select('staff').eq('id', premiseId).single();
-    if (fetchError || !premiseDoc) {
-      throw new Error("Premise not found.");
+    const { data: memberData, error: fetchError } = await adminDb
+      .from('premise_members')
+      .select('id')
+      .eq('premise_id', premiseId)
+      .eq('user_id', hostId)
+      .single();
+
+    if (fetchError || !memberData) {
+      throw new Error("Host profile not found in this premise.");
     }
 
-    const staff = (premiseDoc.staff || []) as StaffMember[];
-    const hostIndex = staff.findIndex(s => s.uid === hostId);
+    const { error: updateError } = await adminDb
+      .from('premise_members')
+      .update({ availability })
+      .eq('id', memberData.id);
 
-    if (hostIndex === -1) {
-      throw new Error("Host not found in this premise's staff list.");
-    }
-
-    staff[hostIndex].availability = availability as any;
-
-    const { error: updateError } = await adminDb.from('premises').update({ staff }).eq('id', premiseId);
+    if (updateError) throw updateError;
     if (updateError) throw updateError;
 
     revalidatePath('/dashboard/host');

@@ -33,6 +33,7 @@ import { useUser, useDoc } from '@/supabase';
 import { useUserProfile } from '@/services/user-service';
 import { useSettings } from '@/services/settings-service';
 import { usePremiseCategories } from '@/services/premise-category-service';
+import { usePremiseMembers } from '@/services/premise-service';
 import QrScanner from '@/components/QrScanner';
 import { DashboardActionCard } from '../visitor/components/DashboardActionCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -143,25 +144,28 @@ export default function GatekeeperDashboardPage() {
   const isLoading = isProfileLoading || isPremiseLoading || areCategoriesLoading;
   const isScanDisabled = isLoading || !hasSufficientPremiseTokens;
 
+  const { data: hostMembers } = usePremiseMembers(premiseId || undefined, 'host');
+
   React.useEffect(() => {
-    if (premise && premise.staff && typeof window !== 'undefined' && navigator.onLine) {
+    if (hostMembers && typeof window !== 'undefined' && navigator.onLine) {
       // Pre-cache the active hosts for offline usage
-      const staffList = premise.staff || [];
-      const activeHosts: SerializableCheckinHost[] = staffList
-        .filter((s: any) => s && s.role === 'host' && s.is_active === true && s.availability !== 'do-not-disturb' && s.uid && s.name && s.identity)
-        .map((h: any) => ({
-          id: h.uid,
-          name: h.name,
-          identity: h.identity!,
-          photo_url: h.photo_url || '',
-          availability: h.availability || 'available',
+      const activeHosts: SerializableCheckinHost[] = hostMembers
+        .filter((h: any) => h.is_active === true && h.availability !== 'do-not-disturb')
+        .map((m: any) => ({
+          id: m.user_id,
+          name: m.user?.name || 'Unknown',
+          identity: m.identity || '',
+          photo_url: m.user?.photo_url || '',
+          availability: m.availability || 'available',
           token_balance: 0, // Simplified for offline cache
           isDisabled: false,
         }));
 
-      saveCachedHosts(premise.id, activeHosts).catch(e => console.error("Failed to cache offline hosts", e));
+      if (premiseId) {
+        saveCachedHosts(premiseId, activeHosts).catch(e => console.error("Failed to cache offline hosts", e));
+      }
     }
-  }, [premise]);
+  }, [hostMembers, premiseId]);
 
   const handleScan = useCallback((token: string) => {
     setIsScannerOpen(false);
