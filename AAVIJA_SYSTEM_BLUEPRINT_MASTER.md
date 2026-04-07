@@ -64,15 +64,32 @@ The database uses a **Mixed Naming Convention** (Crucial for queries).
    - Debit visitor, debit premise/host, create visit, delete QR token.
    - **Safety**: If any single DB operation fails, the entire transaction rolls back.
 5. **Notification**: WhatsApp alert sent to Host via Cloud API (Fire-and-forget background promise).
+6. **The "Host Handshake" Protocol (Verification)**:
+   - IF Premise Setting `require_host_verification` is **TRUE**:
+      - The visitor is checked in as `active`.
+      - The "Checkout" button in the Gatekeeper Dashboard remains **DISABLED**.
+      - The Host receives a "Verify Visit" button in their dashboard.
+      - Once the Host clicks "Verify" (marking the visitor as "Met"), the DB `host_verified_at` is set.
+      - Only then does the Gatekeeper's "Checkout" button become **ACTIVE**.
+   - IF `require_host_verification` is **FALSE**:
+      - The visitor can be checked out by the Gatekeeper at any time.
 
-### B. Premise Application Workflow
-1. **Submission**: Agent submits with `owner_email`. System checks if owner exists.
-2. **Admin Review**: Admin clicks "Approve" and selects a category.
+### B. Premise Lifecycle Management
+Premises are the core organizational unit of Aavija.
+
+1. **Submission**: Agent submits with `owner_email`.
+2. **Admin Review**: Admin clicks "Approve" and selects a category (Industrial/Residential).
 3. **Activation (Atomic RPC `approve_premise_application`)**:
-   - Creates premise row.
-   - Link `owner_id` to owner user.
-   - Update owner's `premise_roles`.
-   - Grant `starting_token_owner`.
+   - Creates `public.premises` row.
+   - Links `owner_id` to the user profile.
+   - Updates owner's `premise_roles`.
+   - Grants `starting_token_owner`.
+4. **Maintenance & CRUD Permissions**:
+   - **Create**: **ADMIN ONLY**.
+   - **Delete**: **ADMIN ONLY** (Cascades logs/visits).
+   - **Edit Basic Info**: **ADMIN** & **OWNER** (Name, Address, City).
+   - **Edit Billing/Category**: **ADMIN ONLY**.
+   - **Toggle Settings**: **OWNER** (Manage Gates, Staff, and `require_host_verification`).
 
 ---
 
@@ -112,16 +129,24 @@ Aavija uses a **Hyper-Premium "Liquid Obsidian"** aesthetic.
 
 ---
 
-## 7. Admin Settings Reference
-Managed in `Admin Dashboard > Settings`.
+## 7. Admin Settings Registry (The Singleton Reference)
+Managed in `Admin Dashboard > Settings`. All settings are stored in a single row (`id='global'`) in the `public.settings` table.
 
-| Category | Key Settings |
-| :--- | :--- |
-| **Financial** | Currency, GST Rate, Token Exchange Rate, Agent Commission %. |
-| **Security** | QR Expiry (seconds), Check-in Limit/Hour, OTP Limit/Hour. |
-| **Operational** | Initial Tokens (Visitor/Owner), Low Token Threshold, History Retention Days. |
-| **Integrations** | WhatsApp Phone/Template IDs, Razorpay Key IDs. |
-| **Regional** | Default Country Code (+91, +971, etc.), Phone Number Length. |
+| Setting Key | Category | Impact / Effect |
+| :--- | :--- | :--- |
+| `starting_token_visitor` | **Financial** | Initial tokens given to every new user upon registration. |
+| `starting_token_owner` | **Financial** | Initial tokens given to a premise upon approval (Welcome Bonus). |
+| `hide_token_economy` | **UI/UX** | **CRITICAL**: If TRUE, all token balances, costs, and recharge buttons are HIDDEN from the app for a "Simple VMS" experience. |
+| `require_host_verification` | **Operational** | (Per Premise) If TRUE, gatekeeper cannot checkout visitor until host verifies the meeting. |
+| `visit_ttl_days` | **Retention** | Automatically expires/archives active visits if not checked out within this window. |
+| `otp_request_limit_hourly` | **Security** | Prevents SMS/WhatsApp OTP spam by capping requests per phone number. |
+| `checkin_rate_limit` | **Security** | Traffic control: Max number of check-ins allowed at a single gate per hour. |
+| `qr_code_expiry_seconds` | **Security** | Time window (default 120s) for a generated QR code to be valid for scanning. |
+| `is_maintenance_mode` | **Safety** | If TRUE, blocks all Server Actions and shows a maintenance splash screen to all users. |
+| `allow_concurrent_checkins` | **Logic** | If FALSE, a visitor must checkout from one premise before they can generate a token for another. |
+| `low_token_threshold` | **Operational** | Triggers "Low Balance" warnings for Premise Owners when tokens drop below this level. |
+| `currency` | **International** | Global currency symbol (e.g., ₹, $, AED) used in all dashboards. |
+| `default_country_code` | **Regional** | Auto-prefixes phone numbers if not provided (e.g., +91 for India). |
 
 ---
 
