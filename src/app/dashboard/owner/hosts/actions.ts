@@ -11,7 +11,7 @@ interface HostData {
   email: string;
   password: string;
   identity: string;
-  premiseId: string;
+  premise_id: string;
   premiseCity: string;
   actor: {
     id: string;
@@ -104,9 +104,9 @@ export async function createHost(
     await adminDb.rpc('increment_host_count', { premise_id_param: premiseId });
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.HOST_CREATED,
       description: `Owner "${actor.name}" created new host "${name}".`
     });
@@ -135,7 +135,7 @@ export async function createHost(
 interface AssignHostByEmailPayload {
   email: string;
   identity: string;
-  premiseId: string;
+  premise_id: string;
   actor: {
     id: string;
     name: string;
@@ -188,9 +188,9 @@ export async function assignHostRoleByEmail(payload: AssignHostByEmailPayload): 
     await adminDb.rpc('increment_host_count', { premise_id_param: premiseId });
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.HOST_CREATED,
       description: `Owner "${actor.name}" assigned host role to existing user "${userDoc.name}" (${email}).`
     });
@@ -206,10 +206,10 @@ export async function assignHostRoleByEmail(payload: AssignHostByEmailPayload): 
 
 
 interface ToggleStatusPayload {
-  hostId: string;
+  host_id: string;
   hostName: string;
   newStatus: boolean;
-  premiseId: string;
+  premise_id: string;
   actor: {
     id: string;
     name: string;
@@ -243,9 +243,9 @@ export async function toggleHostStatus(payload: ToggleStatusPayload): Promise<{ 
     const actionText = newStatus ? 'activated' : 'deactivated';
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: action,
       description: `Owner "${actor.name}" ${actionText} host "${hostName}".`
     });
@@ -260,9 +260,9 @@ export async function toggleHostStatus(payload: ToggleStatusPayload): Promise<{ 
 }
 
 interface RemoveHostPayload {
-  hostId: string;
+  host_id: string;
   hostName: string;
-  premiseId: string;
+  premise_id: string;
   actor: {
     id: string;
     name: string;
@@ -307,9 +307,9 @@ export async function removeHostFromPremise(payload: RemoveHostPayload): Promise
     }
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.HOST_REMOVED,
       description: `Owner "${actor.name}" removed host "${hostName}" from premise, converting them to a visitor.`
     });
@@ -323,7 +323,7 @@ export async function removeHostFromPremise(payload: RemoveHostPayload): Promise
   }
 }
 
-export async function backfillHostAvailability(premiseId: string): Promise<{ success: boolean; error?: string; message?: string; }> {
+export async function backfillHostAvailability(premise_id: string): Promise<{ success: boolean; error?: string; message?: string; }> {
   if (!premiseId) {
     return { success: false, error: 'Premise ID is required.' };
   }

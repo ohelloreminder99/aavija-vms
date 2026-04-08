@@ -8,9 +8,9 @@ import { sendOtpVerification } from '@/services/whatsapp-service';
 // --- WhatsApp OTP Actions ---
 
 export async function sendWhatsAppOtp(payload: {
-  userId: string;
+  user_id: string;
   phone: string;
-  countryCode: string;
+  country_code: string;
 }): Promise<{ success: boolean; error?: string }> {
   const { userId, phone, countryCode } = payload;
 
@@ -121,10 +121,10 @@ export async function sendWhatsAppOtp(payload: {
  * Verifies a WhatsApp OTP, updates the user's profile, and deducts tokens.
  */
 export async function verifyWhatsAppOtp(payload: {
-  userId: string;
+  user_id: string;
   otp: string;
   phone: string; // The new phone number to save
-  countryCode: string;
+  country_code: string;
 }): Promise<{ success: boolean; error?: string; message?: string }> {
   const { userId, otp, phone, countryCode } = payload;
   const adminDb = await getAdminDb();
@@ -147,7 +147,7 @@ export async function verifyWhatsAppOtp(payload: {
     const { data: otpDoc } = await adminDb.from('whatsapp_otps').select('id, otp, expiresAt').eq('id', userId).single();
     if (!otpDoc) throw new Error('No OTP found. Please request a new one.');
 
-    const expiresAt = new Date(otpDoc.expiresAt);
+    const expiresAt = new Date(otpDoc.expires_at);
 
     if (expiresAt < new Date()) {
       await adminDb.from('whatsapp_otps').delete().eq('id', userId);
@@ -173,7 +173,7 @@ export async function verifyWhatsAppOtp(payload: {
 
     await adminDb.from('users').update({
       phone: phone,
-      countryCode: countryCode, // Notice this might be stored in the users table, check schema if needed
+      country_code: countryCode, // Notice this might be stored in the users table, check schema if needed
       is_verified: true,
       token_balance_visitor: newBalance,
     }).eq('id', userId);
@@ -184,20 +184,20 @@ export async function verifyWhatsAppOtp(payload: {
     // Log the token deduction after the transaction succeeds
     if (verificationCost > 0) {
       await createLogEntry({
-        actorId: userId,
-        actorName: userName,
-        actorRole: 'visitor',
+        actor_id: userId,
+        actor_name: userName,
+        actor_role: 'visitor',
         action: LogAction.PHONE_VERIFICATION_COST,
         description: `${userName} paid ${verificationCost} tokens to verify their WhatsApp number (${countryCode}${phone}).`,
-        tokenChange: -verificationCost,
+        token_change: -verificationCost,
       });
     }
 
     // Always log the successful verification itself
     await createLogEntry({
-      actorId: userId,
-      actorName: userName,
-      actorRole: 'visitor',
+      actor_id: userId,
+      actor_name: userName,
+      actor_role: 'visitor',
       action: LogAction.PHONE_VERIFIED,
       description: `${userName} successfully verified their phone number (${countryCode}${phone}) via WhatsApp OTP.`,
     });

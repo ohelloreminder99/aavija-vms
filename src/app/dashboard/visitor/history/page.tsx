@@ -116,7 +116,7 @@ export default function VisitorHistoryPage() {
       try {
         const historyDays = settings?.history_days_visitor;
         const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
-        const result = await getVisitsForVisitorAction({ visitorId: user.id, limit: PAGE_SIZE, startDate: startDateString });
+        const result = await getVisitsForVisitorAction({ visitor_id: user.id, limit: PAGE_SIZE, startDate: startDateString });
 
         if (result.success && result.visits) {
           setVisits(result.visits);
@@ -142,7 +142,7 @@ export default function VisitorHistoryPage() {
     try {
       const historyDays = settings.history_days_visitor;
       const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
-      const result = await getVisitsForVisitorAction({ visitorId: user.id, limit: PAGE_SIZE, startAfter: lastVisible, startDate: startDateString });
+      const result = await getVisitsForVisitorAction({ visitor_id: user.id, limit: PAGE_SIZE, startAfter: lastVisible, startDate: startDateString });
 
       if (result.success && result.visits) {
         setVisits((prev) => [...prev, ...result.visits!]);
@@ -168,9 +168,9 @@ export default function VisitorHistoryPage() {
     setIsExporting(exportType);
     const result = await deductTokensForExport({
       target: { type: 'user', id: userProfile.id },
-      actorId: userProfile.id,
-      actorName: userProfile.name,
-      actorRole: 'visitor',
+      actor_id: userProfile.id,
+      actor_name: userProfile.name,
+      actor_role: 'visitor',
       exportType: exportType,
     });
 
@@ -180,7 +180,7 @@ export default function VisitorHistoryPage() {
       const exportableDays = settings?.export_history_days_visitor || 30;
       const exportStartDate = subDays(new Date(), exportableDays).toISOString();
 
-      const exportDataResult = await getVisitsForExport({ visitorId: userProfile.id, startDate: exportStartDate });
+      const exportDataResult = await getVisitsForExport({ visitor_id: userProfile.id, startDate: exportStartDate });
 
       if (!exportDataResult.success || !exportDataResult.visits) {
         toast({ variant: 'destructive', title: 'Export Failed', description: exportDataResult.error || 'Failed to fetch historical data.' });

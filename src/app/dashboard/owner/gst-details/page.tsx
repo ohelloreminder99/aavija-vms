@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
@@ -11,7 +11,7 @@ import { Premise } from '@/services/premise-service';
 
 export default function OwnerGstDetailsPage() {
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
   const router = useRouter();
 
   const docRef = React.useMemo(() => {
@@ -44,10 +44,10 @@ export default function OwnerGstDetailsPage() {
       <GstDetailsCard
         target={{ type: 'premise', id: premiseId }}
         initialData={{
-          legalName: premise?.legalName,
-          gstNumber: premise?.gstNumber,
-          billingAddress: premise?.billingAddress,
-          billingState: premise?.billingState
+          legal_name: premise?.legal_name,
+          gst_number: premise?.gst_number,
+          billing_address: premise?.billing_address,
+          billing_state: premise?.billing_state
         }}
         onSuccess={() => router.push(`/dashboard/owner?premiseId=${premiseId}`)}
       />

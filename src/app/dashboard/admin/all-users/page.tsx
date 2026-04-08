@@ -56,9 +56,9 @@ export default function AllUsersPage() {
     if (users && users.length > 0 && adminProfile && !hasLoggedView.current) {
       hasLoggedView.current = true;
       createLogEntry({
-        actorId: adminProfile.id,
-        actorName: adminProfile.name,
-        actorRole: 'admin',
+        actor_id: adminProfile.id,
+        actor_name: adminProfile.name,
+        actor_role: 'admin',
         action: LogAction.VIEW_ALL_USERS_ADMIN,
         description: `Admin "${adminProfile.name}" viewed the all users dashboard.`
       });

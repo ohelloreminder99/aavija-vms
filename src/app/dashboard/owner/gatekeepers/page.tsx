@@ -103,7 +103,7 @@ export default function GatekeepersPage() {
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
     
     // Hooks using the new system
     const { data: premise, isLoading: isPremiseLoading } = useDoc<Premise>(premiseId ? { table: 'premises', id: premiseId } : null);
@@ -198,7 +198,7 @@ export default function GatekeepersPage() {
         try {
             const result = await removeGatekeeperFromPremise({
                 premiseId,
-                userId: gatekeeperToRemove.user_id,
+                user_id: gatekeeperToRemove.user_id,
                 actor: { id: user.id, name: userProfile.name, role: 'owner' }
             });
             if (result.success) {
@@ -222,7 +222,7 @@ export default function GatekeepersPage() {
             const newStatus = !gatekeeperToToggle.is_active;
             const result = await toggleGatekeeperStatus({
                 premiseId,
-                userId: gatekeeperToToggle.user_id,
+                user_id: gatekeeperToToggle.user_id,
                 isActive: newStatus,
                 actor: { id: user.id, name: userProfile.name, role: 'owner' }
             });

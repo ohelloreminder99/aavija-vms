@@ -23,7 +23,7 @@ type SerializableVisit = {
 
 
 export async function getVisitsForVisitor(
-  visitorId: string
+  visitor_id: string
 ): Promise<{ success: boolean; visits?: SerializableVisit[]; error?: string }> {
   if (!visitorId) {
     return { success: false, error: 'Visitor ID is required.' };

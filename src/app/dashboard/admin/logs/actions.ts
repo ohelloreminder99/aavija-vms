@@ -4,7 +4,7 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { Log } from '@/services/log-service';
 
 // A version of the Log type that is safe to pass from server to client
-export type SerializableLog = Omit<Log, 'timestamp' | 'expiresAt'> & { id: string, timestamp: string, expiresAt?: string };
+export type SerializableLog = Omit<Log, 'timestamp' | 'expires_at'> & { id: string, timestamp: string, expiresAt?: string };
 
 interface GetLogsPayload {
     role?: string;
@@ -27,7 +27,7 @@ export async function getAdminLogs(payload: GetLogsPayload): Promise<{ logs: Ser
         let logsQuery = adminDb.from('logs').select('*');
 
         if (role && role !== 'all') {
-            logsQuery = logsQuery.eq('actorRole', role);
+            logsQuery = logsQuery.eq('actor_role', role);
         } else if (action && action !== 'all') {
             logsQuery = logsQuery.eq('action', action);
         }
@@ -49,7 +49,7 @@ export async function getAdminLogs(payload: GetLogsPayload): Promise<{ logs: Ser
                 ...rest,
                 id: data.id,
                 timestamp: data.timestamp,
-                ...(expiresAt && { expiresAt: expiresAt }),
+                ...(expiresAt && { expires_at: expiresAt }),
             };
         });
 

@@ -174,9 +174,9 @@ export function AuthForm({ mode }: AuthFormProps) {
 
           if (userProfile) {
             await supabase.from('logs').insert({
-              actorId: user.id,
-              actorName: userProfile.name,
-              actorRole: userProfile.role,
+              actor_id: user.id,
+              actor_name: userProfile.name,
+              actor_role: userProfile.role,
               action: LogAction.USER_LOGIN,
               description: `User "${userProfile.name}" (${userProfile.email}) logged in.`
             });

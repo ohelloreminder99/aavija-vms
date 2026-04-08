@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useStaticCollection, WithId } from '@/supabase';
@@ -9,10 +9,10 @@ import { createClient } from '@/lib/supabase/client';
 export interface City {
   id?: string;
   name: string;
-  districtId: string;
-  districtName: string;
-  stateId: string;
-  stateName: string;
+  district_id: string;
+  district_name: string;
+  state_id: string;
+  state_name: string;
 }
 
 // === REPOSITORY FUNCTIONS (HOOKS & ASYNC) ===
@@ -37,7 +37,7 @@ export function useCities(districtId?: string) {
       return null;
     }
     if (districtId) {
-      return allCities.filter((c) => c.districtId === districtId);
+      return allCities.filter((c) => c.district_id === districtId);
     }
     return allCities;
   }, [allCities, districtId]);
@@ -55,10 +55,10 @@ export async function createCity(_db: any, data: Omit<City, 'id'>) {
   const supabase = await createClient();
   const newCityData = {
     name: data.name.toLowerCase(),
-    districtId: data.districtId,
-    districtName: data.districtName.toLowerCase(),
-    stateId: data.stateId,
-    stateName: data.stateName.toLowerCase(),
+    district_id: data.district_id,
+    district_name: data.district_name.toLowerCase(),
+    state_id: data.state_id,
+    state_name: data.state_name.toLowerCase(),
   };
   const { error } = await supabase.from('cities').insert([newCityData]);
   if (error) throw error;
@@ -78,10 +78,10 @@ export async function updateCity(
   const supabase = await createClient();
   const dataToUpdate: Partial<City> = {};
   if (data.name) dataToUpdate.name = data.name.toLowerCase();
-  if (data.districtId) dataToUpdate.districtId = data.districtId;
-  if (data.districtName) dataToUpdate.districtName = data.districtName.toLowerCase();
-  if (data.stateId) dataToUpdate.stateId = data.stateId;
-  if (data.stateName) dataToUpdate.stateName = data.stateName.toLowerCase();
+  if (data.district_id) dataToUpdate.district_id = data.district_id;
+  if (data.district_name) dataToUpdate.district_name = data.district_name.toLowerCase();
+  if (data.state_id) dataToUpdate.state_id = data.state_id;
+  if (data.state_name) dataToUpdate.state_name = data.state_name.toLowerCase();
 
   const { error } = await supabase.from('cities').update(dataToUpdate).eq('id', id);
   if (error) throw error;
@@ -98,7 +98,7 @@ export async function deleteCity(_db: any, id: string) {
   if (error) throw error;
 }
 
-type CsvCity = { name: string; districtName: string; stateName: string };
+type CsvCity = { name: string; district_name: string; state_name: string };
 
 /**
  * Creates multiple city documents using Supabase insert array.
@@ -115,31 +115,31 @@ export async function batchCreateCities(
   const { data: districts } = await supabase.from('districts').select('*');
 
   const stateMap = new Map((states || []).map(doc => [doc.name.toLowerCase(), doc.id]));
-  const districtMap = new Map((districts || []).map(doc => [doc.name.toLowerCase() + '|' + doc.stateId, doc.id]));
-  const districtStateMap = new Map((districts || []).map(doc => [doc.id, { stateId: doc.stateId, stateName: doc.stateName }]));
+  const districtMap = new Map((districts || []).map(doc => [doc.name.toLowerCase() + '|' + doc.state_id, doc.id]));
+  const districtStateMap = new Map((districts || []).map(doc => [doc.id, { state_id: doc.state_id, state_name: doc.state_name }]));
 
   const newCitiesToInsert = cities.map((city) => {
-    const stateNameLower = city.stateName.toLowerCase();
-    const districtNameLower = city.districtName.toLowerCase();
+    const stateNameLower = city.state_name.toLowerCase();
+    const districtNameLower = city.district_name.toLowerCase();
 
     const stateId = stateMap.get(stateNameLower);
     if (!stateId) {
-      throw new Error(`State '${city.stateName}' not found for city '${city.name}'. Please create the state first.`);
+      throw new Error(`State '${city.state_name}' not found for city '${city.name}'. Please create the state first.`);
     }
 
     const districtId = districtMap.get(districtNameLower + '|' + stateId);
     if (!districtId) {
-      throw new Error(`District '${city.districtName}' in state '${city.stateName}' not found for city '${city.name}'. Please create the district first.`);
+      throw new Error(`District '${city.district_name}' in state '${city.state_name}' not found for city '${city.name}'. Please create the district first.`);
     }
 
     const parentInfo = districtStateMap.get(districtId);
 
     return {
       name: city.name.toLowerCase(),
-      districtId: districtId,
-      districtName: districtNameLower,
-      stateId: parentInfo?.stateId,
-      stateName: parentInfo?.stateName
+      district_id: districtId,
+      district_name: districtNameLower,
+      state_id: parentInfo?.state_id,
+      state_name: parentInfo?.state_name
     };
   });
 

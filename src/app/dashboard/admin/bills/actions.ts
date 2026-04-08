@@ -68,7 +68,7 @@ export async function getReconciliationData(month: number, year: number): Promis
         // 1. Get Invoice Data
         const { data: invoices, error: invError } = await adminDb
             .from('invoices')
-            .select('totalAmount')
+            .select('total_amount')
             .gte('created_at', startOfMonth)
             .lte('created_at', endOfMonth);
 
@@ -84,7 +84,7 @@ export async function getReconciliationData(month: number, year: number): Promis
 
         if (logError) throw logError;
 
-        const totalInvoiceAmount = (invoices || []).reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0);
+        const totalInvoiceAmount = (invoices || []).reduce((sum, inv) => sum + (Number(inv.total_amount) || 0), 0);
         const invoiceCount = invoices?.length || 0;
         const paymentLogCount = logs?.length || 0;
 

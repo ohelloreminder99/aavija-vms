@@ -107,7 +107,7 @@ export default function HostsPage() {
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId') ?? undefined;
+    const premiseId = searchParams.get('premise_id') ?? undefined;
 
     const docRef = React.useMemo(() => {
         if (!premiseId) return null;
@@ -261,11 +261,11 @@ export default function HostsPage() {
         try {
             const newStatus = !(hostToToggle.is_active ?? true);
             const result = await toggleHostStatus({
-                hostId: hostToToggle.user_id,
+                host_id: hostToToggle.user_id,
                 hostName: hostToToggle.user?.name || 'Unknown',
                 newStatus: newStatus,
                 actor: { id: userProfile.id, name: userProfile.name, role: 'owner' },
-                premiseId: premiseId,
+                premise_id: premiseId,
             });
             if (result.success) {
                 toast({ title: 'Success', description: `Host ${hostToToggle.user?.name || 'Unknown'} has been ${newStatus ? 'activated' : 'deactivated'}.` });
@@ -286,9 +286,9 @@ export default function HostsPage() {
         setIsSubmitting(true);
         try {
             const result = await removeHostFromPremise({ 
-                hostId: hostToRemove.user_id, 
+                host_id: hostToRemove.user_id, 
                 hostName: hostToRemove.user?.name || 'Unknown', 
-                premiseId: premiseId, 
+                premise_id: premiseId, 
                 actor: { id: userProfile.id, name: userProfile.name, role: 'owner' } 
             });
             if (result.success) {

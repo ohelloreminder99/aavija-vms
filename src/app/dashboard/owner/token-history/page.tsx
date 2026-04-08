@@ -9,7 +9,7 @@ import { TokenHistoryCard } from '@/components/shared/TokenHistoryCard';
 
 export default function OwnerTokenHistoryPage() {
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
 
   if (!premiseId) {
     return (

@@ -132,7 +132,7 @@ export function usePremises(options?: { pageSize?: number; page?: number }) {
  * @param premiseId The ID of the premise to fetch.
  * @returns The same result as useDoc: { data, isLoading, error }
  */
-export function usePremiseById(premiseId: string | undefined) {
+export function usePremiseById(premise_id: string | undefined) {
   const docRef = React.useMemo(() => {
     if (!premiseId) return null;
     return { table: 'premises', id: premiseId, __memo: true };
@@ -157,7 +157,7 @@ export async function updatePremise(_db: any, id: string, data: Partial<Premise>
 /**
  * Hook to fetch gates for a specific premise.
  */
-export function usePremiseGates(premiseId: string | undefined) {
+export function usePremiseGates(premise_id: string | undefined) {
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
@@ -203,7 +203,7 @@ export function usePremiseGates(premiseId: string | undefined) {
  * Hook to fetch members (Hosts/Gatekeepers) for a specific premise with pagination.
  */
 export function usePremiseMembers(
-  premiseId: string | undefined, 
+  premise_id: string | undefined, 
   role?: 'host' | 'gatekeeper',
   options?: { pageSize?: number; page?: number; searchTerm?: string }
 ) {

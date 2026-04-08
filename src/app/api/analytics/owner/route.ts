@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
 
     if (!premiseId) {
       return NextResponse.json({ error: 'premiseId required' }, { status: 400 });
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     const { data: invoices } = await supabase
       .from('invoices')
       .select('timestamp, tokenAmount, totalAmount')
-      .eq('premiseId', premiseId)
+      .eq('premise_id', premiseId)
       .gte('timestamp', thirtyDaysAgo)
       .order('timestamp', { ascending: true });
 
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     const tokenDayMap: Record<string, number> = {};
     (invoices || []).forEach((inv: any) => {
       const day = inv.timestamp?.substring(0, 10);
-      if (day) tokenDayMap[day] = (tokenDayMap[day] || 0) + (inv.tokenAmount || 0);
+      if (day) tokenDayMap[day] = (tokenDayMap[day] || 0) + (inv.token_amount || 0);
     });
 
     // Build 30-day arrays

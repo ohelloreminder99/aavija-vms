@@ -155,7 +155,7 @@ export function PremiseDialogs({
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                        <FormField control={createForm.control} name="categoryId" render={({ field }) => (
+                                        <FormField control={createForm.control} name="category_id" render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Type</FormLabel>
                                                 <Select onValueChange={field.onChange} value={field.value}>
@@ -181,7 +181,7 @@ export function PremiseDialogs({
                                         </FormItem>
                                     )} />
 
-                                    <FormField control={createForm.control} name="cityId" render={({ field }) => (
+                                    <FormField control={createForm.control} name="city_id" render={({ field }) => (
                                         <FormItem>
                                             <div className="flex items-center justify-between mb-1">
                                                 <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Select City</FormLabel>
@@ -205,7 +205,7 @@ export function PremiseDialogs({
                                                                     field.value === c.id ? "bg-primary/10 text-white" : "hover:bg-white/5 text-zinc-400"
                                                                 )} onClick={() => field.onChange(c.id)}>
                                                                     <RadioGroupItem value={c.id} id={`c-${c.id}`} className="sr-only" />
-                                                                    <Label htmlFor={`c-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">{c.name}, <span className="opacity-50">{c.stateName}</span></Label>
+                                                                    <Label htmlFor={`c-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">{c.name}, <span className="opacity-50">{c.state_name}</span></Label>
                                                                     {field.value === c.id && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
                                                                 </div>
                                                             ))}
@@ -226,7 +226,7 @@ export function PremiseDialogs({
                                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Owner Details</span>
                                             </div>
                                             <div className="grid grid-cols-2 gap-6">
-                                                <FormField control={createForm.control} name="ownerName" render={({ field }) => (
+                                                <FormField control={createForm.control} name="owner_name" render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Owner Name</FormLabel>
                                                         <FormControl><Input {...field} className="bg-black/40 border-white/5 text-white h-11 rounded-xl" /></FormControl>
@@ -262,7 +262,7 @@ export function PremiseDialogs({
 
                                     <div className="h-px bg-white/5" />
 
-                                    <FormField control={createForm.control} name="agentId" render={({ field }) => (
+                                    <FormField control={createForm.control} name="agent_id" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Sales Agent</FormLabel>
                                             <AgentEmailLookup value={field.value || ''} onChange={field.onChange} />
@@ -313,7 +313,7 @@ export function PremiseDialogs({
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                        <FormField control={editForm.control} name="categoryId" render={({ field }) => (
+                                        <FormField control={editForm.control} name="category_id" render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Property Type</FormLabel>
                                                 <Select onValueChange={field.onChange} value={field.value}>
@@ -337,7 +337,7 @@ export function PremiseDialogs({
                                             <FormMessage />
                                         </FormItem>
                                     )} />
-                                    <FormField control={editForm.control} name="cityId" render={({ field }) => (
+                                    <FormField control={editForm.control} name="city_id" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
                                                 City {field.value && (
@@ -374,7 +374,7 @@ export function PremiseDialogs({
 
                                     <div className="h-px bg-white/5" />
 
-                                    <FormField control={editForm.control} name="agentId" render={({ field }) => (
+                                    <FormField control={editForm.control} name="agent_id" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Sales Agent</FormLabel>
                                             <AgentEmailLookup 

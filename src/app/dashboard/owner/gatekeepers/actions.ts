@@ -9,7 +9,7 @@ interface GatekeeperData {
   name: string;
   email: string;
   password: string;
-  premiseId: string;
+  premise_id: string;
   gateId?: string;
   actor: {
     id: string;
@@ -87,9 +87,9 @@ export async function createGatekeeper(
     await adminDb.rpc('increment_gatekeeper_count', { premise_id_param: premiseId });
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.GATEKEEPER_CREATED,
       description: `Owner "${actor.name}" created gatekeeper "${name}"${gateId ? ` assigned to gate ${gateId}` : ''}.`
     });
@@ -108,7 +108,7 @@ export async function createGatekeeper(
 
 interface AssignGatekeeperPayload {
   email: string;
-  premiseId: string;
+  premise_id: string;
   gateId?: string;
   actor: {
     id: string;
@@ -153,9 +153,9 @@ export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperPaylo
     // For simplicity, let's assume we want accurate counts.
     
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.GATEKEEPER_CREATED,
       description: `Owner "${actor.name}" assigned gatekeeper role to existing user "${userDoc.name}" (${email})${gateId ? ` at gate ${gateId}` : ''}.`
     });
@@ -169,7 +169,7 @@ export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperPaylo
   }
 }
 
-export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: { premiseId: string; userId: string; actor: { id: string; name: string; role: string } }) {
+export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: { premise_id: string; user_id: string; actor: { id: string; name: string; role: string } }) {
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
@@ -193,9 +193,9 @@ export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: 
     }
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.GATEKEEPER_DELETED,
       description: `Owner "${actor.name}" removed gatekeeper ${userId} from premise.`
     });
@@ -208,7 +208,7 @@ export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: 
   }
 }
 
-export async function toggleGatekeeperStatus({ premiseId, userId, isActive, actor }: { premiseId: string; userId: string; isActive: boolean; actor: { id: string; name: string; role: string } }) {
+export async function toggleGatekeeperStatus({ premiseId, userId, isActive, actor }: { premise_id: string; user_id: string; isActive: boolean; actor: { id: string; name: string; role: string } }) {
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
@@ -219,9 +219,9 @@ export async function toggleGatekeeperStatus({ premiseId, userId, isActive, acto
     if (error) throw error;
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: isActive ? LogAction.GATEKEEPER_ACTIVATED : LogAction.GATEKEEPER_DEACTIVATED,
       description: `Owner "${actor.name}" ${isActive ? 'activated' : 'deactivated'} gatekeeper ${userId}.`
     });

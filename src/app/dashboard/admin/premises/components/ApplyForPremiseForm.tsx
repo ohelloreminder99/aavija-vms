@@ -44,7 +44,7 @@ const FormSchema = z.object({
 interface ApplyForPremiseFormProps {
   agentName: string;
   agentEmail: string;
-  cities: { id: string; name: string; stateName: string }[];
+  cities: { id: string; name: string; state_name: string }[];
   categories: { id: string; name: string }[];
   onSuccess?: (applicationId: string) => void;
 }
@@ -69,7 +69,7 @@ export function ApplyForPremiseForm({
   const filteredCities = React.useMemo(
     () =>
       cities.filter((c) =>
-        `${c.name} ${c.stateName}`.toLowerCase().includes(citySearch.toLowerCase())
+        `${c.name} ${c.state_name}`.toLowerCase().includes(citySearch.toLowerCase())
       ),
     [cities, citySearch]
   );
@@ -120,7 +120,7 @@ export function ApplyForPremiseForm({
       const result = await submitPremiseApplication({
         ...values,
         city_name: selectedCity?.name,
-        city_state: selectedCity?.stateName,
+        city_state: selectedCity?.state_name,
       });
 
       if (!result.success) {
@@ -254,7 +254,7 @@ export function ApplyForPremiseForm({
                         >
                           <RadioGroupItem value={c.id} id={`city-${c.id}`} className="sr-only" />
                           <Label htmlFor={`city-${c.id}`} className="flex-1 text-[10px] font-bold uppercase tracking-widest cursor-pointer">
-                            {c.name} <span className="opacity-40">{c.stateName}</span>
+                            {c.name} <span className="opacity-40">{c.state_name}</span>
                           </Label>
                           {field.value === c.id && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
                         </div>

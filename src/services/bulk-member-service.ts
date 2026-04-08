@@ -22,7 +22,7 @@ interface BulkEnrollResult {
  * handles user creation if they don't exist.
  */
 export async function bulkEnrollHosts(
-  premiseId: string,
+  premise_id: string,
   members: BulkMemberData[],
   actor: { id: string; name: string; role: string }
 ): Promise<BulkEnrollResult> {
@@ -95,9 +95,9 @@ export async function bulkEnrollHosts(
 
   if (enrolledCount > 0) {
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.HOST_CREATED,
       description: `Owner "${actor.name}" bulk enrolled ${enrolledCount} hosts.`
     });

@@ -3,7 +3,7 @@
 import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function removeUserPhoneNumber(userId: string): Promise<{ success: boolean; error?: string }> {
+export async function removeUserPhoneNumber(user_id: string): Promise<{ success: boolean; error?: string }> {
     if (!userId) {
         return { success: false, error: 'User ID is required.' };
     }

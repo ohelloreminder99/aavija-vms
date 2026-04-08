@@ -6,7 +6,7 @@ import { LogAction } from '@/services/log-actions';
 import { createLogEntry } from '@/services/log-service';
 
 export interface GateActionParams {
-  premiseId: string;
+  premise_id: string;
   name: string;
   description?: string;
   actor: { id: string; name: string; role: string };
@@ -27,9 +27,9 @@ export async function createGate({ premiseId, name, description, actor }: GateAc
   }
 
   await createLogEntry({
-    actorId: actor.id,
-    actorName: actor.name,
-    actorRole: actor.role,
+    actor_id: actor.id,
+    actor_name: actor.name,
+    actor_role: actor.role,
     action: LogAction.GATE_CREATED,
     description: `Owner "${actor.name}" created gate "${name}" at premise ${premiseId}.`
   });
@@ -53,9 +53,9 @@ export async function updateGate({ gateId, name, description, actor, premiseId }
   }
 
   await createLogEntry({
-    actorId: actor.id,
-    actorName: actor.name,
-    actorRole: actor.role,
+    actor_id: actor.id,
+    actor_name: actor.name,
+    actor_role: actor.role,
     action: LogAction.GATE_UPDATED,
     description: `Owner "${actor.name}" updated gate "${name}".`
   });
@@ -64,7 +64,7 @@ export async function updateGate({ gateId, name, description, actor, premiseId }
   return { success: true, gate: data };
 }
 
-export async function deleteGate({ gateId, gateName, actor, premiseId }: { gateId: string; gateName: string; actor: { id: string; name: string; role: string }; premiseId: string }) {
+export async function deleteGate({ gateId, gateName, actor, premiseId }: { gateId: string; gateName: string; actor: { id: string; name: string; role: string }; premise_id: string }) {
   const supabase = await createClient();
   
   // Check if any gatekeeper is assigned to this gate
@@ -84,9 +84,9 @@ export async function deleteGate({ gateId, gateName, actor, premiseId }: { gateI
   }
 
   await createLogEntry({
-    actorId: actor.id,
-    actorName: actor.name,
-    actorRole: actor.role,
+    actor_id: actor.id,
+    actor_name: actor.name,
+    actor_role: actor.role,
     action: LogAction.GATE_DELETED,
     description: `Owner "${actor.name}" deleted gate "${gateName}".`
   });

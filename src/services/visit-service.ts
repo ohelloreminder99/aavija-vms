@@ -38,7 +38,7 @@ export interface Visit {
  * @param visitId The ID of the visit to fetch.
  * @returns The same result as useDoc: { data, isLoading, error }
  */
-export function useVisitByIdForUser(userId: string | undefined, visitId: string | null | undefined) {
+export function useVisitByIdForUser(user_id: string | undefined, visit_id: string | null | undefined) {
     const docRef = React.useMemo(() => {
         if (!userId || !visitId) return null;
         return { table: 'visits', id: visitId, __memo: true };
@@ -54,7 +54,7 @@ export function useVisitByIdForUser(userId: string | undefined, visitId: string 
  * @param premiseId The ID of the premise to fetch visits for.
  * @param pageSize Number of visits to fetch per page (default 50).
  */
-export function useVisitsByPremise(premiseId: string | undefined, pageSize: number = 50) {
+export function useVisitsByPremise(premise_id: string | undefined, pageSize: number = 50) {
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
@@ -104,7 +104,7 @@ export function useVisitsByPremise(premiseId: string | undefined, pageSize: numb
  * @param premiseId The ID of the premise to fetch visits from.
  * @param pageSize Number of visits to fetch per page (default 50).
  */
-export function useVisitsForHost(hostId: string | undefined, premiseId: string | undefined, pageSize: number = 50) {
+export function useVisitsForHost(host_id: string | undefined, premise_id: string | undefined, pageSize: number = 50) {
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
@@ -155,7 +155,7 @@ export function useVisitsForHost(hostId: string | undefined, premiseId: string |
  * Real-time enabled.
  * @param userId The ID of the user.
  */
-export function useUserActiveVisit(userId: string | undefined) {
+export function useUserActiveVisit(user_id: string | undefined) {
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
@@ -206,7 +206,7 @@ export function useUserActiveVisit(userId: string | undefined) {
  * Hook to fetch only ACTIVE visits for a specific premise.
  * Real-time enabled.
  */
-export function useActiveVisitsForPremise(premiseId: string | undefined, pageSize: number = 50) {
+export function useActiveVisitsForPremise(premise_id: string | undefined, pageSize: number = 50) {
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {

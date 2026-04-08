@@ -79,14 +79,14 @@ describe('token-service', () => {
 
     describe('purchaseTokens', () => {
         const validPayload = {
-            userId: 'user-123',
-            tokenAmount: 100,
+            user_id: 'user-123',
+            token_amount: 100,
             totalCost: 100,
             currency: 'INR',
-            actorName: 'Test User',
-            actorRole: 'owner',
+            actor_name: 'Test User',
+            actor_role: 'owner',
             roleToCredit: 'owner' as const,
-            premiseId: 'premise-123',
+            premise_id: 'premise-123',
             razorpay_order_id: 'order_123',
             razorpay_payment_id: 'pay_123',
             razorpay_signature: 'sig_123',
@@ -101,7 +101,7 @@ describe('token-service', () => {
 
         it('should fail if token amount is zero or negative', async () => {
             mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-            const result = await purchaseTokens({ ...validPayload, tokenAmount: 0 });
+            const result = await purchaseTokens({ ...validPayload, token_amount: 0 });
             expect(result.success).toBe(false);
             expect(result.error).toContain('Token amount must be positive');
         });
@@ -123,7 +123,7 @@ describe('token-service', () => {
             mockBuilder.single = vi.fn()
                 .mockImplementationOnce(() => Promise.resolve({ data: null, error: null })) // existing invoice check
                 .mockImplementationOnce(() => Promise.resolve({ data: { token_exchange_rate: 1, agent_commission_rate: 10, company_state_billing: 'State1' }, error: null })) // settings
-                .mockImplementationOnce(() => Promise.resolve({ data: { email: 'test@example.com', billingState: 'State1' }, error: null })) // user
+                .mockImplementationOnce(() => Promise.resolve({ data: { email: 'test@example.com', billing_state: 'State1' }, error: null })) // user
                 .mockImplementationOnce(() => Promise.resolve({ data: { name: 'Test Premise', agent_id: 'agent-123' }, error: null })) // premise
                 .mockImplementationOnce(() => Promise.resolve({ data: { name: 'Agent User' }, error: null })); // agent
 

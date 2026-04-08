@@ -81,7 +81,7 @@ export default function GatesPage() {
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
     
     const { data: premise, isLoading: isPremiseLoading } = useDoc<Premise>(premiseId ? { table: 'premises', id: premiseId } : null);
     const { data: gates, isLoading: isGatesLoading } = usePremiseGates(premiseId || '');

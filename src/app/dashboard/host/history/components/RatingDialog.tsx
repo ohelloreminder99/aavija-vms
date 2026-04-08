@@ -85,10 +85,10 @@ export function RatingDialog({
         }
         setIsSubmitting(true);
         const result = await submitRatingAndRecalculate({
-            visitId: visit.id,
-            visitorId: (visit as any).visitor_id,
-            hostId: hostProfile.id,
-            premiseId: (visit as any).premise_id,
+            visit_id: visit.id,
+            visitor_id: (visit as any).visitor_id,
+            host_id: hostProfile.id,
+            premise_id: (visit as any).premise_id,
             rating,
             actor: {
                 id: hostProfile.id,

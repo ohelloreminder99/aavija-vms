@@ -8,12 +8,12 @@ import { notifyThresholdReached } from './whatsapp-service';
 import nodeCrypto from 'crypto';
 
 interface PurchaseTokensPayload {
-  userId: string;
-  tokenAmount: number;
+  user_id: string;
+  token_amount: number;
   totalCost: number;
   currency: string;
-  actorName: string;
-  actorRole: string;
+  actor_name: string;
+  actor_role: string;
   roleToCredit: 'visitor' | 'owner';
   premiseId?: string;
   razorpay_order_id: string;
@@ -142,17 +142,17 @@ export async function purchaseTokens(
     const finalActorName = isWebhook ? (userData.name || actorName) : actorName;
 
     if (roleToCredit === 'owner' && premiseData) {
-      userState = premiseData.billingState || premiseData.city_state || 'Unknown';
-      customerGstin = premiseData.gstNumber || '';
-      customerBillingAddress = premiseData.billingAddress || '';
-      customerLegalName = premiseData.legalName || premiseData.name || finalActorName;
+      userState = premiseData.billing_state || premiseData.city_state || 'Unknown';
+      customerGstin = premiseData.gst_number || '';
+      customerBillingAddress = premiseData.billing_address || '';
+      customerLegalName = premiseData.legal_name || premiseData.name || finalActorName;
       targetPremiseName = premiseData.name || 'Premise';
       logDescription = `Purchased ${tokenAmount.toLocaleString()} tokens for premise "${targetPremiseName}". Invoice: ${invoiceId}`;
     } else {
-      userState = userData.billingState || userData.city_state || 'Unknown';
-      customerGstin = userData.gstNumber || '';
-      customerBillingAddress = userData.billingAddress || '';
-      customerLegalName = userData.legalName || userData.name || finalActorName;
+      userState = userData.billing_state || userData.city_state || 'Unknown';
+      customerGstin = userData.gst_number || '';
+      customerBillingAddress = userData.billing_address || '';
+      customerLegalName = userData.legal_name || userData.name || finalActorName;
       logDescription = `Purchased ${tokenAmount.toLocaleString()} tokens for visitor balance. Invoice: ${invoiceId}`;
     }
 
@@ -244,14 +244,14 @@ export async function purchaseTokens(
     const { error: invoiceError } = await adminDb.from('invoices').insert({
       id: invoiceId,
       userId,
-      userName: customerLegalName,
-      userEmail: userData.email || '',
-      userPhone: userData.phone || '',
+      user_name: customerLegalName,
+      user_email: userData.email || '',
+      user_phone: userData.phone || '',
       userState,
-      premiseId: roleToCredit === 'owner' ? (premiseId || null) : null,
+      premise_id: roleToCredit === 'owner' ? (premiseId || null) : null,
       tokenAmount,
       subtotal,
-      totalAmount: (subtotal + cgst + sgst + igst),
+      total_amount: (subtotal + cgst + sgst + igst),
       cgst,
       sgst,
       igst,
@@ -263,7 +263,7 @@ export async function purchaseTokens(
       created_at: new Date().toISOString(),
       hsnSacCode: settingsData.hsn_sac_code || '997331',
       companyGstin: settingsData.company_gstin || '',
-      companyName: settingsData.company_name_billing || '',
+      company_name: settingsData.company_name_billing || '',
       companyAddress: settingsData.company_address_billing || '',
       status: 'paid',
       customerGstin,
@@ -274,18 +274,18 @@ export async function purchaseTokens(
     // 4. Create Audit Log
     const logTtlDays = settingsData.log_ttl_days;
     const now = new Date();
-    let expiresAt: string | undefined = undefined;
+    let expires_at: string | undefined = undefined;
     if (logTtlDays && Number.isInteger(logTtlDays) && logTtlDays > 0) {
       expiresAt = new Date(now.getTime() + logTtlDays * 24 * 60 * 60 * 1000).toISOString();
     }
 
     await adminDb.from('logs').insert({
-      actorId: userId,
-      actorName: actorName,
-      actorRole: actorRole,
+      actor_id: userId,
+      actor_name: actorName,
+      actor_role: actorRole,
       action: LogAction.TOKEN_PURCHASE,
       description: logDescription,
-      tokenChange: tokenAmount,
+      token_change: tokenAmount,
       timestamp: now.toISOString(),
       ...(expiresAt && { expiresAt }),
       ...(roleToCredit === 'owner' && premiseId ? { premiseId } : {}),

@@ -33,7 +33,7 @@ import { sendWhatsAppOtp, verifyWhatsAppOtp } from '@/app/dashboard/profile/acti
 export interface UserSetupDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    userId: string;
+    user_id: string;
     settings?: Settings | null;
     onComplete: () => void;
 }
@@ -54,7 +54,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
             phone: z.string()
                 .length(phoneLength, { message: `Phone number must be exactly ${phoneLength} digits.` })
                 .regex(/^[0-9]+$/, { message: 'Phone number must contain only digits.' }),
-            cityId: z.string().min(1, 'Please select your city.'),
+            city_id: z.string().min(1, 'Please select your city.'),
             otp: z.string().optional(),
         });
     }, [phoneLength]);
@@ -65,7 +65,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
         resolver: zodResolver(formSchema),
         defaultValues: {
             phone: '',
-            cityId: '',
+            city_id: '',
             otp: '',
         },
     });
@@ -78,14 +78,14 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
         setIsSubmitting(true);
         try {
             if (step === 'details') {
-                const selectedCityObj = cities?.find(c => c.id === data.cityId);
+                const selectedCityObj = cities?.find(c => c.id === data.city_id);
 
                 // 1. Save initial profile data
                 await updateUserProfile(userId, {
                     phone: data.phone,
-                    cityId: data.cityId,
+                    city_id: data.city_id,
                     city: selectedCityObj?.name || 'Unknown',
-                    city_state: selectedCityObj?.stateName || 'Unknown',
+                    city_state: selectedCityObj?.state_name || 'Unknown',
                     is_verified: false,
                 } as any);
 
@@ -93,7 +93,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
                 const res = await sendWhatsAppOtp({
                     userId,
                     phone: data.phone,
-                    countryCode: defaultCountryCode,
+                    country_code: defaultCountryCode,
                 });
 
                 if (!res.success) {
@@ -114,7 +114,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
                     userId,
                     otp: data.otp,
                     phone: data.phone,
-                    countryCode: defaultCountryCode,
+                    country_code: defaultCountryCode,
                 });
 
                 if (!res.success) {
@@ -177,7 +177,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
 
                             <FormField
                                 control={form.control}
-                                name="cityId"
+                                name="city_id"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>City</FormLabel>
@@ -194,7 +194,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
                                                         <div key={c.id} className="flex items-center space-x-2 mb-2">
                                                             <RadioGroupItem value={c.id} id={`city-${c.id}`} />
                                                             <Label htmlFor={`city-${c.id}`} className="font-normal capitalize cursor-pointer">
-                                                                {c.name}, {c.stateName}
+                                                                {c.name}, {c.state_name}
                                                             </Label>
                                                         </div>
                                                     ))}

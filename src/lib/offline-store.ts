@@ -7,20 +7,20 @@ const QUEUE_KEY_PREFIX = 'aavija:offline_queue:';
 export type OfflineCheckinPayload = {
     id: string; // unique ID for the queue item
     token: string;
-    premiseId: string;
-    hostId: string;
+    premise_id: string;
+    host_id: string;
     gatekeeperId: string;
-    visitorId: string; // we need this to finalize checkin offline
+    visitor_id: string; // we need this to finalize checkin offline
     timestamp: number;
 };
 
 // --- HOSTS CACHING ---
-export async function saveCachedHosts(premiseId: string, hosts: SerializableCheckinHost[]): Promise<void> {
+export async function saveCachedHosts(premise_id: string, hosts: SerializableCheckinHost[]): Promise<void> {
     const key = `${CACHE_KEY_PREFIX}${premiseId}`;
     await set(key, hosts);
 }
 
-export async function getCachedHosts(premiseId: string): Promise<SerializableCheckinHost[] | null> {
+export async function getCachedHosts(premise_id: string): Promise<SerializableCheckinHost[] | null> {
     const key = `${CACHE_KEY_PREFIX}${premiseId}`;
     return await get<SerializableCheckinHost[]>(key) || null;
 }

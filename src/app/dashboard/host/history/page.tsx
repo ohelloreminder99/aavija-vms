@@ -79,7 +79,7 @@ const PAGE_SIZE = 10;
 export default function HostHistoryPage() {
   const { user } = useUser();
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId') ?? undefined;
+  const premiseId = searchParams.get('premise_id') ?? undefined;
   const { data: hostProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { data: settings, isLoading: areSettingsLoading } = useSettings();
   const { toast } = useToast();
@@ -131,7 +131,7 @@ export default function HostHistoryPage() {
         const historyDays = settings?.history_days_host;
         const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
         const result = await getVisitsForHostInPremise({
-          hostId: user.id,
+          host_id: user.id,
           premiseId,
           limit: PAGE_SIZE,
           startDate: startDateString
@@ -162,7 +162,7 @@ export default function HostHistoryPage() {
       const historyDays = settings.history_days_host;
       const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
       const result = await getVisitsForHostInPremise({
-        hostId: user.id,
+        host_id: user.id,
         premiseId,
         limit: PAGE_SIZE,
         startAfter: lastVisible,
@@ -191,14 +191,14 @@ export default function HostHistoryPage() {
 
     setIsBlocking(true);
     const result = await blockVisitorFromHost({
-      hostId: hostProfile.id,
-      premiseId: premiseId || '',
-      visitorId: visitToBlock.visitor_id,
+      host_id: hostProfile.id,
+      premise_id: premiseId || '',
+      visitor_id: visitToBlock.visitor_id,
       visitorName: visitToBlock.visitor_name,
       visitorPhotoUrl: visitToBlock.visitor_snapshot_url || '',
-      actorName: hostProfile.name,
-      actorRole: 'host',
-      actorId: hostProfile.id,
+      actor_name: hostProfile.name,
+      actor_role: 'host',
+      actor_id: hostProfile.id,
     });
 
     if (result.success) {
@@ -228,9 +228,9 @@ export default function HostHistoryPage() {
     setIsExporting(exportType);
     const result = await deductTokensForExport({
       target: { type: 'user', id: hostProfile.id },
-      actorId: hostProfile.id,
-      actorName: hostProfile.name,
-      actorRole: 'host',
+      actor_id: hostProfile.id,
+      actor_name: hostProfile.name,
+      actor_role: 'host',
       exportType: exportType,
       premiseIdForLog: premiseId,
     });

@@ -86,7 +86,7 @@ interface OwnerAnalyticsData {
 
 export default function OwnerAnalyticsPage() {
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
 
   const [data, setData] = React.useState<OwnerAnalyticsData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);

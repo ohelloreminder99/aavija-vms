@@ -109,19 +109,19 @@ export type UpdateableUserProfile = Pick<
   UserProfile,
   | 'name'
   | 'phone'
-  | 'countryCode'
+  | 'country_code'
   | 'photo_url'
   | 'city'
-  | 'cityId'
+  | 'city_id'
   | 'city_state'
-  | 'companyName'
+  | 'company_name'
   | 'vehicles'
   | 'selected_vehicle_number'
   | 'products'
-  | 'gstNumber'
-  | 'billingAddress'
-  | 'legalName'
-  | 'billingState'
+  | 'gst_number'
+  | 'billing_address'
+  | 'legal_name'
+  | 'billing_state'
 >;
 
 /**
@@ -182,7 +182,7 @@ export function useUsersByRole(role: UserProfile['role'], options?: { pageSize?:
  * Hook to fetch users by role and premise ID by reading a denormalized list from the premise document.
  * @deprecated
  */
-export function useUsersByRoleAndPremise(role: 'host' | 'gatekeeper', premiseId: string | undefined) {
+export function useUsersByRoleAndPremise(role: 'host' | 'gatekeeper', premise_id: string | undefined) {
   const docRef = React.useMemo(() => {
     if (!premiseId) return null;
     return { table: 'premises', id: premiseId, __memo: true };
@@ -227,7 +227,7 @@ export interface HostBlock {
  * @param premiseId The ID of the premise.
  * @param userId The UID of the owner querying their blocks.
  */
-export function usePremiseBlocks(premiseId: string | undefined, userId: string | undefined) {
+export function usePremiseBlocks(premise_id: string | undefined, user_id: string | undefined) {
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {

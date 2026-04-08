@@ -48,7 +48,7 @@ export default function HostBlockedPage() {
     const { toast } = useToast();
     const { data: settings } = useSettings();
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
 
     const [blocks, setBlocks] = React.useState<SerializableHostBlock[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -87,12 +87,12 @@ export default function HostBlockedPage() {
 
         setIsUnblocking(true);
         const result = await unblockVisitorFromHost({
-            hostId: user.id,
-            premiseId: premiseId || '', // Pass premiseId
-            visitorId: visitorToUnblock.id,
-            actorId: user.id,
-            actorName: userProfile.name,
-            actorRole: 'host',
+            host_id: user.id,
+            premise_id: premiseId || '', // Pass premiseId
+            visitor_id: visitorToUnblock.id,
+            actor_id: user.id,
+            actor_name: userProfile.name,
+            actor_role: 'host',
         });
 
         if (result.success) {

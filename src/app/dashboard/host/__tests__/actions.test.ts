@@ -54,10 +54,10 @@ describe('host actions', () => {
 
     describe('submitRatingAndRecalculate', () => {
         const validData = {
-            visitId: 'visit-1',
-            visitorId: 'visitor-1',
-            hostId: 'host-1',
-            premiseId: 'premise-1',
+            visit_id: 'visit-1',
+            visitor_id: 'visitor-1',
+            host_id: 'host-1',
+            premise_id: 'premise-1',
             rating: 5,
             actor: { id: 'host-1', name: 'Host One', role: 'host' },
         };

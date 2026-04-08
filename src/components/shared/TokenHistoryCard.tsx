@@ -40,7 +40,7 @@ interface TokenHistoryCardProps {
 }
 
 const LogItem = ({ log }: { log: SerializableLog }) => {
-  const isCredit = (log.tokenChange ?? 0) > 0;
+  const isCredit = (log.token_change ?? 0) > 0;
   const Icon = isCredit ? ArrowUpCircle : ArrowDownCircle;
   const colorClass = isCredit ? 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]';
   const timestamp = new Date(log.timestamp);
@@ -108,7 +108,7 @@ const LogItem = ({ log }: { log: SerializableLog }) => {
         )}
       >
         {isCredit ? '+' : ''}
-        {log.tokenChange?.toLocaleString()}
+        {log.token_change?.toLocaleString()}
       </div>
     </div>
   );
@@ -123,8 +123,8 @@ const TokenHistoryCardComponent = ({ target, className }: TokenHistoryCardProps)
     table: 'logs',
     filters:
       target.type === 'user'
-        ? [{ column: 'actorId', operator: 'eq', value: target.id }]
-        : [{ column: 'premiseId', operator: 'eq', value: target.id }],
+        ? [{ column: 'actor_id', operator: 'eq', value: target.id }]
+        : [{ column: 'premise_id', operator: 'eq', value: target.id }],
     __memo: true
   });
   const pulseHash = realtimePulse ? realtimePulse.length : 0;

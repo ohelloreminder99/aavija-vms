@@ -7,7 +7,7 @@ import { randomBytes } from 'crypto';
 // Simple Node.js In-Memory Rate Limiter Map
 const rateLimitCache = new Map<string, { count: number, resetAt: number }>();
 
-function isRateLimited(userId: string, maxRequests: number = 5, windowMs: number = 60000): boolean {
+function isRateLimited(user_id: string, maxRequests: number = 5, windowMs: number = 60000): boolean {
   const now = Date.now();
   const record = rateLimitCache.get(userId);
   if (record && record.resetAt > now) {
@@ -23,7 +23,7 @@ function isRateLimited(userId: string, maxRequests: number = 5, windowMs: number
  * A Server Action to generate a short-lived, single-use check-in token.
  * It will first delete any existing 'unused' tokens for the user to ensure only one is active.
  */
-export async function generateCheckinToken(userId: string): Promise<{
+export async function generateCheckinToken(user_id: string): Promise<{
   success: boolean;
   token?: string;
   expiresAt?: number;
@@ -73,7 +73,7 @@ export async function generateCheckinToken(userId: string): Promise<{
       id: token,
       visitor_id: userId,
       created_at: new Date(now).toISOString(),
-      expiresAt: new Date(expiresAt).toISOString(),
+      expires_at: new Date(expiresAt).toISOString(),
       status: 'unused',
     });
 
@@ -82,7 +82,7 @@ export async function generateCheckinToken(userId: string): Promise<{
     return {
       success: true,
       token: token,
-      expiresAt: expiresAt,
+      expires_at: expiresAt,
     };
   } catch (error: any) {
     console.error('Error generating check-in token:', error);

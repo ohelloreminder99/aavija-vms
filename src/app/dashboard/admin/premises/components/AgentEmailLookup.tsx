@@ -13,7 +13,7 @@ interface AgentEmailLookupProps {
     value: string;
     initialEmail?: string;
     initialName?: string;
-    onChange: (agentId: string) => void;
+    onChange: (agent_id: string) => void;
 }
 
 export function AgentEmailLookup({ value, initialEmail, initialName, onChange }: AgentEmailLookupProps) {

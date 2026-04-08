@@ -31,7 +31,7 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
   // Filter based on the current dashboard context
   const actingCity = premise?.city;
   const actingState = premise?.city_state;
-  const actingCityId = premise?.cityId;
+  const actingCityId = premise?.city_id;
 
   const { data: announcements, isLoading, error } = useAnnouncementsForUser(
     userProfile,

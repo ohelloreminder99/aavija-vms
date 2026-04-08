@@ -16,7 +16,7 @@ export type SerializableVisit = {
 };
 
 interface GetVisitsPayload {
-  visitorId: string;
+  visitor_id: string;
   limit: number;
   startAfter?: string;
   startDate?: string;

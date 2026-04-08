@@ -47,7 +47,7 @@ export default function ConfirmPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
   const { user } = useUser();
   const { toast } = useToast();
 
@@ -139,8 +139,8 @@ export default function ConfirmPage() {
           // Actually, our checkin QR code `token` is literally the `checkin_tokens.id`.
           // We can just pass the placeholder and when syncing, the server will read the `userId` from the token table!
           // So we'll pass the exact token, and the backend logic in `finalizeCheckin` ignores `visitorId` and uses the token's `userId`.
-          visitorId: checkinData.visitor.id,
-          hostId: selectedHostId,
+          visitor_id: checkinData.visitor.id,
+          host_id: selectedHostId,
           premiseId,
           gatekeeperId: user.id,
           timestamp: Date.now()
@@ -156,8 +156,8 @@ export default function ConfirmPage() {
 
     const result = await finalizeCheckin({
       token,
-      visitorId: checkinData.visitor.id,
-      hostId: selectedHostId,
+      visitor_id: checkinData.visitor.id,
+      host_id: selectedHostId,
       premiseId,
       gatekeeperId: user.id,
     });
@@ -251,14 +251,14 @@ export default function ConfirmPage() {
                 </Avatar>
               </button>
               <h2 className="mt-4 text-2xl font-bold">{visitor?.name}</h2>
-              <p className="text-muted-foreground">{visitor?.companyName || 'No company'}</p>
+              <p className="text-muted-foreground">{visitor?.company_name || 'No company'}</p>
             </CardContent>
             <Separator />
             <CardContent className="p-6 text-sm space-y-4">
               <div className="flex items-center gap-4">
                 <Phone className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">{(visitor as any)?.countryCode ? `(${(visitor as any).countryCode}) ` : ''}{(visitor as any)?.phone}</p>
+                  <p className="font-medium">{(visitor as any)?.country_code ? `(${(visitor as any).country_code}) ` : ''}{(visitor as any)?.phone}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">

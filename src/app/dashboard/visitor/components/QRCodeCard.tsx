@@ -58,7 +58,7 @@ export function QRCodeCard() {
   // State for token data
   const [tokenData, setTokenData] = useState<{
     token: string;
-    expiresAt: number;
+    expires_at: number;
   } | null>(null);
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -98,8 +98,8 @@ export function QRCodeCard() {
       setTokenData(null);
 
       const result = await generateCheckinToken(user.id);
-      if (result.success && result.token && result.expiresAt) {
-        setTokenData({ token: result.token, expiresAt: result.expiresAt });
+      if (result.success && result.token && result.expires_at) {
+        setTokenData({ token: result.token, expires_at: result.expires_at });
         setIsDialogOpen(true);
       } else {
         setTokenError(result.error || 'Failed to generate QR code.');
@@ -126,7 +126,7 @@ export function QRCodeCard() {
     if (!tokenData || !isDialogOpen) return;
 
     const timer = setInterval(() => {
-      const remaining = Math.max(0, tokenData.expiresAt - Date.now());
+      const remaining = Math.max(0, tokenData.expires_at - Date.now());
       if (remaining === 0) {
         // When timer hits 0, call the close handler which also performs cleanup.
         handleDialogClose(false);

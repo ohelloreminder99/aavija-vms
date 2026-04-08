@@ -74,9 +74,9 @@ export async function createStaffUser(
     if (insertError) throw insertError;
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.USER_SIGNUP, // Consider a new LogAction for STAFF_CREATED
       description: `Admin "${actor.name}" created new staff user "${name}".`
     });

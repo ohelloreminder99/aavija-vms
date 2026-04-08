@@ -44,7 +44,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 export default function ActiveVisitsPage() {
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
   const { toast } = useToast();
 
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -76,9 +76,9 @@ export default function ActiveVisitsPage() {
     setCheckingOutVisitId(visitToCheckout.id);
     startCheckoutTransition(async () => {
       const result = await checkoutVisitor({
-        visitId: visitToCheckout.id,
-        visitorId: visitToCheckout.visitor_id,
-        premiseId: premiseId,
+        visit_id: visitToCheckout.id,
+        visitor_id: visitToCheckout.visitor_id,
+        premise_id: premiseId,
       });
 
       setCheckingOutVisitId(null);
@@ -106,8 +106,8 @@ export default function ActiveVisitsPage() {
     setEmergencyPhoneData(null);
 
     const result = await getEmergencyContactInfo({
-      visitId: visit.id,
-      premiseId: premiseId,
+      visit_id: visit.id,
+      premise_id: premiseId,
     });
 
     setIsFetchingEmergency(false);

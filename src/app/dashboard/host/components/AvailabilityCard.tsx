@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 
 interface AvailabilityCardProps {
   hostProfile: WithId<UserProfile> | null;
-  premiseId: string | undefined;
+  premise_id: string | undefined;
 }
 
 const availabilityOptions = [
@@ -51,8 +51,8 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
 
     setIsSubmitting(true);
     const result = await setHostAvailability({
-      hostId: hostProfile.id,
-      premiseId: premiseId,
+      host_id: hostProfile.id,
+      premise_id: premiseId,
       availability: selectedAvailability,
     });
 

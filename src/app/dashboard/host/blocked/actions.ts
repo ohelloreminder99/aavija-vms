@@ -5,7 +5,7 @@ import type { HostBlock } from '@/services/user-service';
 
 export type SerializableHostBlock = Omit<HostBlock, 'blockedAt'> & { id: string; blockedAt: string };
 
-export async function getBlockedVisitorsForHost(hostId: string, premiseId?: string): Promise<{
+export async function getBlockedVisitorsForHost(host_id: string, premiseId?: string): Promise<{
     success: boolean;
     blocks?: SerializableHostBlock[];
     error?: string;
@@ -35,9 +35,9 @@ export async function getBlockedVisitorsForHost(hostId: string, premiseId?: stri
         const blocks = (blocksSnapshot || []).map((data: any) => {
             return {
                 id: data.id,
-                visitorId: data.visitor_id,
-                hostId: data.host_id,
-                premiseId: data.premise_id,
+                visitor_id: data.visitor_id,
+                host_id: data.host_id,
+                premise_id: data.premise_id,
                 visitorName: data.visitor_name,
                 visitorPhotoUrl: data.visitor_photo_url,
                 blockedAt: data.blocked_at,

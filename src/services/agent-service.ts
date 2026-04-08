@@ -68,7 +68,7 @@ export type AgentOverview = {
  */
 export async function designateAgentByEmail(
   agentEmail: string,
-  premiseId: string
+  premise_id: string
 ): Promise<{ success: boolean; agentId?: string; agentName?: string; error?: string }> {
   try {
     const { profile } = await requireAuth();
@@ -94,7 +94,7 @@ export async function designateAgentByEmail(
       const { data: agentUser } = await adminDb
         .from('users')
         .select('phone, name')
-        .eq('id', data.agentId)
+        .eq('id', data.agent_id)
         .single();
       // Also fetch premise name for a meaningful message
       const { data: premiseData } = await adminDb
@@ -113,7 +113,7 @@ export async function designateAgentByEmail(
       console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', notifyErr instanceof Error ? notifyErr.message : 'Unknown error');
     }
 
-    return { success: true, agentId: data.agentId, agentName: data.agentName };
+    return { success: true, agent_id: data.agent_id, agentName: data.agentName };
   } catch (e: unknown) {
     console.error('Error designating agent:', e);
     return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
@@ -155,7 +155,7 @@ export async function lookupUserByEmail(
  * Their commission history (agent_ledger) is preserved.
  */
 export async function removeAgentDesignation(
-  userId: string
+  user_id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { profile } = await requireAuth();
@@ -306,9 +306,9 @@ export async function adminProcessPayout(
           ? `Admin ${profile.name} approved token conversion for ${agentName}: ${reqInfo.tokens_credited || 0} tokens credited.`
           : `Admin ${profile.name} approved cash payout of ₹${reqInfo.amount} for ${agentName}. UTR: ${utrNote || 'N/A'}.`;
         void createLogEntry({
-          actorId: profile.id,
-          actorName: profile.name,
-          actorRole: 'admin',
+          actor_id: profile.id,
+          actor_name: profile.name,
+          actor_role: 'admin',
           action: LogAction.PAYOUT_APPROVED,
           description: logDesc,
         });
@@ -366,9 +366,9 @@ export async function adminRejectPayout(
         const { data: reqUser } = await adminDb.from('users').select('phone, name').eq('id', reqInfo.user_id).single();
         const agentName = reqUser?.name || 'Unknown Agent';
         void createLogEntry({
-          actorId: profile.id,
-          actorName: profile.name,
-          actorRole: 'admin',
+          actor_id: profile.id,
+          actor_name: profile.name,
+          actor_role: 'admin',
           action: LogAction.PAYOUT_REJECTED,
           description: `Admin ${profile.name} rejected payout of ₹${reqInfo.amount} for ${agentName}. Reason: ${reason}.`,
         });
@@ -423,7 +423,7 @@ export async function updatePayoutDetails(payload: {
  */
 export async function getPayoutRequestsForAdmin(): Promise<{
   success: boolean;
-  data?: (PayoutRequest & { userName: string; userEmail: string; userPhoto: string })[];
+  data?: (PayoutRequest & { user_name: string; user_email: string; userPhoto: string })[];
   error?: string;
 }> {
   try {
@@ -450,8 +450,8 @@ export async function getPayoutRequestsForAdmin(): Promise<{
 
     const enriched = (requests || []).map((r: PayoutRequest) => ({
       ...r,
-      userName: userMap.get(r.user_id)?.name || 'Unknown',
-      userEmail: userMap.get(r.user_id)?.email || '',
+      user_name: userMap.get(r.user_id)?.name || 'Unknown',
+      user_email: userMap.get(r.user_id)?.email || '',
       userPhoto: userMap.get(r.user_id)?.photo_url || '',
     }));
 
@@ -493,7 +493,7 @@ export async function getAgentsOverview(): Promise<{
  * Admin: Approve KYC for an agent (sets kyc_verified=true).
  */
 export async function adminApproveKyc(
-  userId: string
+  user_id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { profile } = await requireAuth();

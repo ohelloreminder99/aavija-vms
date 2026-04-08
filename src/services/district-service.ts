@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useStaticCollection } from '@/supabase';
@@ -9,8 +9,8 @@ import { createClient } from '@/lib/supabase/client';
 export interface District {
   id?: string;
   name: string;
-  stateId: string;
-  stateName: string;
+  state_id: string;
+  state_name: string;
 }
 
 // === REPOSITORY FUNCTIONS (HOOKS & ASYNC) ===
@@ -34,7 +34,7 @@ export function useDistricts(stateId?: string) {
       return null;
     }
     if (stateId) {
-      return allDistricts.filter((d) => d.stateId === stateId);
+      return allDistricts.filter((d) => d.state_id === stateId);
     }
     return allDistricts;
   }, [allDistricts, stateId]);
@@ -52,8 +52,8 @@ export async function createDistrict(_db: any, data: Omit<District, 'id'>) {
   const supabase = await createClient();
   const newDistrictData = {
     name: data.name.toLowerCase(),
-    stateId: data.stateId,
-    stateName: data.stateName.toLowerCase(),
+    state_id: data.state_id,
+    state_name: data.state_name.toLowerCase(),
   };
   const { error } = await supabase.from('districts').insert([newDistrictData]);
   if (error) throw error;
@@ -73,8 +73,8 @@ export async function updateDistrict(
   const supabase = await createClient();
   const dataToUpdate: Partial<District> = {};
   if (data.name) dataToUpdate.name = data.name.toLowerCase();
-  if (data.stateId) dataToUpdate.stateId = data.stateId;
-  if (data.stateName) dataToUpdate.stateName = data.stateName.toLowerCase();
+  if (data.state_id) dataToUpdate.state_id = data.state_id;
+  if (data.state_name) dataToUpdate.state_name = data.state_name.toLowerCase();
   const { error } = await supabase.from('districts').update(dataToUpdate).eq('id', id);
   if (error) throw error;
 }
@@ -91,7 +91,7 @@ export async function deleteDistrict(_db: any, id: string) {
 }
 
 
-type CsvDistrict = { name: string; stateName: string };
+type CsvDistrict = { name: string; state_name: string };
 
 /**
  * Creates multiple district documents using Supabase insert.
@@ -108,17 +108,17 @@ export async function batchCreateDistricts(
   const stateMap = new Map((states || []).map(doc => [doc.name.toLowerCase(), doc.id]));
 
   const newDistrictsToInsert = districts.map((district) => {
-    const stateNameLower = district.stateName.toLowerCase();
+    const stateNameLower = district.state_name.toLowerCase();
     const stateId = stateMap.get(stateNameLower);
 
     if (!stateId) {
-      throw new Error(`State '${district.stateName}' not found for district '${district.name}'. Please create the state first.`);
+      throw new Error(`State '${district.state_name}' not found for district '${district.name}'. Please create the state first.`);
     }
 
     return {
       name: district.name.toLowerCase(),
-      stateId: stateId,
-      stateName: stateNameLower
+      state_id: stateId,
+      state_name: stateNameLower
     };
   });
 

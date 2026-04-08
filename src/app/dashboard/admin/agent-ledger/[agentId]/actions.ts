@@ -6,7 +6,7 @@ import { createLogEntry } from '@/services/log-service';
 
 
 interface PayoutPayload {
-    agentId: string;
+    agent_id: string;
     amount: number;
     description: string;
     actor: {
@@ -67,12 +67,12 @@ export async function recordAgentPayout(payload: PayoutPayload): Promise<{ succe
 
         // 3. Create global log entry (after transaction succeeds)
         await createLogEntry({
-            actorId: actor.id,
-            actorName: actor.name,
-            actorRole: 'admin',
+            actor_id: actor.id,
+            actor_name: actor.name,
+            actor_role: 'admin',
             action: LogAction.AGENT_PAYOUT_RECORDED,
             description: `Admin "${actor.name}" recorded a payout of ${amount} to agent "${agentName}".`,
-            context: { agentId: agentId },
+            context: { agent_id: agentId },
         });
 
         return { success: true };

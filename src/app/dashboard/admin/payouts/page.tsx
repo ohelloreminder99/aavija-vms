@@ -16,7 +16,7 @@ import { adminProcessPayout, adminRejectPayout, getPayoutRequestsForAdmin, type 
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-type EnrichedRequest = PayoutRequest & { userName: string; userEmail: string; userPhoto: string };
+type EnrichedRequest = PayoutRequest & { user_name: string; user_email: string; userPhoto: string };
 
 const statusBadge = (status: string) => {
     const map: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -64,7 +64,7 @@ export default function AdminPayoutsPage() {
         setIsSubmitting(true);
         const res = await adminProcessPayout(approveTarget.id, approveTarget.type === 'cash' ? utrNote : undefined);
         if (res.success) {
-            toast({ title: 'Payout Processed', description: `${approveTarget.type === 'cash' ? 'Payment confirmed' : 'Tokens credited'} for ${approveTarget.userName}.` });
+            toast({ title: 'Payout Processed', description: `${approveTarget.type === 'cash' ? 'Payment confirmed' : 'Tokens credited'} for ${approveTarget.user_name}.` });
             fetchRequests();
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
@@ -79,7 +79,7 @@ export default function AdminPayoutsPage() {
         setIsSubmitting(true);
         const res = await adminRejectPayout(rejectTarget.id, rejectReason);
         if (res.success) {
-            toast({ title: 'Request Rejected', description: `Payout rejected. ${rejectTarget.userName} notified.` });
+            toast({ title: 'Request Rejected', description: `Payout rejected. ${rejectTarget.user_name} notified.` });
             fetchRequests();
         } else {
             toast({ variant: 'destructive', title: 'Error', description: res.error });
@@ -150,11 +150,11 @@ export default function AdminPayoutsPage() {
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="h-8 w-8">
                                                             <AvatarImage src={req.userPhoto} />
-                                                            <AvatarFallback>{req.userName.charAt(0)}</AvatarFallback>
+                                                            <AvatarFallback>{req.user_name.charAt(0)}</AvatarFallback>
                                                         </Avatar>
                                                         <div>
-                                                            <p className="text-sm font-medium">{req.userName}</p>
-                                                            <p className="text-xs text-muted-foreground">{req.userEmail}</p>
+                                                            <p className="text-sm font-medium">{req.user_name}</p>
+                                                            <p className="text-xs text-muted-foreground">{req.user_email}</p>
                                                         </div>
                                                     </div>
                                                 </TableCell>
@@ -211,8 +211,8 @@ export default function AdminPayoutsPage() {
                         <DialogTitle>{approveTarget?.type === 'cash' ? 'Confirm Payment' : 'Approve Token Conversion'}</DialogTitle>
                         <DialogDescription>
                             {approveTarget?.type === 'cash'
-                                ? `Pay ₹${approveTarget?.net_amount?.toFixed(2) || approveTarget?.amount?.toFixed(2)} to ${approveTarget?.userName} via UPI (${approveTarget?.upi_id}) and enter the reference.`
-                                : `Credit ${approveTarget?.tokens_credited} tokens to ${approveTarget?.userName}. This is irreversible.`
+                                ? `Pay ₹${approveTarget?.net_amount?.toFixed(2) || approveTarget?.amount?.toFixed(2)} to ${approveTarget?.user_name} via UPI (${approveTarget?.upi_id}) and enter the reference.`
+                                : `Credit ${approveTarget?.tokens_credited} tokens to ${approveTarget?.user_name}. This is irreversible.`
                             }
                         </DialogDescription>
                     </DialogHeader>

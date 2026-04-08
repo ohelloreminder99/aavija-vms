@@ -81,7 +81,7 @@ export default function HistoryPage() {
   const { user } = useUser();
   const { data: userProfile } = useUserProfile(user?.id);
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
 
   const { data: settings, isLoading: isLoadingSettings } = useSettings();
   const { toast } = useToast();
@@ -93,9 +93,9 @@ export default function HistoryPage() {
   const { data: premise, isLoading: isLoadingPremise } = useDoc<Premise>(premiseDocRef);
 
   const categoryDocRef = React.useMemo(() => {
-    if (!premise?.categoryId) return null;
-    return { table: 'premise_categories', id: premise.categoryId, __memo: true };
-  }, [premise?.categoryId]);
+    if (!premise?.category_id) return null;
+    return { table: 'premise_categories', id: premise.category_id, __memo: true };
+  }, [premise?.category_id]);
   const { data: category, isLoading: isLoadingCategory } = useDoc<PremiseCategory>(categoryDocRef);
 
   const [visits, setVisits] = React.useState<SerializableVisit[]>([]);
@@ -159,9 +159,9 @@ export default function HistoryPage() {
           setHasMore(result.visits.length === PAGE_SIZE);
           if (userProfile && premiseId) {
             createLogEntry({
-              actorId: userProfile.id,
-              actorName: userProfile.name,
-              actorRole: 'owner',
+              actor_id: userProfile.id,
+              actor_name: userProfile.name,
+              actor_role: 'owner',
               action: LogAction.VIEW_PREMISE_HISTORY_OWNER,
               description: `Owner "${userProfile.name}" viewed visit history for premise ID ${premiseId}.`,
               context: { premiseId }
@@ -241,12 +241,12 @@ export default function HistoryPage() {
     setIsBlocking(true);
     const result = await blockVisitorFromPremise({
       premiseId,
-      visitorId: visitToBlock.visitor_id,
+      visitor_id: visitToBlock.visitor_id,
       visitorName: visitToBlock.visitor_name,
       visitorPhotoUrl: visitToBlock.visitor_snapshot_url || '',
-      actorName: userProfile.name,
-      actorRole: 'owner',
-      actorId: userProfile.id,
+      actor_name: userProfile.name,
+      actor_role: 'owner',
+      actor_id: userProfile.id,
     });
 
     if (result.success) {
@@ -271,9 +271,9 @@ export default function HistoryPage() {
 
     setIsCheckingOut(true);
     const result = await forceCheckoutVisitor({
-      visitId: visitToForceCheckout.id,
-      premiseId: premiseId,
-      visitorId: visitToForceCheckout.visitor_id,
+      visit_id: visitToForceCheckout.id,
+      premise_id: premiseId,
+      visitor_id: visitToForceCheckout.visitor_id,
       actor: { id: userProfile.id, name: userProfile.name, role: 'owner' }
     });
 
@@ -333,9 +333,9 @@ export default function HistoryPage() {
     setIsExporting(exportType);
     const result = await deductTokensForExport({
       target: { type: 'premise', id: premiseId },
-      actorId: userProfile.id,
-      actorName: userProfile.name,
-      actorRole: 'owner',
+      actor_id: userProfile.id,
+      actor_name: userProfile.name,
+      actor_role: 'owner',
       exportType: exportType,
     });
 
@@ -349,7 +349,7 @@ export default function HistoryPage() {
       const exportStartDate = subDays(new Date(), exportableDays).toISOString();
 
       const exportDataResult = await getVisitsForExport({
-        premiseId: premiseId,
+        premise_id: premiseId,
         startDate: exportStartDate,
       });
 

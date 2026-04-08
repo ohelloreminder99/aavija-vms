@@ -43,7 +43,7 @@ export default function BlockedVisitorsPage() {
     const { user } = useUser();
     const { data: userProfile } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId') ?? undefined;
+    const premiseId = searchParams.get('premise_id') ?? undefined;
 
     const { data: premiseBlocks, isLoading, error } = usePremiseBlocks(premiseId, user?.id);
 
@@ -58,10 +58,10 @@ export default function BlockedVisitorsPage() {
         setIsUnblocking(true);
         const result = await unblockVisitorFromPremise({
             premiseId,
-            visitorId: visitorToUnblock.id,
-            actorId: userProfile.id,
-            actorName: userProfile.name,
-            actorRole: 'owner',
+            visitor_id: visitorToUnblock.id,
+            actor_id: userProfile.id,
+            actor_name: userProfile.name,
+            actor_role: 'owner',
         });
 
         if (result.success) {

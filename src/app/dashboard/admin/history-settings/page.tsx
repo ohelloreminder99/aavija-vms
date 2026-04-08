@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -207,7 +207,7 @@ export default function HistorySettingsPage() {
                       <p>Changing these numbers only sets the "Expiration Date" on new records. To enable deletion, you must create <strong>Cron Jobs</strong> in the Supabase Dashboard:</p>
                       <ol className="list-decimal pl-5 mt-2 space-y-1">
                         <li>Go to <strong>Database</strong> &gt; <strong>Extensions</strong> and enable <code>pg_cron</code>.</li>
-                        <li>Write a SQL script to automatically trigger <code>DELETE FROM public.* WHERE "expiresAt" &lt; NOW()</code> on a schedule.</li>
+                        <li>Write a SQL script to automatically trigger <code>DELETE FROM public.* WHERE "expires_at" &lt; NOW()</code> on a schedule.</li>
                       </ol>
                     </div>  <Button variant="link" className="p-0 h-auto text-xs" asChild>
                       <a href="https://supabase.com/dashboard" target="_blank">Open Console <ExternalLink className="ml-1 h-3 w-3" /></a>

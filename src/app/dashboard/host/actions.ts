@@ -8,10 +8,10 @@ import { createLogEntry } from '@/services/log-service';
 import { StaffMember } from '@/services/premise-service';
 
 interface RatingData {
-  visitId: string;
-  visitorId: string;
-  hostId: string;
-  premiseId: string;
+  visit_id: string;
+  visitor_id: string;
+  host_id: string;
+  premise_id: string;
   rating: number;
   actor: {
     id: string;
@@ -42,7 +42,7 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
     const { data: existingRatings, error: existError } = await adminDb
       .from('ratings')
       .select('id')
-      .eq('visitId', visitId)
+      .eq('visit_id', visitId)
       .limit(1);
 
     if (existError) throw existError;
@@ -64,7 +64,7 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
     const { data: allRatingsDocs, error: ratingsError } = await adminDb
       .from('ratings')
       .select('rating')
-      .eq('visitorId', visitorId);
+      .eq('visitor_id', visitorId);
     if (ratingsError) throw ratingsError;
 
     const allRatings = (allRatingsDocs || []).map((r: { rating: number }) => r.rating);
@@ -99,12 +99,12 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
 
     // 8. Create log entry for the HOST (Token deduction)
     await createLogEntry({
-      actorId: hostId,
-      actorName: actor.name,
-      actorRole: 'host',
+      actor_id: hostId,
+      actor_name: actor.name,
+      actor_role: 'host',
       action: LogAction.VISITOR_RATED,
       description: `Rated visitor ${visitorId} (${rating} stars). Cost: ${starRatingCost} tokens.`,
-      tokenChange: -starRatingCost,
+      token_change: -starRatingCost,
       context: { visitId }
     });
 
@@ -135,8 +135,8 @@ type SerializableVisit = {
 };
 
 interface GetHostVisitsPayload {
-  hostId: string;
-  premiseId: string;
+  host_id: string;
+  premise_id: string;
   limit: number;
   startAfter?: string; // Document ID OR ISO string depending on how it's matched
   startDate?: string;
@@ -216,7 +216,7 @@ export async function getVisitsForHostInPremise(
   }
 }
 
-export async function setHostAvailability(payload: { hostId: string; premiseId: string; availability: string }): Promise<{ success: boolean; error?: string }> {
+export async function setHostAvailability(payload: { host_id: string; premise_id: string; availability: string }): Promise<{ success: boolean; error?: string }> {
   const { hostId, premiseId, availability } = payload;
 
   const adminDb = await getAdminDb();
@@ -262,7 +262,7 @@ export async function setHostAvailability(payload: { hostId: string; premiseId: 
   }
 }
 
-export async function verifyVisitByHost(payload: { visitId: string; premiseId: string; hostId: string }): Promise<{ success: boolean; error?: string }> {
+export async function verifyVisitByHost(payload: { visit_id: string; premise_id: string; host_id: string }): Promise<{ success: boolean; error?: string }> {
   const { visitId, premiseId, hostId } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Server database connection failed.' };
@@ -286,9 +286,9 @@ export async function verifyVisitByHost(payload: { visitId: string; premiseId: s
     if (updateError) throw updateError;
 
     await createLogEntry({
-      actorId: hostId,
-      actorName: 'Host', 
-      actorRole: 'host',
+      actor_id: hostId,
+      actor_name: 'Host', 
+      actor_role: 'host',
       action: LogAction.VISIT_VERIFIED_BY_HOST,
       description: `Verified meeting with visitor for visit ${visitId}.`,
       context: { premiseId, visitId }

@@ -28,7 +28,7 @@ export default function AdminAgentsPage() {
 
     React.useEffect(() => { fetchAgents(); }, [fetchAgents]);
 
-    const handleApproveKyc = async (userId: string, name: string) => {
+    const handleApproveKyc = async (user_id: string, name: string) => {
         setIsSubmitting(true);
         const res = await adminApproveKyc(userId);
         if (res.success) {

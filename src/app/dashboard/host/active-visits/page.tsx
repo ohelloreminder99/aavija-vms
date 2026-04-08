@@ -29,7 +29,7 @@ import { verifyVisitByHost } from '../actions';
 
 export default function HostActiveVisitsPage() {
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
     const { user } = useUser();
     const { toast } = useToast();
     const [searchTerm, setSearchTerm] = React.useState('');
@@ -37,14 +37,14 @@ export default function HostActiveVisitsPage() {
 
     const { data: visits, isLoading, error } = useVisitsForHost(premiseId || undefined, user?.id);
 
-    const handleVerify = async (visitId: string) => {
+    const handleVerify = async (visit_id: string) => {
         if (!premiseId || !user) return;
         setIsVerifying(visitId);
         try {
             const result = await verifyVisitByHost({
                 visitId,
                 premiseId,
-                hostId: user.id
+                host_id: user.id
             });
             if (result.success) {
                 toast({

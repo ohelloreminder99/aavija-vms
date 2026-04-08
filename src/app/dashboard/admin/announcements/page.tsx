@@ -172,7 +172,7 @@ export default function AnnouncementsPage() {
   const filteredDistricts = React.useMemo(() => {
     if (!allDistricts) return [];
     return allDistricts.filter(d =>
-      (browseStateId ? d.stateId === browseStateId : true) &&
+      (browseStateId ? d.state_id === browseStateId : true) &&
       d.name.toLowerCase().includes(districtSearch.toLowerCase())
     );
   }, [allDistricts, browseStateId, districtSearch]);
@@ -180,7 +180,7 @@ export default function AnnouncementsPage() {
   const filteredCities = React.useMemo(() => {
     if (!allCities) return [];
     return allCities.filter(c =>
-      (browseDistrictId ? c.districtId === browseDistrictId : true) &&
+      (browseDistrictId ? c.district_id === browseDistrictId : true) &&
       c.name.toLowerCase().includes(citySearch.toLowerCase())
     );
   }, [allCities, browseDistrictId, citySearch]);

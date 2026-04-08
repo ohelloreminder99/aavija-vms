@@ -17,8 +17,8 @@ interface NewOwnerPremiseData {
   premiseName: string;
   premiseAddress: string;
   premiseCity: string;
-  cityId: string;
-  ownerName: string;
+  city_id: string;
+  owner_name: string;
   ownerEmail: string;
   ownerPassword: string;
   agentId?: string;
@@ -31,7 +31,7 @@ interface ExistingUserPremiseData {
   premiseName: string;
   premiseAddress: string;
   premiseCity: string;
-  cityId: string;
+  city_id: string;
   ownerEmail: string;
   agentId?: string;
   categoryId?: string;
@@ -64,7 +64,7 @@ export type SerializablePremiseWithDetails = {
   name: string;
   address: string;
   city: string;
-  cityId: string;
+  city_id: string;
   is_active: boolean;
   owner?: {
     id: string;
@@ -134,7 +134,7 @@ export async function getPremisesForAdmin(
     const premisesData: SerializablePremiseWithDetails[] = (premisesSnap || []).map((doc: any) => {
       const agentId = doc.agent_id;
       const ownerId = doc.owner_id;
-      const catId = doc.categoryId; // Authoritative: actual DB column name is camelCase
+      const catId = doc.category_id; // Authoritative: actual DB column name is camelCase
 
       const ownerUser = userMap.get(ownerId);
       const agentUser = agentId ? userMap.get(agentId) : undefined;
@@ -147,12 +147,12 @@ export async function getPremisesForAdmin(
         name: doc.name,
         address: doc.address,
         city: doc.city,
-        cityId: doc.cityId || '',
+        city_id: doc.city_id || '',
         is_active: doc.is_active,
         owner_id: ownerId,
         agent_id: agentId,
-        categoryId: catId,
-        categoryName: category?.name || doc.categoryName || null,
+        category_id: catId,
+        category_name: category?.name || doc.category_name || null,
         owner: ownerUser ? {
           id: ownerId,
           name: ownerUser.name,
@@ -227,7 +227,7 @@ export async function createPremiseAndNewOwner(
       active_checkin_id: null,
       photo_url: '',
       city: premiseCity,
-      cityId: cityId,
+      city_id: cityId,
       city_state: city_state || 'Unknown',
     });
     if (userError) throw userError;
@@ -254,14 +254,14 @@ export async function createPremiseAndNewOwner(
       name: premiseName,
       address: premiseAddress,
       city: premiseCity,
-      cityId: cityId,
+      city_id: cityId,
       city_state: city_state || 'Unknown',
       is_active: true,
       owner_id: ownerUid,
-      ownerName: ownerName,
+      owner_name: ownerName,
       agent_id: (agentId && agentId.trim()) ? agentId : null,
-      categoryId: categoryId,
-      categoryName: categoryName || null,
+      category_id: categoryId,
+      category_name: categoryName || null,
       staff: [],
       host_count: 0,
       gatekeeper_count: 0,
@@ -271,13 +271,13 @@ export async function createPremiseAndNewOwner(
 
     if (startingOwnerTokens > 0) {
       await adminDb.from('logs').insert({
-        actorId: profile.id,
-        actorName: profile.name || 'Admin',
-        actorRole: 'admin',
+        actor_id: profile.id,
+        actor_name: profile.name || 'Admin',
+        actor_role: 'admin',
         action: LogAction.INITIAL_TOKEN_ALLOCATION,
         description: `Welcome Bonus: Premise "${premiseName}" received ${startingOwnerTokens} tokens.`,
-        tokenChange: startingOwnerTokens,
-        premiseId: premiseId,
+        token_change: startingOwnerTokens,
+        premise_id: premiseId,
         context: { premiseId },
       });
 
@@ -285,15 +285,15 @@ export async function createPremiseAndNewOwner(
       // Add initial invoice (Free welcome bonus)
       await adminDb.from('invoices').insert({
         id: `INV-${premiseId}`,
-        userId: ownerUid,
-        userName: ownerName,
-        userEmail: ownerEmail,
-        userPhone: '',
-        userState: city_state || 'Unknown',
-        premiseId: premiseId,
-        tokenAmount: startingOwnerTokens,
+        user_id: ownerUid,
+        user_name: ownerName,
+        user_email: ownerEmail,
+        user_phone: '',
+        user_state: city_state || 'Unknown',
+        premise_id: premiseId,
+        token_amount: startingOwnerTokens,
         subtotal: 0,
-        totalAmount: 0,
+        total_amount: 0,
         status: 'paid',
         created_at: new Date().toISOString(),
       });
@@ -351,14 +351,14 @@ export async function createPremiseForExistingUser(
       name: premiseName,
       address: premiseAddress,
       city: premiseCity,
-      cityId: cityId,
+      city_id: cityId,
       city_state: city_state || 'Unknown',
       is_active: true,
       owner_id: ownerId,
-      ownerName: ownerName,
+      owner_name: ownerName,
       agent_id: (agentId && agentId.trim()) ? agentId : null,
-      categoryId: categoryId,
-      categoryName: categoryName || null,
+      category_id: categoryId,
+      category_name: categoryName || null,
       staff: [],
       host_count: 0,
       gatekeeper_count: 0,
@@ -376,13 +376,13 @@ export async function createPremiseForExistingUser(
 
     if (startingOwnerTokens > 0) {
       await adminDb.from('logs').insert({
-        actorId: profile.id,
-        actorName: profile.name || 'Admin',
-        actorRole: 'admin',
+        actor_id: profile.id,
+        actor_name: profile.name || 'Admin',
+        actor_role: 'admin',
         action: LogAction.INITIAL_TOKEN_ALLOCATION,
         description: `Premise "${premiseName}" received ${startingOwnerTokens} welcome tokens.`,
-        tokenChange: startingOwnerTokens,
-        premiseId: premiseId,
+        token_change: startingOwnerTokens,
+        premise_id: premiseId,
         context: { premiseId },
       });
 
@@ -390,15 +390,15 @@ export async function createPremiseForExistingUser(
       // Add initial invoice (Free welcome bonus)
       await adminDb.from('invoices').insert({
         id: `INV-${premiseId}`,
-        userId: ownerId,
-        userName: ownerName,
-        userEmail: ownerEmail,
-        userPhone: userDoc.phone || '',
-        userState: userDoc.billingState || userDoc.city_state || 'Unknown',
-        premiseId: premiseId,
-        tokenAmount: startingOwnerTokens,
+        user_id: ownerId,
+        user_name: ownerName,
+        user_email: ownerEmail,
+        user_phone: userDoc.phone || '',
+        user_state: userDoc.billing_state || userDoc.city_state || 'Unknown',
+        premise_id: premiseId,
+        token_amount: startingOwnerTokens,
         subtotal: 0,
-        totalAmount: 0,
+        total_amount: 0,
         status: 'paid',
         created_at: new Date().toISOString(),
       });
@@ -414,7 +414,7 @@ export async function createPremiseForExistingUser(
 
 
 export async function deletePremise(
-  premiseId: string,
+  premise_id: string,
   ownerId: string
 ): Promise<{ success: boolean; error?: string }> {
   const adminDb = await getAdminDb();
@@ -450,7 +450,7 @@ export async function deletePremise(
 }
 
 interface GetVisitsPayload {
-  premiseId: string;
+  premise_id: string;
   limit: number;
   startAfter?: string;
   startDate?: string;
@@ -503,7 +503,7 @@ export async function getVisitsForPremise(
 }
 
 export async function changePremiseOwner(payload: {
-  premiseId: string;
+  premise_id: string;
   oldOwnerId: string;
   newOwnerEmail: string;
   actor: { id: string; name: string; role: string; };
@@ -527,7 +527,7 @@ export async function changePremiseOwner(payload: {
     const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
     premiseName = premiseDoc?.name || 'Unknown Premise';
 
-    await adminDb.from('premises').update({ owner_id: newOwnerDoc.id, ownerName: newOwnerName }).eq('id', premiseId);
+    await adminDb.from('premises').update({ owner_id: newOwnerDoc.id, owner_name: newOwnerName }).eq('id', premiseId);
 
     const { data: oldOwnerDoc } = await adminDb.from('users').select('premise_roles').eq('id', oldOwnerId).single();
     if (oldOwnerDoc) {
@@ -550,9 +550,9 @@ export async function changePremiseOwner(payload: {
     await adminDb.from('users').update({ premise_roles: newOwnerRoles }).eq('id', newOwnerDoc.id);
 
     await createLogEntry({
-      actorId: actor.id,
-      actorName: actor.name,
-      actorRole: actor.role,
+      actor_id: actor.id,
+      actor_name: actor.name,
+      actor_role: actor.role,
       action: LogAction.OWNERSHIP_TRANSFERRED,
       description: `Admin "${actor.name}" transferred ownership of premise "${premiseName}" to "${newOwnerName}".`
     });
@@ -565,7 +565,7 @@ export async function changePremiseOwner(payload: {
 }
 
 export async function updatePremiseAdmin(
-  premiseId: string,
+  premise_id: string,
   dataToUpdate: Partial<Premise>,
   expectedUpdatedAt?: string  // For optimistic locking: pass the `updated_at` you last fetched
 ): Promise<{ success: boolean; error?: string; conflict?: boolean }> {
@@ -583,9 +583,9 @@ export async function updatePremiseAdmin(
 
     // The premises table uses camelCase (agent_id, categoryId, etc. are inconsistent in DB).
     // Normalize any client-side fields to match the database column names precisely.
-    if ('agentId' in updateData) {
-      updateData.agent_id = updateData.agentId;
-      delete (updateData as any).agentId;
+    if ('agent_id' in updateData) {
+      updateData.agent_id = updateData.agent_id;
+      delete (updateData as any).agent_id;
     }
     // Note: PostgREST respects camelCase if configured/matching the schema, 
     // but we ensure owner_id is present if it was changed recently.

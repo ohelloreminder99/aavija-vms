@@ -52,7 +52,7 @@ export type SerializableVisit = {
  */
 export async function processScannedToken(
   token: string,
-  premiseId: string
+  premise_id: string
 ): Promise<{
   success: boolean;
   visitor?: SerializableUserProfile;
@@ -86,7 +86,7 @@ export async function processScannedToken(
       throw new Error('This QR code has already been used or is invalid.');
     }
 
-    if (!tokenData.expiresAt) {
+    if (!tokenData.expires_at) {
       throw new Error('Token data is invalid (missing expiry date).');
     }
 
@@ -95,7 +95,7 @@ export async function processScannedToken(
       throw new Error('Token is not associated with a user.');
     }
 
-    const expiresAt = new Date(tokenData.expiresAt);
+    const expiresAt = new Date(tokenData.expires_at);
     if (expiresAt < new Date()) {
       await adminDb.from('checkin_tokens').update({ status: 'expired' }).eq('id', token);
       throw new Error('Expired QR code. Please ask the visitor to generate a new one.');
@@ -118,7 +118,7 @@ export async function processScannedToken(
 
     const { data: categoryData } = await adminDb.from('premise_categories')
       .select('id, name, type, deduction_rate_visitor, deduction_rate_premise')
-      .eq('id', premiseData.categoryId).single();
+      .eq('id', premiseData.category_id).single();
     let requiredTokensPremiseSide = 0;
     let requiredTokensVisitorSide = 0;
     let categoryType = 'industrial';
@@ -172,7 +172,7 @@ export async function processScannedToken(
       active_checkin_id: visitorData.active_checkin_id,
       photo_url: visitorData.photo_url,
       city: visitorData.city,
-      companyName: visitorData.companyName,
+      company_name: visitorData.company_name,
       vehicles: visitorData.vehicles,
       selected_vehicle_number: visitorData.selected_vehicle_number,
       products: visitorData.products,
@@ -188,9 +188,9 @@ export async function processScannedToken(
 
 interface FinalizeCheckinPayload {
   token: string;
-  visitorId: string;
-  hostId: string;
-  premiseId: string;
+  visitor_id: string;
+  host_id: string;
+  premise_id: string;
   gatekeeperId: string;
 }
 
@@ -262,8 +262,8 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     const visitorRating = visitorData.global_rating || 0;
 
     let categoryType = 'industrial';
-    if (premiseData.categoryId) {
-      const { data: categoryData } = await adminDb.from('premise_categories').select('*').eq('id', premiseData.categoryId).single();
+    if (premiseData.category_id) {
+      const { data: categoryData } = await adminDb.from('premise_categories').select('*').eq('id', premiseData.category_id).single();
       if (categoryData) {
         visitorDeduction = categoryData.deduction_rate_visitor || 0;
         premiseDeduction = categoryData.deduction_rate_premise || 0;
@@ -292,7 +292,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
 
     const now = Date.now();
     const visitTtlDays = settingsData?.visit_ttl_days;
-    let expiresAt: string | undefined = undefined;
+    let expires_at: string | undefined = undefined;
     if (visitTtlDays && Number.isInteger(visitTtlDays) && visitTtlDays > 0) {
       expiresAt = new Date(now + visitTtlDays * 24 * 60 * 60 * 1000).toISOString();
     }
@@ -347,34 +347,34 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     // Log actions after transaction
     if (!settingsData?.hide_token_economy && visitorDeduction > 0) {
       await createLogEntry({
-        actorId: resolvedVisitorId,
-        actorName: visitorName,
-        actorRole: 'visitor',
+        actor_id: resolvedVisitorId,
+        actor_name: visitorName,
+        actor_role: 'visitor',
         action: LogAction.VISITOR_CHECKIN_COST,
         description: `Checked into ${premiseName}. Cost: ${visitorDeduction} tokens.`,
-        tokenChange: -visitorDeduction,
+        token_change: -visitorDeduction,
       });
     }
 
     if (!settingsData?.hide_token_economy && premiseDeduction > 0) {
       if (categoryType === 'residential') {
         await createLogEntry({
-          actorId: hostId,
-          actorName: hostData.name,
-          actorRole: 'host',
+          actor_id: hostId,
+          actor_name: hostData.name,
+          actor_role: 'host',
           action: LogAction.VISITOR_CHECKIN_COST,
           description: `Visitor ${visitorName} checked in. Cost: ${premiseDeduction} tokens.`,
-          tokenChange: -premiseDeduction,
+          token_change: -premiseDeduction,
         });
       } else if (categoryType === 'industrial') {
         await createLogEntry({
-          actorId: ownerId,
-          actorName: 'System',
-          actorRole: 'owner',
+          actor_id: ownerId,
+          actor_name: 'System',
+          actor_role: 'owner',
           action: LogAction.PREMISE_CHECKIN_COST,
           description: `Visitor ${visitorName} checked in. Cost: ${premiseDeduction} tokens.`,
-          tokenChange: -premiseDeduction,
-          context: { premiseId: premiseId }
+          token_change: -premiseDeduction,
+          context: { premise_id: premiseId }
         });
       }
     }
@@ -385,7 +385,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
       sendVisitorArrivalNotification({
         hostName: hostForNotification.name,
         hostPhone: hostForNotification.phone,
-        countryCode: countryCodeForNotification,
+        country_code: countryCodeForNotification,
         visitorName: visitorName,
         premiseName: premiseName,
         visitorRating: visitorRating,
@@ -393,12 +393,12 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
         if (!notificationResult.success) {
           // If the notification failed in the background, log it silently.
           await createLogEntry({
-            actorId: gatekeeperId,
-            actorName: 'System',
-            actorRole: 'gatekeeper',
+            actor_id: gatekeeperId,
+            actor_name: 'System',
+            actor_role: 'gatekeeper',
             action: LogAction.WHATSAPP_NOTIFICATION_FAILED,
             description: `WhatsApp notification to host "${hostForNotification.name}" failed for visitor "${visitorName}". Reason: ${notificationResult.error}`,
-            context: { premiseId: premiseId, hostId: hostId, visitorId: visitorId }
+            context: { premise_id: premiseId, host_id: hostId, visitor_id: visitorId }
           });
         }
       }).catch(console.error);
@@ -411,12 +411,12 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
         reason = 'Host details could not be determined.'
       }
       await createLogEntry({
-        actorId: gatekeeperId,
-        actorName: 'System',
-        actorRole: 'gatekeeper',
+        actor_id: gatekeeperId,
+        actor_name: 'System',
+        actor_role: 'gatekeeper',
         action: LogAction.WHATSAPP_NOTIFICATION_FAILED,
         description: `WhatsApp notification to host was skipped. Reason: ${reason}`,
-        context: { premiseId: premiseId, hostId: hostId, visitorId: visitorId }
+        context: { premise_id: premiseId, host_id: hostId, visitor_id: visitorId }
       });
     }
 
@@ -447,9 +447,9 @@ export async function cancelCheckin(token: string): Promise<{ success: boolean }
 
 
 interface CheckoutPayload {
-  visitId: string;
-  visitorId: string;
-  premiseId: string;
+  visit_id: string;
+  visitor_id: string;
+  premise_id: string;
 }
 
 export async function checkoutVisitor(payload: CheckoutPayload): Promise<{ success: boolean; error?: string }> {
@@ -522,12 +522,12 @@ export async function forceCheckoutVisitor(payload: ForceCheckoutPayload): Promi
 
     if (visitData) {
       await createLogEntry({
-        actorId: actor.id,
-        actorName: actor.name,
-        actorRole: actor.role,
+        actor_id: actor.id,
+        actor_name: actor.name,
+        actor_role: actor.role,
         action: actor.role === 'admin' ? LogAction.FORCE_CHECKOUT_ADMIN : LogAction.FORCE_CHECKOUT_OWNER,
         description: `${actor.role} "${actor.name}" forcefully checked out visitor "${visitData.visitor_name}".`,
-        context: { premiseId: premiseId }
+        context: { premise_id: premiseId }
       });
     }
 
@@ -541,8 +541,8 @@ export async function forceCheckoutVisitor(payload: ForceCheckoutPayload): Promi
 }
 
 interface EmergencyContactPayload {
-  visitId: string;
-  premiseId: string;
+  visit_id: string;
+  premise_id: string;
 }
 
 /**
@@ -576,9 +576,9 @@ export async function getEmergencyContactInfo(payload: EmergencyContactPayload):
 
     // The critical step: The Audit Trail (Trusting internal Session ID, not client JSON)
     await createLogEntry({
-      actorId: user.id,
-      actorName: profile.name || 'Unknown Security Staff',
-      actorRole: profile.role || 'gatekeeper', // or host
+      actor_id: user.id,
+      actor_name: profile.name || 'Unknown Security Staff',
+      actor_role: profile.role || 'gatekeeper', // or host
       action: LogAction.EMERGENCY_CONTACT_ACCESSED,
       description: `Accessed Emergency Phone Numbers for visitor "${visitData.visitor_name}" and host "${visitData.host_name}".`,
       context: { premiseId, visitId }

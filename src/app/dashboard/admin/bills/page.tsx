@@ -104,9 +104,9 @@ export default function AdminBillsPage() {
     const filteredInvoices = React.useMemo(() => {
         const lower = searchTerm.toLowerCase();
         return invoices.filter(inv =>
-            inv.userName.toLowerCase().includes(lower) ||
+            inv.user_name.toLowerCase().includes(lower) ||
             inv.id.toLowerCase().includes(lower) ||
-            inv.userEmail.toLowerCase().includes(lower)
+            inv.user_email.toLowerCase().includes(lower)
         );
     }, [invoices, searchTerm]);
 
@@ -117,17 +117,17 @@ export default function AdminBillsPage() {
         const data = filteredInvoices.map(inv => ({
             'Invoice No': inv.id,
             'Date': format(parseISO(inv.timestamp), 'PPpp'),
-            'Customer': inv.userName,
+            'Customer': inv.user_name,
             'Buyer GSTIN': inv.customerGstin || 'N/A',
             'HSN/SAC': inv.hsnSacCode || '997331',
-            'Email': inv.userEmail,
-            'Phone': inv.userPhone,
-            'State': inv.userState,
+            'Email': inv.user_email,
+            'Phone': inv.user_phone,
+            'State': inv.user_state,
             'Subtotal': inv.subtotal,
             'CGST': inv.cgst,
             'SGST': inv.sgst,
             'IGST': inv.igst,
-            'Total': inv.totalAmount,
+            'Total': inv.total_amount,
             'Status': inv.status
         }));
         const csv = Papa.unparse(data);
@@ -291,18 +291,18 @@ export default function AdminBillsPage() {
                                             <TableCell className="font-mono text-xs">{inv.id}</TableCell>
                                             <TableCell>
                                                 <div className='flex flex-col'>
-                                                    <span className='font-medium'>{inv.userName}</span>
-                                                    <span className='text-xs text-muted-foreground'>{inv.userEmail}</span>
+                                                    <span className='font-medium'>{inv.user_name}</span>
+                                                    <span className='text-xs text-muted-foreground'>{inv.user_email}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="capitalize text-xs">{inv.userState}</TableCell>
+                                            <TableCell className="capitalize text-xs">{inv.user_state}</TableCell>
                                             <TableCell className="text-xs">
                                                 {format(parseISO(inv.timestamp), 'PP p')}
                                             </TableCell>
                                             <TableCell className="text-right font-semibold">
                                                 <div className='flex items-center justify-end gap-1'>
                                                     <IndianRupee className='h-3 w-3' />
-                                                    {inv.totalAmount.toFixed(2)}
+                                                    {inv.total_amount.toFixed(2)}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right">

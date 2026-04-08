@@ -76,7 +76,7 @@ type PayoutFormValues = z.infer<typeof payoutSchema>;
 
 export default function AgentLedgerPage() {
   const params = useParams();
-  const agentId = params.agentId as string;
+  const agentId = params.agent_id as string;
   const { user } = useUser();
   const { data: adminProfile } = useUserProfile(user?.id);
   const { toast } = useToast();
@@ -116,12 +116,12 @@ export default function AgentLedgerPage() {
   React.useEffect(() => {
     if (ledger.length > 0 && adminProfile && agent) {
       createLogEntry({
-        actorId: adminProfile.id,
-        actorName: adminProfile.name,
-        actorRole: 'admin',
+        actor_id: adminProfile.id,
+        actor_name: adminProfile.name,
+        actor_role: 'admin',
         action: LogAction.VIEW_AGENT_LEDGER_ADMIN,
         description: `Admin "${adminProfile.name}" viewed agent ledger for "${agent.name}".`,
-        context: { agentId: agent.id }
+        context: { agent_id: agent.id }
       });
     }
   }, [ledger.length, adminProfile, agent]);

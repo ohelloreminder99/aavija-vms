@@ -57,7 +57,7 @@ export function PhoneVerification({
 
     const handleSendOtp = async () => {
         const phone = form.getValues('phone');
-        const countryCode = form.getValues('countryCode');
+        const countryCode = form.getValues('country_code');
 
         if (!phone) {
             toast({ variant: 'destructive', title: 'Error', description: 'Please enter a phone number.' });
@@ -73,7 +73,7 @@ export function PhoneVerification({
         setIsVerifying(true);
         setVerificationError(null);
         try {
-            const result = await sendWhatsAppOtp({ userId: userProfile.id, phone, countryCode });
+            const result = await sendWhatsAppOtp({ user_id: userProfile.id, phone, countryCode });
             if (result.success) {
                 setOtpSent(true);
                 toast({ title: 'OTP Sent', description: 'Please check your WhatsApp for the verification code.' });
@@ -93,7 +93,7 @@ export function PhoneVerification({
         setIsVerifying(true);
         setVerificationError(null);
         try {
-            const result = await verifyWhatsAppOtp({ userId: userProfile.id, otp, phone: form.getValues('phone'), countryCode: form.getValues('countryCode') });
+            const result = await verifyWhatsAppOtp({ user_id: userProfile.id, otp, phone: form.getValues('phone'), country_code: form.getValues('country_code') });
             if (result.success) {
                 setIsPhoneLocked(true);
                 setOtpSent(false);
@@ -130,7 +130,7 @@ export function PhoneVerification({
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 pt-4">
-                    <FormField control={form.control} name="countryCode" render={({ field }) => (
+                    <FormField control={form.control} name="country_code" render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-zinc-400 font-bold uppercase tracking-widest text-[9px] ml-1">Protocol</FormLabel>
                             <FormControl><Input {...field} disabled={isPhoneLocked} className="bg-black/20 border-white/5 text-white h-11" /></FormControl>

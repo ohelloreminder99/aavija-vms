@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useCollection, WithId } from '@/supabase';
 import { type UserProfile } from '@/services/user-service';
@@ -31,7 +31,7 @@ export interface Announcement {
  */
 export function useAnnouncements() {
   const query = React.useMemo(() => {
-    return { table: 'announcements', orderBy: { column: 'createdAt', ascending: false }, __memo: true };
+    return { table: 'announcements', orderBy: { column: 'created_at', ascending: false }, __memo: true };
   }, []);
 
   return useCollection<Announcement>(query as any);
@@ -61,7 +61,7 @@ export function useAnnouncementsForUser(
     const actingRole = activeRole || userProfile.role;
 
     // 2. Resolve the acting location.
-    const targetCityId = activeCityId || userProfile.cityId;
+    const targetCityId = activeCityId || userProfile.city_id;
     const cityName = (activeCityName || userProfile.city)?.toLowerCase().trim();
     const stateName = (activeStateName || userProfile.city_state)?.toLowerCase().trim();
 
@@ -71,7 +71,7 @@ export function useAnnouncementsForUser(
 
       // Fallback to name-based lookup for older profiles
       const nameMatch = c.name.toLowerCase().trim() === cityName;
-      const stateMatch = stateName ? c.stateName.toLowerCase().trim() === stateName : true;
+      const stateMatch = stateName ? c.state_name.toLowerCase().trim() === stateName : true;
       return cityName && nameMatch && stateMatch;
     });
 
@@ -102,8 +102,8 @@ export function useAnnouncementsForUser(
 
       // Check if the user's specific city, or its parent district/state, is targeted.
       const matchCity = targetedCities.includes(userCity.id!);
-      const matchDistrict = targetedDistricts.includes(userCity.districtId);
-      const matchState = targetedStates.includes(userCity.stateId);
+      const matchDistrict = targetedDistricts.includes(userCity.district_id);
+      const matchState = targetedStates.includes(userCity.state_id);
 
       return matchCity || matchDistrict || matchState;
     });
@@ -118,7 +118,7 @@ export function useAnnouncementsForUser(
  */
 export async function createAnnouncement(
   _db: any,
-  data: Omit<Announcement, 'createdAt' | 'updatedAt' | 'id'>
+  data: Omit<Announcement, 'created_at' | 'updated_at' | 'id'>
 ) {
   const supabase = await createClient();
   const newAnnouncement = {
@@ -136,7 +136,7 @@ export async function createAnnouncement(
 export async function updateAnnouncement(
   _db: any,
   id: string,
-  data: Partial<Omit<Announcement, 'createdAt'>>
+  data: Partial<Omit<Announcement, 'created_at'>>
 ) {
   const supabase = await createClient();
   const dataToUpdate = {

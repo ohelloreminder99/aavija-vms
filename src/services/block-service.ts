@@ -35,21 +35,21 @@ export interface HostBlock {
 // === SHARED HELPERS ===
 
 interface BlockActionPayload {
-  actorId: string;
-  actorName: string;
-  actorRole: string;
-  visitorId: string;
+  actor_id: string;
+  actor_name: string;
+  actor_role: string;
+  visitor_id: string;
 }
 
 interface PremiseBlockPayload extends BlockActionPayload {
-  premiseId: string;
+  premise_id: string;
   visitorName: string;
   visitorPhotoUrl: string;
 }
 
 interface HostBlockPayload extends BlockActionPayload {
-  hostId: string;
-  premiseId: string; // Added premiseId
+  host_id: string;
+  premise_id: string; // Added premiseId
   visitorName: string;
   visitorPhotoUrl: string;
 }
@@ -60,7 +60,7 @@ interface HostBlockPayload extends BlockActionPayload {
  */
 async function getLogExpiry(adminDb: NonNullable<Awaited<ReturnType<typeof getAdminDb>>>): Promise<{
   settings: Record<string, any>;
-  expiresAt: string | null;
+  expires_at: string | null;
 }> {
   const { data: settings } = await adminDb
     .from('settings')
@@ -74,7 +74,7 @@ async function getLogExpiry(adminDb: NonNullable<Awaited<ReturnType<typeof getAd
     throw new Error('System configuration unavailable. Action aborted for safety.');
   }
 
-  let expiresAt: string | null = null;
+  let expires_at: string | null = null;
   const ttlDays = settings.log_ttl_days;
   if (ttlDays && Number.isInteger(ttlDays) && ttlDays > 0) {
     expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000).toISOString();
@@ -178,7 +178,7 @@ export async function blockVisitorFromHost(
       p_actor_role: actorRole,
       p_visitor_name: visitorName,
       p_visitor_photo: visitorPhotoUrl,
-      p_premise_id: payload.premiseId, // Pass premiseId
+      p_premise_id: payload.premise_id, // Pass premiseId
       p_expires_at: expiresAt,
     });
 
@@ -209,7 +209,7 @@ export async function unblockVisitorFromHost(
     const { data, error } = await adminDb.rpc('rpc_unblock_visitor_host', {
       p_host_id: hostId,
       p_visitor_id: visitorId,
-      p_premise_id: payload.premiseId, // Pass premiseId
+      p_premise_id: payload.premise_id, // Pass premiseId
       p_unblock_cost: settings?.unblock_visitor_cost_host ?? 0,
       p_actor_id: actorId,
       p_actor_name: actorName,

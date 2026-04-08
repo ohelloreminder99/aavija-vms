@@ -55,7 +55,7 @@ export default function GatekeeperHistoryPage() {
   const { data: userProfile } = useUserProfile(user?.id);
   const { data: settings, isLoading: isLoadingSettings } = useSettings();
   const searchParams = useSearchParams();
-  const premiseIdFromUrl = searchParams.get('premiseId');
+  const premiseIdFromUrl = searchParams.get('premise_id');
 
   const premiseId = premiseIdFromUrl || (userProfile?.premise_roles && Object.keys(userProfile.premise_roles)[0]);
 

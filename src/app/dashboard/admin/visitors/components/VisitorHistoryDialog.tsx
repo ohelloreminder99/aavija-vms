@@ -83,9 +83,9 @@ export default function VisitorHistoryDialog({
             setVisits(result.visits);
             if (adminProfile) {
               createLogEntry({
-                actorId: adminProfile.id,
-                actorName: adminProfile.name,
-                actorRole: 'admin',
+                actor_id: adminProfile.id,
+                actor_name: adminProfile.name,
+                actor_role: 'admin',
                 action: LogAction.VIEW_VISITOR_HISTORY_ADMIN,
                 description: `Admin "${adminProfile.name}" viewed visit history for visitor "${visitor.name}".`,
                 context: { viewedUserId: visitor.id }

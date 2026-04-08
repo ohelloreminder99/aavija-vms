@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -82,7 +82,7 @@ import { useFirestore, WithId } from '@/supabase';
 
 const districtSchema = z.object({
   name: z.string().min(1, 'District name is required.'),
-  stateId: z.string().min(1, 'State is required.'),
+  state_id: z.string().min(1, 'State is required.'),
 });
 
 type DistrictFormValues = z.infer<typeof districtSchema>;
@@ -105,27 +105,27 @@ export default function DistrictsPage() {
 
   const form = useForm<DistrictFormValues>({
     resolver: zodResolver(districtSchema),
-    defaultValues: { name: '', stateId: '' },
+    defaultValues: { name: '', state_id: '' },
   });
 
   React.useEffect(() => {
     if (districtToEdit) {
       form.reset({
         name: districtToEdit.name,
-        stateId: districtToEdit.stateId,
+        state_id: districtToEdit.state_id,
       });
     } else {
-      form.reset({ name: '', stateId: '' });
+      form.reset({ name: '', state_id: '' });
     }
   }, [districtToEdit, form]);
 
   const handleFormSubmit = async (data: DistrictFormValues) => {
-    const selectedState = states?.find(s => s.id === data.stateId);
+    const selectedState = states?.find(s => s.id === data.state_id);
     if (!selectedState) {
       toast({ variant: 'destructive', title: 'Error', description: 'Selected state is invalid.' });
       return;
     }
-    const districtData = { name: data.name, stateId: data.stateId, stateName: selectedState.name };
+    const districtData = { name: data.name, state_id: data.state_id, state_name: selectedState.name };
 
     try {
       if (districtToEdit) {
@@ -178,19 +178,19 @@ export default function DistrictsPage() {
     setIsUploading(true);
     const Papa = (await import('papaparse')).default;
 
-    Papa.parse<{ name: string; stateName: string }>(file, {
+    Papa.parse<{ name: string; state_name: string }>(file, {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
         const districtsToUpload = results.data.filter(
-          (row) => row.name && row.stateName
+          (row) => row.name && row.state_name
         );
 
         if (districtsToUpload.length === 0) {
           toast({
             variant: 'destructive',
             title: 'Upload Failed',
-            description: 'No valid districts found in the CSV. Make sure it has "name" and "stateName" headers.',
+            description: 'No valid districts found in the CSV. Make sure it has "name" and "state_name" headers.',
           });
           setIsUploading(false);
           return;
@@ -252,7 +252,7 @@ export default function DistrictsPage() {
           {districts.map((district) => (
             <TableRow key={district.id}>
               <TableCell className="font-medium capitalize">{district.name}</TableCell>
-              <TableCell className="capitalize">{district.stateName}</TableCell>
+              <TableCell className="capitalize">{district.state_name}</TableCell>
               <TableCell className="text-right">
                 <Button variant="ghost" size="icon" onClick={() => openEditForm(district)}><Edit className="h-4 w-4" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(district.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -296,7 +296,7 @@ export default function DistrictsPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="stateId"
+                    name="state_id"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>State</FormLabel>

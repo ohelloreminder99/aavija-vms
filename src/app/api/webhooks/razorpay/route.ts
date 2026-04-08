@@ -36,21 +36,21 @@ export async function POST(req: Request) {
         const paymentEntity = event.payload.payment.entity;
         const notes = orderEntity.notes || {};
 
-        if (!notes.userId || !notes.tokenAmount || !notes.roleToCredit) {
+        if (!notes.user_id || !notes.token_amount || !notes.roleToCredit) {
           console.warn('[Webhook] Order missing required notes metadata. Possibly an older order format.');
           // Return 200 so Razorpay doesn't retry this bad request
           return NextResponse.json({ received: true, note: 'Missing metadata, ignored.' });
         }
 
         const result = await purchaseTokens({
-          userId: notes.userId,
-          tokenAmount: parseInt(notes.tokenAmount, 10),
+          user_id: notes.user_id,
+          token_amount: parseInt(notes.token_amount, 10),
           totalCost: orderEntity.amount / 100,
           currency: orderEntity.currency,
-          actorName: 'Webhook Action', // Fallback, will be overridden by token-service DB lookup
-          actorRole: 'user', // Fallback
+          actor_name: 'Webhook Action', // Fallback, will be overridden by token-service DB lookup
+          actor_role: 'user', // Fallback
           roleToCredit: notes.roleToCredit as 'owner' | 'visitor',
-          premiseId: notes.premiseId || null,
+          premise_id: notes.premise_id || null,
           razorpay_order_id: orderEntity.id,
           razorpay_payment_id: paymentEntity.id,
           razorpay_signature: 'webhook-verified', // Bypassed by isWebhook
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
           return NextResponse.json({ error: result.error }, { status: 400 });
         }
         
-        console.log(`[Webhook] Successfully fulfilled tokens for user ${notes.userId}`);
+        console.log(`[Webhook] Successfully fulfilled tokens for user ${notes.user_id}`);
       }
     }
 

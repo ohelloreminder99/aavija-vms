@@ -138,9 +138,9 @@ export default function ProfilePage() {
 
     return z.object({
       name: z.string().min(2, 'Name must be at least 2 characters.'),
-      companyName: z.string().optional(),
-      cityId: z.string().min(1, 'Please select a city.'),
-      countryCode: z.string(),
+      company_name: z.string().optional(),
+      city_id: z.string().min(1, 'Please select a city.'),
+      country_code: z.string(),
       phone: phoneSchema,
       products: z.array(z.string()).max(10, 'You can add a maximum of 10 products.').optional(),
       vehicles: z.array(vehicleSchema).optional(),
@@ -158,9 +158,9 @@ export default function ProfilePage() {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: '',
-      companyName: '',
-      cityId: '',
-      countryCode: '+91',
+      company_name: '',
+      city_id: '',
+      country_code: '+91',
       phone: '',
       products: [],
       vehicles: [],
@@ -190,9 +190,9 @@ export default function ProfilePage() {
     if (userProfile) {
       form.reset({
         name: userProfile.name || '',
-        companyName: userProfile.companyName || '',
-        cityId: userProfile.cityId || '',
-        countryCode: userProfile.countryCode || settings?.default_country_code || '+91',
+        company_name: userProfile.company_name || '',
+        city_id: userProfile.city_id || '',
+        country_code: userProfile.country_code || settings?.default_country_code || '+91',
         phone: userProfile.phone || '',
         products: userProfile.products || [],
         vehicles: userProfile.vehicles || [],
@@ -304,14 +304,14 @@ export default function ProfilePage() {
     setIsSubmitting(true);
     const phoneChanged = userProfile && data.phone !== userProfile.phone;
     try {
-      const selectedCityObj = cities?.find(c => c.id === data.cityId);
+      const selectedCityObj = cities?.find(c => c.id === data.city_id);
       const dataToUpdate: Partial<UpdateableUserProfile> & { is_verified?: boolean } = {
         name: data.name,
-        companyName: data.companyName,
-        cityId: data.cityId,
+        company_name: data.company_name,
+        city_id: data.city_id,
         city: selectedCityObj?.name || 'Unknown',
-        city_state: selectedCityObj?.stateName || 'Unknown',
-        countryCode: data.countryCode,
+        city_state: selectedCityObj?.state_name || 'Unknown',
+        country_code: data.country_code,
         products: data.products,
         vehicles: data.vehicles,
         selected_vehicle_number: data.selected_vehicle_number,
@@ -386,7 +386,7 @@ export default function ProfilePage() {
                         <FormMessage className="text-red-500 text-[10px]" />
                       </FormItem>
                     )} />
-                    <FormField control={form.control} name="companyName" render={({ field }) => (
+                    <FormField control={form.control} name="company_name" render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Company Name</FormLabel>
                         <FormControl>
@@ -404,7 +404,7 @@ export default function ProfilePage() {
                       settings={settings}
                     />
 
-                    <FormField control={form.control} name="cityId" render={({ field }) => (
+                    <FormField control={form.control} name="city_id" render={({ field }) => (
                       <FormItem className="p-6 bg-[#010a05]/95 backdrop-blur-3xl/[0.02] border border-white/5 rounded-3xl">
                         <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px] mb-4 block">
                           City {field.value && (
@@ -424,7 +424,7 @@ export default function ProfilePage() {
                                 <div key={city.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group/item">
                                   <RadioGroupItem value={city.id} id={`city-${city.id}`} className="border-white/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
                                   <Label htmlFor={`city-${city.id}`} className="font-medium text-zinc-400 group-hover/item:text-white transition-colors capitalize text-sm flex-1 cursor-pointer">
-                                    {city.name} <span className="text-[10px] text-zinc-400 uppercase tracking-tighter ml-2">{city.stateName}</span>
+                                    {city.name} <span className="text-[10px] text-zinc-400 uppercase tracking-tighter ml-2">{city.state_name}</span>
                                   </Label>
                                 </div>
                               ))}

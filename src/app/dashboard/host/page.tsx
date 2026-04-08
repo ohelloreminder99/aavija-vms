@@ -14,7 +14,7 @@ import { DashboardActionCard } from '../visitor/components/DashboardActionCard';
 export default function HostDashboardPage() {
     const { user } = useUser();
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId') ?? undefined;
+    const premiseId = searchParams.get('premise_id') ?? undefined;
     const { data: hostProfile } = useUserProfile(user?.id);
 
     return (

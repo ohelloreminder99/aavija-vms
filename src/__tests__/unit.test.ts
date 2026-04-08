@@ -84,7 +84,7 @@ describe('withTiming', () => {
 
   it('accepts context without throwing', async () => {
     const result = await withTiming('ctx_action', async () => 'ok', {
-      context: { userId: 'abc', page: 'test' },
+      context: { user_id: 'abc', page: 'test' },
       slowThresholdMs: 99999,
     });
     expect(result).toBe('ok');

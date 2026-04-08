@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function OwnerSettingsPage() {
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
     const router = useRouter();
     const { toast } = useToast();
     const [isSaving, setIsSaving] = React.useState(false);

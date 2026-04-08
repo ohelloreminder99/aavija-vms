@@ -6,8 +6,8 @@ import crypto from 'crypto';
 interface CreateOrderPayload {
   amount: number; // Amount in the smallest currency unit (e.g., paise for INR)
   currency: string;
-  tokenAmount: number;
-  userId: string;
+  token_amount: number;
+  user_id: string;
   roleToCredit: 'owner' | 'visitor';
   premiseId?: string | null;
   appCheckToken?: string;
@@ -53,7 +53,7 @@ export async function createRazorpayOrder(payload: CreateOrderPayload): Promise<
       receipt: `receipt_order_${new Date().getTime()}`,
       notes: {
         userId,
-        tokenAmount: String(tokenAmount),
+        token_amount: String(tokenAmount),
         roleToCredit,
         ...(premiseId ? { premiseId } : {})
       }

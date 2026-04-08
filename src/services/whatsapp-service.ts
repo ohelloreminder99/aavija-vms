@@ -317,7 +317,7 @@ export async function notifyThresholdReached(p: {
 export async function sendVisitorArrivalNotification(p: {
   hostName: string;
   hostPhone: string;
-  countryCode: string;   // e.g. "+91" — stripped before send
+  country_code: string;   // e.g. "+91" — stripped before send
   visitorName: string;
   premiseName: string;
   visitorRating: number;
@@ -457,14 +457,14 @@ export async function notifyAgentPremiseApproved(p: {
  */
 export async function notifyOwnerPremiseApproved(p: {
   ownerPhone: string;
-  ownerName: string;
+  owner_name: string;
   premiseName: string;
 }): Promise<void> {
   try {
     await sendWhatsApp({
       phone: p.ownerPhone,
       templateName: 'aavija_premise_approved',
-      params: [p.ownerName, p.premiseName],
+      params: [p.owner_name, p.premiseName],
     });
   } catch (e: unknown) {
     console.error('[WhatsApp] notifyOwnerPremiseApproved failed (non-fatal):', e instanceof Error ? e.message : 'Unknown error');

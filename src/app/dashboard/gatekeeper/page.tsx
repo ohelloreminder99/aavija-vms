@@ -111,7 +111,7 @@ export default function GatekeeperDashboardPage() {
   const { data: gatekeeperProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
 
   const docRef = React.useMemo(() => {
     if (!premiseId) return null;
@@ -124,7 +124,7 @@ export default function GatekeeperDashboardPage() {
 
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
-  const categoryId = premise?.categoryId;
+  const categoryId = premise?.category_id;
 
   const currentCategory = useMemo(() => {
     if (!categories || !categoryId) return null;

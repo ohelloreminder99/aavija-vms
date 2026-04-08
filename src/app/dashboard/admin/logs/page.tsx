@@ -172,11 +172,11 @@ export default function LogsPage() {
                   <span className="text-zinc-300">•</span>
                   <Badge className={cn(
                     "text-[9px] font-black uppercase tracking-[0.15em] px-2",
-                    log.actorRole === 'admin' ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
-                      log.actorRole === 'owner' ? "bg-cyan-500/10 text-cyan-500 border border-cyan-500/20" :
+                    log.actor_role === 'admin' ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" :
+                      log.actor_role === 'owner' ? "bg-cyan-500/10 text-cyan-500 border border-cyan-500/20" :
                         "bg-zinc-800 text-zinc-400"
                   )}>
-                    {log.actorRole}
+                    {log.actor_role}
                   </Badge>
                   <div className="flex-1" />
                   <TooltipProvider>

@@ -131,7 +131,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
   const isGstMissing = React.useMemo(() => {
     const target = role === 'owner' ? premise : userProfile;
     if (!target) return false;
-    return !target.legalName || !target.billingAddress || !target.billingState;
+    return !target.legal_name || !target.billing_address || !target.billing_state;
   }, [role, premise, userProfile]);
 
   const handlePayment = async (data: BuyTokensFormValues) => {
@@ -155,10 +155,10 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
       const orderResult = await createRazorpayOrder({
         amount: totalInPaise,
         currency,
-        tokenAmount: data.quantity,
-        userId: user.id,
+        token_amount: data.quantity,
+        user_id: user.id,
         roleToCredit: role,
-        premiseId: premiseId || null,
+        premise_id: premiseId || null,
         appCheckToken: '',
       });
 
@@ -169,7 +169,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
       const { order } = orderResult;
 
       // Clean concatenation of phone number for Razorpay
-      const cleanCountryCode = (userProfile.countryCode || '+91').replace(/\D/g, '');
+      const cleanCountryCode = (userProfile.country_code || '+91').replace(/\D/g, '');
       const cleanPhone = (userProfile.phone || '').replace(/\D/g, '');
       const fullContact = cleanPhone.startsWith(cleanCountryCode) ? cleanPhone : `${cleanCountryCode}${cleanPhone}`;
 

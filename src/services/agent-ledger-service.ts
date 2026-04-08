@@ -25,7 +25,7 @@ export interface AgentLedgerEntry {
 /**
  * Fetches all ledger entries for a specific agent securely using the Admin SDK.
  */
-export async function getAgentLedgerAction(agentId: string): Promise<{
+export async function getAgentLedgerAction(agent_id: string): Promise<{
   success: boolean;
   ledger?: AgentLedgerEntry[];
   error?: string;

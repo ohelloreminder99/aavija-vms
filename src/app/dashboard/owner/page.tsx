@@ -14,7 +14,7 @@ import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 
 export default function OwnerDashboardPage() {
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId') ?? undefined;
+    const premiseId = searchParams.get('premise_id') ?? undefined;
     const [visitCount, setVisitCount] = React.useState<number | null>(null);
     const [hostCount, setHostCount] = React.useState<number | null>(null);
     const [gatekeeperCount, setGatekeeperCount] = React.useState<number | null>(null);

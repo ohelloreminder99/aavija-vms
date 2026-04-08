@@ -212,7 +212,7 @@ export async function getPremiseApplications(
 
 export async function approvePremiseApplication(
   applicationId: string,
-  categoryId: string
+  category_id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { profile } = await requireAuth();
@@ -257,7 +257,7 @@ export async function approvePremiseApplication(
       // Notify Owner
       if (result.owner_phone) {
         await notifyOwnerPremiseApproved({
-          ownerName: result.owner_name || 'Owner',
+          owner_name: result.owner_name || 'Owner',
           ownerPhone: result.owner_phone,
           premiseName: result.premise_name || 'Premise'
         });
@@ -277,13 +277,13 @@ export async function approvePremiseApplication(
 
     // ─── LOG (non-fatal, after successful RPC) ────────────────────────────────
     createLogEntry({
-      actorId: profile.id,
-      actorName: profile.name || 'Admin',
-      actorRole: 'admin',
+      actor_id: profile.id,
+      actor_name: profile.name || 'Admin',
+      actor_role: 'admin',
       action: LogAction.PREMISE_CREATED,
       description: `Admin approved premise application: "${result.premise_name}" (owner approved via atomic transaction).`,
-      premiseId: result.premise_id,
-      context: { premiseId: result.premise_id, applicationId }
+      premise_id: result.premise_id,
+      context: { premise_id: result.premise_id, applicationId }
     }).catch(err => console.error('[PremiseApp] Log write failed (non-fatal):', err));
 
     revalidatePath('/dashboard/admin/premises');

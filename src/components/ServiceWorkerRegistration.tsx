@@ -42,9 +42,9 @@ export function ServiceWorkerRegistration() {
                     try {
                         const result = await finalizeCheckin({
                             token: item.token,
-                            visitorId: item.visitorId,
-                            hostId: item.hostId,
-                            premiseId: item.premiseId,
+                            visitor_id: item.visitor_id,
+                            host_id: item.host_id,
+                            premise_id: item.premise_id,
                             gatekeeperId: item.gatekeeperId,
                         });
 

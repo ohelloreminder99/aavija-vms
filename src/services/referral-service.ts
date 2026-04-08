@@ -91,7 +91,7 @@ export async function applyReferralCode(
     error?: string;
 }> {
     try {
-        let userId: string;
+        let user_id: string;
         if (overrideUserId) {
             // Called from signup flow — user.id is known from the client-side
             // authData but server-side cookie hasn't propagated yet.

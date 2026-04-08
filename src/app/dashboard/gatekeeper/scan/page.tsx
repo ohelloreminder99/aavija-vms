@@ -15,7 +15,7 @@ import QrScanner from '@/components/QrScanner';
 export default function ScanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const premiseId = searchParams.get('premiseId');
+  const premiseId = searchParams.get('premise_id');
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
 
@@ -28,7 +28,7 @@ export default function ScanPage() {
   const { data: categories, isLoading: areCategoriesLoading } = usePremiseCategories();
   const { data: settings } = useSettings();
 
-  const categoryId = premise?.categoryId;
+  const categoryId = premise?.category_id;
 
   const currentCategory = React.useMemo(() => {
     if (!categories || !categoryId) return null;

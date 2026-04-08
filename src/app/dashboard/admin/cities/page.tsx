@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -83,7 +83,7 @@ import { useFirestore, WithId } from '@/supabase';
 
 const citySchema = z.object({
   name: z.string().min(1, 'City name is required.'),
-  districtId: z.string().min(1, 'District is required.'),
+  district_id: z.string().min(1, 'District is required.'),
 });
 
 type CityFormValues = z.infer<typeof citySchema>;
@@ -106,29 +106,29 @@ export default function CitiesPage() {
 
   const form = useForm<CityFormValues>({
     resolver: zodResolver(citySchema),
-    defaultValues: { name: '', districtId: '' },
+    defaultValues: { name: '', district_id: '' },
   });
 
   React.useEffect(() => {
     if (cityToEdit) {
-      setSelectedStateId(cityToEdit.stateId);
+      setSelectedStateId(cityToEdit.state_id);
       form.reset({
         name: cityToEdit.name,
-        districtId: cityToEdit.districtId
+        district_id: cityToEdit.district_id
       });
     } else {
       setSelectedStateId('');
-      form.reset({ name: '', districtId: '' });
+      form.reset({ name: '', district_id: '' });
     }
   }, [cityToEdit, form]);
 
   const handleFormSubmit = async (data: CityFormValues) => {
-    const selectedDistrict = districts?.find(d => d.id === data.districtId);
+    const selectedDistrict = districts?.find(d => d.id === data.district_id);
     if (!selectedDistrict) {
       toast({ variant: 'destructive', title: 'Error', description: 'Selected district is invalid.' });
       return;
     }
-    const cityData = { ...data, districtName: selectedDistrict.name, stateId: selectedDistrict.stateId, stateName: selectedDistrict.stateName };
+    const cityData = { ...data, district_name: selectedDistrict.name, state_id: selectedDistrict.state_id, state_name: selectedDistrict.state_name };
 
     try {
       if (cityToEdit) {
@@ -181,19 +181,19 @@ export default function CitiesPage() {
     setIsUploading(true);
     const Papa = (await import('papaparse')).default;
 
-    Papa.parse<{ name: string; districtName: string; stateName: string }>(file, {
+    Papa.parse<{ name: string; district_name: string; state_name: string }>(file, {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
         const citiesToUpload = results.data.filter(
-          (row) => row.name && row.districtName && row.stateName
+          (row) => row.name && row.district_name && row.state_name
         );
 
         if (citiesToUpload.length === 0) {
           toast({
             variant: 'destructive',
             title: 'Upload Failed',
-            description: 'No valid cities found in the CSV. Make sure it has "name", "districtName", and "stateName" headers.',
+            description: 'No valid cities found in the CSV. Make sure it has "name", "district_name", and "state_name" headers.',
           });
           setIsUploading(false);
           return;
@@ -256,8 +256,8 @@ export default function CitiesPage() {
           {cities.map((city) => (
             <TableRow key={city.id}>
               <TableCell className="font-medium capitalize">{city.name}</TableCell>
-              <TableCell className="capitalize">{city.districtName}</TableCell>
-              <TableCell className="capitalize">{city.stateName}</TableCell>
+              <TableCell className="capitalize">{city.district_name}</TableCell>
+              <TableCell className="capitalize">{city.state_name}</TableCell>
               <TableCell className="text-right">
                 <Button variant="ghost" size="icon" onClick={() => openEditForm(city)}><Edit className="h-4 w-4" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(city.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -312,7 +312,7 @@ export default function CitiesPage() {
                   </FormItem>
                   <FormField
                     control={form.control}
-                    name="districtId"
+                    name="district_id"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>District</FormLabel>

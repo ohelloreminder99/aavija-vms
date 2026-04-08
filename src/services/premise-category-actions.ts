@@ -39,9 +39,9 @@ export async function createPremiseCategoryAction(data: PremiseCategory, actor: 
   }
 
   await createLogEntry({
-    actorId: actor.id,
-    actorName: actor.name,
-    actorRole: actor.role,
+    actor_id: actor.id,
+    actor_name: actor.name,
+    actor_role: actor.role,
     action: LogAction.CREATE_PREMISE_CATEGORY,
     description: `Admin "${actor.name}" created premise category "${data.name}".`,
   });
@@ -66,9 +66,9 @@ export async function updatePremiseCategoryAction(id: string, data: Partial<Prem
   }
 
   await createLogEntry({
-    actorId: actor.id,
-    actorName: actor.name,
-    actorRole: actor.role,
+    actor_id: actor.id,
+    actor_name: actor.name,
+    actor_role: actor.role,
     action: LogAction.UPDATE_PREMISE_CATEGORY,
     description: `Admin "${actor.name}" updated premise category "${data.name || id}".`,
   });
@@ -89,9 +89,9 @@ export async function deletePremiseCategoryAction(id: string, actor: Actor) {
   if (error) throw error;
 
   await createLogEntry({
-    actorId: actor.id,
-    actorName: actor.name,
-    actorRole: actor.role,
+    actor_id: actor.id,
+    actor_name: actor.name,
+    actor_role: actor.role,
     action: LogAction.DELETE_PREMISE_CATEGORY,
     description: `Admin "${actor.name}" deleted premise category (ID: ${id}).`,
   });

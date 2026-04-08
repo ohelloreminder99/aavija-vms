@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -14,7 +14,7 @@ function HostLayoutContent({ children }: { children: React.ReactNode }) {
     const { user } = useUser();
     const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
     const searchParams = useSearchParams();
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
 
     const hasAccess = React.useMemo(() => {
         if (!userProfile || !premiseId) return false;

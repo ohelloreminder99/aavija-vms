@@ -10,9 +10,9 @@ interface DeductTokensPayload {
     type: 'user' | 'premise';
     id: string;
   };
-  actorId: string;
-  actorName: string;
-  actorRole: string;
+  actor_id: string;
+  actor_name: string;
+  actor_role: string;
   exportType: 'csv' | 'pdf';
   premiseIdForLog?: string; // For context when a user (host/visitor) exports
 }
@@ -63,7 +63,7 @@ export async function deductTokensForExport(
 
     // --- SECURE COST CALCULATION ---
     if (target.type === 'premise') {
-      const categoryId = (targetData as any).categoryId;
+      const categoryId = (targetData as any).category_id;
       if (!categoryId) throw new Error("Premise does not have an assigned category.");
 
       const { data: categoryData } = await adminDb
@@ -113,13 +113,13 @@ export async function deductTokensForExport(
     const logAction = (LogAction as any)[logActionKey] || (exportType === 'csv' ? LogAction.OWNER_EXPORT_CSV : LogAction.OWNER_EXPORT_PDF);
 
     await createLogEntry({
-      actorId: actorId,
-      actorName: actorName,
-      actorRole: actorRole,
+      actor_id: actorId,
+      actor_name: actorName,
+      actor_role: actorRole,
       action: logAction,
       description: `${actorRole} "${actorName}" exported visit history as ${exportType.toUpperCase()}. Cost: ${finalCost} tokens.`,
-      tokenChange: -finalCost,
-      context: { premiseId: premiseIdForLog || (target.type === 'premise' ? target.id : undefined) },
+      token_change: -finalCost,
+      context: { premise_id: premiseIdForLog || (target.type === 'premise' ? target.id : undefined) },
     });
 
     if (target.type === 'premise') {

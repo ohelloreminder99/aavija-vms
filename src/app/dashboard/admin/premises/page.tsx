@@ -54,31 +54,31 @@ const PremiseHistoryDialog = React.lazy(() => import('./components/PremiseHistor
 const newOwnerFormSchema = z.object({
   premiseName: z.string().min(3, 'Premise name must be at least 3 characters.'),
   premiseAddress: z.string().min(5, 'Address is required.'),
-  cityId: z.string().min(1, 'City is required.'),
-  categoryId: z.string().min(1, 'Please select a category.'),
-  ownerName: z.string().min(2, 'Owner name is required.'),
+  city_id: z.string().min(1, 'City is required.'),
+  category_id: z.string().min(1, 'Please select a category.'),
+  owner_name: z.string().min(2, 'Owner name is required.'),
   ownerEmail: z.string().email('Please enter a valid email.'),
   ownerPassword: z.string().min(8, 'Password must be at least 8 characters.'),
-  agentId: z.string().optional(),
+  agent_id: z.string().optional(),
 });
 type NewOwnerFormValues = z.infer<typeof newOwnerFormSchema>;
 
 const existingUserFormSchema = z.object({
   premiseName: z.string().min(3, 'Premise name must be at least 3 characters.'),
   premiseAddress: z.string().min(5, 'Address is required.'),
-  cityId: z.string().min(1, 'City is required.'),
-  categoryId: z.string().min(1, 'Please select a category.'),
+  city_id: z.string().min(1, 'City is required.'),
+  category_id: z.string().min(1, 'Please select a category.'),
   ownerEmail: z.string().email('Please enter a valid email for the owner.'),
-  agentId: z.string().optional(),
+  agent_id: z.string().optional(),
 });
 type ExistingUserFormValues = z.infer<typeof existingUserFormSchema>;
 
 const editFormSchema = z.object({
   name: z.string().min(3, 'Premise name must be at least 3 characters.'),
   address: z.string().min(5, 'Address is required.'),
-  cityId: z.string().min(1, 'City is required.'),
-  categoryId: z.string().min(1, 'Please select a category.'),
-  agentId: z.string().optional(),
+  city_id: z.string().min(1, 'City is required.'),
+  category_id: z.string().min(1, 'Please select a category.'),
+  agent_id: z.string().optional(),
   is_active: z.boolean(),
 });
 type EditFormValues = z.infer<typeof editFormSchema>;
@@ -124,12 +124,12 @@ export default function PremisesPage() {
 
   const newOwnerForm = useForm<NewOwnerFormValues>({
     resolver: zodResolver(newOwnerFormSchema),
-    defaultValues: { premiseName: '', premiseAddress: '', cityId: '', categoryId: '', ownerName: '', ownerEmail: '', ownerPassword: '', agentId: '', },
+    defaultValues: { premiseName: '', premiseAddress: '', city_id: '', category_id: '', owner_name: '', ownerEmail: '', ownerPassword: '', agent_id: '', },
   });
 
   const existingUserForm = useForm<ExistingUserFormValues>({
     resolver: zodResolver(existingUserFormSchema),
-    defaultValues: { premiseName: '', premiseAddress: '', cityId: '', categoryId: '', ownerEmail: '', agentId: '' },
+    defaultValues: { premiseName: '', premiseAddress: '', city_id: '', category_id: '', ownerEmail: '', agent_id: '' },
   });
 
   const editForm = useForm<EditFormValues>({ resolver: zodResolver(editFormSchema), });
@@ -144,9 +144,9 @@ export default function PremisesPage() {
     if (userProfile && !hasLogged.current) {
       hasLogged.current = true;
       createLogEntry({
-        actorId: userProfile.id,
-        actorName: userProfile.name,
-        actorRole: 'admin',
+        actor_id: userProfile.id,
+        actor_name: userProfile.name,
+        actor_role: 'admin',
         action: LogAction.VIEW_ALL_PREMISES_ADMIN,
         description: `Admin "${userProfile.name}" viewed the all premises dashboard.`
       });
@@ -158,9 +158,9 @@ export default function PremisesPage() {
       editForm.reset({
         name: selectedPremise.name,
         address: selectedPremise.address,
-        cityId: (selectedPremise as any).cityId || '',
-        categoryId: selectedPremise.category?.id ?? '',
-        agentId: selectedPremise.agent?.id || '',
+        city_id: (selectedPremise as any).city_id || '',
+        category_id: selectedPremise.category?.id ?? '',
+        agent_id: selectedPremise.agent?.id || '',
         is_active: selectedPremise.is_active,
       });
     }
@@ -192,15 +192,15 @@ export default function PremisesPage() {
   const handleCreateSubmit = async (data: NewOwnerFormValues | ExistingUserFormValues) => {
     setIsSubmitting(true);
     try {
-      const selectedCategory = categories?.find(c => c.id === data.categoryId);
-      const selectedCityObj = cities?.find(c => c.id === data.cityId);
+      const selectedCategory = categories?.find(c => c.id === data.category_id);
+      const selectedCityObj = cities?.find(c => c.id === data.city_id);
 
       const payload: any = {
         ...data,
         premiseCity: selectedCityObj?.name || 'Unknown',
-        categoryName: selectedCategory?.name || null,
-        city_state: selectedCityObj?.stateName || 'Unknown',
-        cityId: data.cityId,
+        category_name: selectedCategory?.name || null,
+        city_state: selectedCityObj?.state_name || 'Unknown',
+        city_id: data.city_id,
       };
 
       const result = creationMode === 'new'
@@ -231,18 +231,18 @@ export default function PremisesPage() {
     if (!selectedPremise) return;
     setIsSubmitting(true);
     try {
-      const selectedCategory = categories?.find(c => c.id === data.categoryId);
-      const selectedCityObj = cities?.find(c => c.id === data.cityId);
+      const selectedCategory = categories?.find(c => c.id === data.category_id);
+      const selectedCityObj = cities?.find(c => c.id === data.city_id);
 
       const dataToUpdate: Partial<Premise> = {
         name: data.name,
         address: data.address,
         city: selectedCityObj?.name || 'Unknown',
-        cityId: data.cityId,
-        agent_id: data.agentId,
-        categoryName: selectedCategory?.name || null,
-        categoryId: data.categoryId,
-        city_state: selectedCityObj?.stateName || 'Unknown',
+        city_id: data.city_id,
+        agent_id: data.agent_id,
+        category_name: selectedCategory?.name || null,
+        category_id: data.category_id,
+        city_state: selectedCityObj?.state_name || 'Unknown',
         is_active: data.is_active,
       };
 
@@ -300,7 +300,7 @@ export default function PremisesPage() {
     setIsSubmitting(true);
     try {
       const result = await changePremiseOwner({
-        premiseId: premiseToChangeOwner.id,
+        premise_id: premiseToChangeOwner.id,
         oldOwnerId: premiseToChangeOwner.owner.id,
         newOwnerEmail: newOwnerEmail,
         actor: { id: userProfile.id, name: userProfile.name, role: 'admin' }
@@ -322,7 +322,7 @@ export default function PremisesPage() {
   };
 
   const openHistoryDialog = (p: SerializablePremiseWithDetails) => {
-    const fullPremiseObject = { ...p, owner_id: p.owner?.id || '', agent_id: p.agent?.id || '', categoryId: p.category?.id || '', categoryName: p.category?.name || '' };
+    const fullPremiseObject = { ...p, owner_id: p.owner?.id || '', agent_id: p.agent?.id || '', category_id: p.category?.id || '', category_name: p.category?.name || '' };
     setSelectedPremiseForHistory(fullPremiseObject as any);
     setIsHistoryDialogOpen(true);
   };

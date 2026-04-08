@@ -1,16 +1,13 @@
 /**
  * AAVIJA VMS — Database Type Definitions
- * Auto-generated from live Supabase schema on 2026-03-20.
+ * Updated: 2026-04-08 — CASE STANDARDIZATION
  * 
- * IMPORTANT: These types reflect the EXACT column names in the database.
- * Do NOT rename columns without a corresponding migration.
- * 
- * Mixed naming convention note:
- *  - `premises` table uses camelCase (categoryId, ownerName, cityId)
- *  - `premise_applications` uses snake_case (category_id, agent_user_id)
- *  - `users` uses mixed (is_active, companyName, cityId, created_at)
- * 
+ * ALL column names now use snake_case to match the PostgreSQL schema.
  * This file is the single source of truth for column names.
+ * 
+ * CASING RULE:
+ *  - Database columns: snake_case (e.g., category_id, owner_name)
+ *  - Frontend-only variables: camelCase (e.g., isLoading, formData)
  */
 
 // ─── PREMISES ─────────────────────────────────────────────────────────────────
@@ -20,34 +17,35 @@ export interface DbPremise {
   name: string;
   address: string;
   city: string;
-  cityId: string;
+  city_id: string;
   city_state: string;
   is_active: boolean;
   owner_id: string | null;
-  ownerName: string | null;
+  owner_name: string | null;
   token_balance: number;
   agent_id: string | null;
-  categoryId: string | null;   // NOTE: camelCase — actual DB column name
-  categoryName: string | null; // NOTE: camelCase — actual DB column name
+  category_id: string | null;
+  category_name: string | null;
   host_count: number;
   gatekeeper_count: number;
   gate_count: number;
   staff: string[];
-  gstNumber: string | null;
-  billingAddress: string | null;
-  legalName: string | null;
-  billingState: string | null;
+  gst_number: string | null;
+  billing_address: string | null;
+  legal_name: string | null;
+  billing_state: string | null;
   created_at: string;
+  updated_at: string;
   require_host_verification: boolean;
 }
 
 /** Columns safe to select for the admin list view */
 export const PREMISE_LIST_COLS =
-  'id, name, address, city, cityId, city_state, is_active, owner_id, ownerName, agent_id, categoryId, categoryName, token_balance, created_at' as const;
+  'id, name, address, city, city_id, city_state, is_active, owner_id, owner_name, agent_id, category_id, category_name, token_balance, created_at' as const;
 
 /** Columns needed for an individual premise detail */
 export const PREMISE_DETAIL_COLS =
-  'id, name, address, city, cityId, city_state, is_active, owner_id, ownerName, agent_id, categoryId, categoryName, token_balance, host_count, gatekeeper_count, gate_count, staff, gstNumber, billingAddress, legalName, billingState, created_at, require_host_verification' as const;
+  'id, name, address, city, city_id, city_state, is_active, owner_id, owner_name, agent_id, category_id, category_name, token_balance, host_count, gatekeeper_count, gate_count, staff, gst_number, billing_address, legal_name, billing_state, created_at, updated_at, require_host_verification' as const;
 
 // ─── USERS ────────────────────────────────────────────────────────────────────
 
@@ -57,7 +55,7 @@ export interface DbUser {
   email: string;
   role: 'admin' | 'owner' | 'host' | 'gatekeeper' | 'visitor';
   phone: string;
-  countryCode: string | null;
+  country_code: string | null;
   is_verified: boolean;
   is_active: boolean;
   is_agent: boolean;
@@ -66,17 +64,17 @@ export interface DbUser {
   active_checkin_id: string | null;
   photo_url: string;
   city: string | null;
-  cityId: string | null;
+  city_id: string | null;
   city_state: string | null;
-  companyName: string | null;
+  company_name: string | null;
   premise_roles: Record<string, string[]>;
   vehicles: unknown;
   selected_vehicle_number: string | null;
   products: unknown;
-  gstNumber: string | null;
-  billingAddress: string | null;
-  legalName: string | null;
-  billingState: string | null;
+  gst_number: string | null;
+  billing_address: string | null;
+  legal_name: string | null;
+  billing_state: string | null;
   created_at: string;
   updated_at: string;
   agent_commission_balance: number;
@@ -90,10 +88,10 @@ export interface DbUser {
 }
 
 /** Columns for user identity (name/email/phone/photo) */
-export const USER_IDENTITY_COLS = 'id, name, email, phone, photo_url, role, is_active, is_verified, city, cityId, created_at' as const;
+export const USER_IDENTITY_COLS = 'id, name, email, phone, photo_url, role, is_active, is_verified, city, city_id, created_at' as const;
 
 /** Columns for admin user list */
-export const USER_LIST_COLS = 'id, name, email, role, phone, is_verified, is_active, is_agent, city, cityId, created_at, premise_roles, token_balance_visitor' as const;
+export const USER_LIST_COLS = 'id, name, email, role, phone, is_verified, is_active, is_agent, city, city_id, created_at, premise_roles, token_balance_visitor' as const;
 
 // ─── AGENTS ───────────────────────────────────────────────────────────────────
 
@@ -118,8 +116,8 @@ export interface DbPremiseApplication {
   city_id: string;
   city_name: string | null;
   city_state: string | null;
-  category_id: string | null;    // NOTE: snake_case — actual DB column name
-  category_name: string | null;  // NOTE: snake_case — actual DB column name
+  category_id: string | null;
+  category_name: string | null;
   owner_email: string;
   owner_id: string | null;
   agent_user_id: string | null;
@@ -152,33 +150,33 @@ export const CATEGORY_COLS = 'id, name, type, deduction_rate_visitor, deduction_
 
 export interface DbLog {
   id: string;
-  actorId: string;
-  actorName: string;
-  actorRole: string;
+  actor_id: string;
+  actor_name: string;
+  actor_role: string;
   action: string;
   timestamp: string;
-  expiresAt: string | null;
+  expires_at: string | null;
   description: string;
-  tokenChange: number | null;
-  premiseId: string | null;
+  token_change: number | null;
+  premise_id: string | null;
   context: Record<string, unknown> | null;
   created_at: string;
 }
 
-export const LOG_LIST_COLS = 'id, actorId, actorName, actorRole, action, timestamp, description, tokenChange, premiseId, context, created_at' as const;
+export const LOG_LIST_COLS = 'id, actor_id, actor_name, actor_role, action, timestamp, description, token_change, premise_id, context, created_at' as const;
 
 // ─── CITIES ───────────────────────────────────────────────────────────────────
 
 export interface DbCity {
   id: string;
   name: string;
-  districtName: string;
-  stateName: string;
-  districtId: string;
-  stateId: string;
+  district_name: string;
+  state_name: string;
+  district_id: string;
+  state_id: string;
 }
 
-export const CITY_COLS = 'id, name, districtName, stateName, districtId, stateId' as const;
+export const CITY_COLS = 'id, name, district_name, state_name, district_id, state_id' as const;
 
 // ─── SETTINGS ─────────────────────────────────────────────────────────────────
 

@@ -3,23 +3,23 @@
 import { getAdminDb } from '@/lib/supabase/server';
 import { LogAction, LogActionType } from './log-actions';
 
-// This interface is for server-side use.
+// This interface is for server-side use — matches DB column names (snake_case).
 export interface Log {
-  actorId: string;
-  actorName: string;
-  actorRole: string;
+  actor_id: string;
+  actor_name: string;
+  actor_role: string;
   action: LogActionType;
   timestamp: string;
-  expiresAt?: string;
+  expires_at?: string;
   description: string;
-  tokenChange?: number;
-  premiseId?: string; // For premise-related logs
+  token_change?: number;
+  premise_id?: string; // For premise-related logs
   context?: {
     [key: string]: any;
   };
 }
 
-type LogData = Omit<Log, 'id' | 'timestamp' | 'expiresAt'>;
+type LogData = Omit<Log, 'id' | 'timestamp' | 'expires_at'>;
 
 /**
  * Creates a new log entry in Supabase.
@@ -38,15 +38,15 @@ export async function createLogEntry(data: LogData) {
 
     const logPayload: any = { ...data };
 
-    if (data.context?.premiseId) {
-      logPayload.premiseId = data.context.premiseId;
+    if (data.context?.premise_id) {
+      logPayload.premise_id = data.context.premise_id;
     }
 
     logPayload.timestamp = now.toISOString();
 
     if (logTtlDays && Number.isInteger(logTtlDays) && logTtlDays > 0) {
       const expiresAt = new Date(now.getTime() + logTtlDays * 24 * 60 * 60 * 1000);
-      logPayload.expiresAt = expiresAt.toISOString();
+      logPayload.expires_at = expiresAt.toISOString();
     }
 
     await adminDb.from('logs').insert(logPayload);

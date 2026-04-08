@@ -36,12 +36,12 @@ import { createClient } from '@/lib/supabase/client';
 import { useStates } from '@/services/state-service';
 
 const gstSchema = z.object({
-  legalName: z.string().min(2, 'Legal name is required for billing.'),
-  gstNumber: z.string().regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, {
+  legal_name: z.string().min(2, 'Legal name is required for billing.'),
+  gst_number: z.string().regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, {
     message: "Invalid GSTIN format (e.g., 27ABCDE1234F1Z5).",
   }).or(z.literal('')),
-  billingAddress: z.string().min(5, 'Billing address is too short.'),
-  billingState: z.string().min(1, 'Please select your registered state.'),
+  billing_address: z.string().min(5, 'Billing address is too short.'),
+  billing_state: z.string().min(1, 'Please select your registered state.'),
 });
 
 type GstFormValues = z.infer<typeof gstSchema>;
@@ -69,10 +69,10 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
   const form = useForm<GstFormValues>({
     resolver: zodResolver(gstSchema),
     defaultValues: {
-      legalName: initialData?.legalName || '',
-      gstNumber: initialData?.gstNumber || '',
-      billingAddress: initialData?.billingAddress || '',
-      billingState: initialData?.billingState || '',
+      legal_name: initialData?.legal_name || '',
+      gst_number: initialData?.gst_number || '',
+      billing_address: initialData?.billing_address || '',
+      billing_state: initialData?.billing_state || '',
     },
   });
 
@@ -80,10 +80,10 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
   React.useEffect(() => {
     if (initialData) {
       form.reset({
-        legalName: initialData.legalName || '',
-        gstNumber: initialData.gstNumber || '',
-        billingAddress: initialData.billingAddress || '',
-        billingState: initialData.billingState || '',
+        legal_name: initialData.legal_name || '',
+        gst_number: initialData.gst_number || '',
+        billing_address: initialData.billing_address || '',
+        billing_state: initialData.billing_state || '',
       });
     }
   }, [initialData, form]);
@@ -96,10 +96,10 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
       const tableName = target.type === 'user' ? 'users' : 'premises';
 
       const { error } = await supabase.from(tableName).update({
-        legalName: data.legalName,
-        gstNumber: data.gstNumber.toUpperCase(),
-        billingAddress: data.billingAddress,
-        billingState: data.billingState,
+        legal_name: data.legal_name,
+        gst_number: data.gst_number.toUpperCase(),
+        billing_address: data.billing_address,
+        billing_state: data.billing_state,
       }).eq('id', target.id);
 
       if (error) throw error;
@@ -149,7 +149,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="legalName"
+              name="legal_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Name (as per GST)</FormLabel>
@@ -163,7 +163,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
             />
             <FormField
               control={form.control}
-              name="gstNumber"
+              name="gst_number"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">GST Number (Optional)</FormLabel>
@@ -177,7 +177,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
             />
             <FormField
               control={form.control}
-              name="billingState"
+              name="billing_state"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Registered State</FormLabel>
@@ -202,7 +202,7 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
             />
             <FormField
               control={form.control}
-              name="billingAddress"
+              name="billing_address"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-zinc-300 font-bold uppercase tracking-widest text-[10px]">Billing Address</FormLabel>

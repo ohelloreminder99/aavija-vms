@@ -8,7 +8,7 @@ import { applyReferralCode, ensureReferralCode } from '@/services/referral-servi
 import { z } from 'zod';
 
 const SignupSchema = z.object({
-  userId: z.string().uuid(),
+  user_id: z.string().uuid(),
   email: z.string().email(),
   name: z.string().optional(),
   refCode: z.string().nullable().optional(),
@@ -48,7 +48,7 @@ export async function checkAuthRateLimit(): Promise<{ success: boolean; error?: 
 }
 
 export async function handleSignupProfile(
-  userId: string, 
+  user_id: string, 
   email: string, 
   name: string,
   refCode?: string | null
@@ -89,21 +89,21 @@ export async function handleSignupProfile(
 
     // Log the signup
     await adminDb.from('logs').insert({
-      actorId: userId,
-      actorName: name || (isAdmin ? 'Admin' : 'Unnamed User'),
-      actorRole: role,
+      actor_id: userId,
+      actor_name: name || (isAdmin ? 'Admin' : 'Unnamed User'),
+      actor_role: role,
       action: LogAction.USER_SIGNUP,
       description: `New ${role} user "${name || 'User'}" (${email}) signed up.`
     });
 
     if (startingTokens > 0) {
       await adminDb.from('logs').insert({
-        actorId: userId,
-        actorName: name || 'User',
-        actorRole: role,
+        actor_id: userId,
+        actor_name: name || 'User',
+        actor_role: role,
         action: LogAction.INITIAL_TOKEN_ALLOCATION,
         description: `Welcome Bonus: Received ${startingTokens} tokens on signup.`,
-        tokenChange: startingTokens,
+        token_change: startingTokens,
       });
     }
 
@@ -116,12 +116,12 @@ export async function handleSignupProfile(
           welcomeTokens = refResult.welcomeTokens;
           // Log the referral welcome token credit
           await adminDb.from('logs').insert({
-            actorId: userId,
-            actorName: name || 'User',
-            actorRole: 'visitor',
+            actor_id: userId,
+            actor_name: name || 'User',
+            actor_role: 'visitor',
             action: LogAction.REFERRAL_WELCOME_TOKENS,
             description: `${name || 'User'} received ${welcomeTokens} bonus tokens for signing up via referral code "${refCode}".`,
-            tokenChange: welcomeTokens,
+            token_change: welcomeTokens,
           });
         }
       } catch (refErr) {

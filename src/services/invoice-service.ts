@@ -4,13 +4,13 @@ import { format, parseISO } from 'date-fns';
 
 export interface Invoice {
   id: string;
-  userName: string;
-  userEmail: string;
-  userPhone: string;
-  userState: string;
-  tokenAmount: number;
+  user_name: string;
+  user_email: string;
+  user_phone: string;
+  user_state: string;
+  token_amount: number;
   subtotal: number;
-  totalAmount: number;
+  total_amount: number;
   cgst: number;
   sgst: number;
   igst: number;
@@ -21,7 +21,7 @@ export interface Invoice {
   timestamp: any;
   hsnSacCode: string;
   companyGstin: string;
-  companyName: string;
+  company_name: string;
   companyAddress: string;
   status: string;
   customerGstin?: string;
@@ -56,7 +56,7 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(26);
   doc.setTextColor(255, 255, 255);
-  doc.text(invoice.companyName.toUpperCase(), 14, 28); // Using Legal Name or Brand
+  doc.text(invoice.company_name.toUpperCase(), 14, 28); // Using Legal Name or Brand
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -134,7 +134,7 @@ export async function generateInvoicePdf(invoice: Invoice) {
 
   doc.setFontSize(11);
   doc.setTextColor(20, 20, 20);
-  doc.text(invoice.companyName, 14, sectionY + 7);
+  doc.text(invoice.company_name, 14, sectionY + 7);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(60, 60, 60);
@@ -151,14 +151,14 @@ export async function generateInvoicePdf(invoice: Invoice) {
 
   doc.setFontSize(11);
   doc.setTextColor(20, 20, 20);
-  doc.text(invoice.userName, pageWidth / 2 + 10, sectionY + 7);
+  doc.text(invoice.user_name, pageWidth / 2 + 10, sectionY + 7);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(60, 60, 60);
-  doc.text(invoice.userEmail, pageWidth / 2 + 10, sectionY + 13);
-  doc.text(invoice.userPhone, pageWidth / 2 + 10, sectionY + 18);
+  doc.text(invoice.user_email, pageWidth / 2 + 10, sectionY + 13);
+  doc.text(invoice.user_phone, pageWidth / 2 + 10, sectionY + 18);
 
-  const customerAddr = invoice.customerBillingAddress || invoice.userState;
+  const customerAddr = invoice.customerBillingAddress || invoice.user_state;
   const splitCustomerAddr = doc.splitTextToSize(customerAddr, 80);
   doc.text(splitCustomerAddr, pageWidth / 2 + 10, sectionY + 23);
 
@@ -172,10 +172,10 @@ export async function generateInvoicePdf(invoice: Invoice) {
     startY: 140,
     head: [['Description', 'HSN/SAC', 'Qty', 'Rate', 'Amount']],
     body: [[
-      `Aavija Utility Tokens (${invoice.tokenAmount} units)`,
+      `Aavija Utility Tokens (${invoice.token_amount} units)`,
       invoice.hsnSacCode,
-      invoice.tokenAmount,
-      (invoice.subtotal / invoice.tokenAmount).toFixed(2),
+      invoice.token_amount,
+      (invoice.subtotal / invoice.token_amount).toFixed(2),
       invoice.subtotal.toFixed(2),
     ]],
     theme: 'grid',
@@ -230,7 +230,7 @@ export async function generateInvoicePdf(invoice: Invoice) {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(16, 185, 129); // Emerald
   doc.text('TOTAL', summaryX, taxesY + 10);
-  doc.text(`${invoice.currency} ${invoice.totalAmount.toFixed(2)}`, pageWidth - 14, taxesY + 10, { align: 'right' });
+  doc.text(`${invoice.currency} ${invoice.total_amount.toFixed(2)}`, pageWidth - 14, taxesY + 10, { align: 'right' });
 
   // --- 7. Footer & Security Watermark ---
   doc.setFontSize(8);

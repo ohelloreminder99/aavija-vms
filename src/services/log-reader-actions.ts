@@ -5,12 +5,12 @@ import { getAdminDb } from '@/lib/supabase/server';
 import { Log } from '@/services/log-service';
 import { LOG_LIST_COLS } from '@/types/database.types';
 
-export type SerializableLog = Omit<Log, 'timestamp' | 'expiresAt'> & { id: string, timestamp: string, expiresAt?: string };
+export type SerializableLog = Omit<Log, 'timestamp' | 'expires_at'> & { id: string, timestamp: string, expiresAt?: string };
 
 /**
  * Fetches logs for a specific actor.
  */
-export async function getLogsForActorAction(actorId: string, role?: string): Promise<{
+export async function getLogsForActorAction(actor_id: string, role?: string): Promise<{
   logs: SerializableLog[] | null;
   error: string | null;
 }> {
@@ -21,7 +21,7 @@ export async function getLogsForActorAction(actorId: string, role?: string): Pro
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
       .select(LOG_LIST_COLS)
-      .eq('actorId', actorId)
+      .eq('actor_id', actorId)
       .order('timestamp', { ascending: false })
       .limit(500);
 
@@ -32,14 +32,14 @@ export async function getLogsForActorAction(actorId: string, role?: string): Pro
 
     // Filtering logic for the dashboard views
     const filteredLogs = logs.filter(log => {
-      const hasChange = log.tokenChange != null && log.tokenChange !== 0;
+      const hasChange = log.token_change != null && log.token_change !== 0;
       if (!hasChange) return false;
 
       if (role === 'visitor') {
-        return !log.premiseId;
+        return !log.premise_id;
       }
       if (role === 'host') {
-        return log.actorRole === 'host';
+        return log.actor_role === 'host';
       }
       return true;
     });
@@ -56,7 +56,7 @@ export async function getLogsForActorAction(actorId: string, role?: string): Pro
 /**
  * Fetches logs associated with a specific premise.
  */
-export async function getLogsForPremiseAction(premiseId: string): Promise<{
+export async function getLogsForPremiseAction(premise_id: string): Promise<{
   logs: SerializableLog[] | null;
   error: string | null;
 }> {
@@ -67,7 +67,7 @@ export async function getLogsForPremiseAction(premiseId: string): Promise<{
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
       .select(LOG_LIST_COLS)
-      .eq('premiseId', premiseId)
+      .eq('premise_id', premiseId)
       .order('timestamp', { ascending: false })
       .limit(500);
 
@@ -76,7 +76,7 @@ export async function getLogsForPremiseAction(premiseId: string): Promise<{
 
     const logs = logsData as SerializableLog[];
 
-    return { logs: logs.filter(l => l.tokenChange != null && l.tokenChange !== 0), error: null };
+    return { logs: logs.filter(l => l.token_change != null && l.token_change !== 0), error: null };
 
   } catch (e: any) {
     Sentry.captureException(e, { extra: { premiseId } });

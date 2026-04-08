@@ -88,7 +88,7 @@ export default function PremiseHistoryDialog({
     setError(null);
     try {
       const result = await getVisitsForPremise({
-        premiseId: premise.id,
+        premise_id: premise.id,
         limit: PAGE_SIZE,
         startAfter: loadMore ? lastVisible : undefined
       });

@@ -55,9 +55,9 @@ describe('owner history actions', () => {
     describe('deductTokensForExport', () => {
         const validPremisePayload = {
             target: { type: 'premise' as const, id: 'premise-1' },
-            actorId: 'owner-1',
-            actorName: 'Owner One',
-            actorRole: 'owner',
+            actor_id: 'owner-1',
+            actor_name: 'Owner One',
+            actor_role: 'owner',
             exportType: 'csv' as const,
         };
 
@@ -70,7 +70,7 @@ describe('owner history actions', () => {
             // 1. fetch targetData (premise)
             // 2. fetch categoryData
             mockBuilder.then = vi.fn()
-                .mockImplementationOnce((cb: any) => cb({ data: { id: 'premise-1', owner_id: 'owner-1', categoryId: 'cat-1', token_balance: 50 }, error: null }))
+                .mockImplementationOnce((cb: any) => cb({ data: { id: 'premise-1', owner_id: 'owner-1', category_id: 'cat-1', token_balance: 50 }, error: null }))
                 .mockImplementationOnce((cb: any) => cb({ data: { csv_export_cost: 5 }, error: null }))
                 .mockImplementation((cb: any) => cb({ data: [], error: null }));
 
@@ -87,7 +87,7 @@ describe('owner history actions', () => {
             });
 
             mockBuilder.then = vi.fn()
-                .mockImplementationOnce((cb: any) => cb({ data: { id: 'premise-1', owner_id: 'owner-1', categoryId: 'cat-1', token_balance: 2 }, error: null }))
+                .mockImplementationOnce((cb: any) => cb({ data: { id: 'premise-1', owner_id: 'owner-1', category_id: 'cat-1', token_balance: 2 }, error: null }))
                 .mockImplementationOnce((cb: any) => cb({ data: { csv_export_cost: 5 }, error: null }));
 
             const result = await deductTokensForExport(validPremisePayload);
@@ -99,9 +99,9 @@ describe('owner history actions', () => {
         it('should deduct tokens from user for personal export', async () => {
             const userPayload = {
                 target: { type: 'user' as const, id: 'user-1' },
-                actorId: 'user-1',
-                actorName: 'User One',
-                actorRole: 'visitor',
+                actor_id: 'user-1',
+                actor_name: 'User One',
+                actor_role: 'visitor',
                 exportType: 'pdf' as const,
             };
 

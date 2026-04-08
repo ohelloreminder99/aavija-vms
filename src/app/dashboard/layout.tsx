@@ -29,7 +29,7 @@ function HeaderContent() {
     const searchParams = useSearchParams();
     const pathname = usePathname();
 
-    const premiseId = searchParams.get('premiseId');
+    const premiseId = searchParams.get('premise_id');
 
     const premiseDocRef = React.useMemo(() => {
         if (!premiseId) return null;

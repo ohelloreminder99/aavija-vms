@@ -41,10 +41,10 @@ export async function GET() {
       adminDb.from('visits').select('*', { count: 'exact', head: true }).eq('status', 'active'),
       adminDb.from('users').select('*', { count: 'exact', head: true }),
       adminDb.from('premises').select('*', { count: 'exact', head: true }),
-      adminDb.from('invoices').select('totalAmount'),
+      adminDb.from('invoices').select('total_amount'),
     ]);
 
-    const totalRevenue = (revenueData || []).reduce((sum: number, inv: any) => sum + (inv.totalAmount || 0), 0);
+    const totalRevenue = (revenueData || []).reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0);
 
     // --- VISITS OVER TIME (last 30 days) ---
     const { data: visitsByDay } = await adminDb
@@ -72,10 +72,10 @@ export async function GET() {
       if (!day) return;
       if (!revenueDayMap[day]) revenueDayMap[day] = { owner: 0, visitor: 0 };
       // visitor invoices have no premiseId
-      if (inv.premiseId) {
-        revenueDayMap[day].owner += inv.totalAmount || 0;
+      if (inv.premise_id) {
+        revenueDayMap[day].owner += inv.total_amount || 0;
       } else {
-        revenueDayMap[day].visitor += inv.totalAmount || 0;
+        revenueDayMap[day].visitor += inv.total_amount || 0;
       }
     });
 

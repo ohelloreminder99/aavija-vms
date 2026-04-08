@@ -7,7 +7,7 @@ import { getRegionConfig } from '@/lib/multi-tenant';
 // Helper: apply referral code server-side using admin client (no session needed)
 async function maybeApplyReferral(
     adminClient: any,
-    userId: string,
+    user_id: string,
     refCode: string
 ): Promise<void> {
     try {
@@ -117,9 +117,9 @@ export async function GET(request: Request) {
                         photo_url: photoUrl,
                     });
                     await adminSupabase.from('logs').insert({
-                        actorId: user.id,
-                        actorName: name,
-                        actorRole: 'admin',
+                        actor_id: user.id,
+                        actor_name: name,
+                        actor_role: 'admin',
                         action: LogAction.USER_SIGNUP,
                         description: `New admin user "${name}" (${email}) signed up via Google.`
                     });
@@ -142,21 +142,21 @@ export async function GET(request: Request) {
                     });
 
                     await adminSupabase.from('logs').insert({
-                        actorId: user.id,
-                        actorName: name,
-                        actorRole: 'visitor',
+                        actor_id: user.id,
+                        actor_name: name,
+                        actor_role: 'visitor',
                         action: LogAction.USER_SIGNUP,
                         description: `New user "${name}" (${email}) signed up via Google as a visitor.`
                     });
 
                     if (startingTokens > 0) {
                         await adminSupabase.from('logs').insert({
-                            actorId: user.id,
-                            actorName: name,
-                            actorRole: 'visitor',
+                            actor_id: user.id,
+                            actor_name: name,
+                            actor_role: 'visitor',
                             action: LogAction.INITIAL_TOKEN_ALLOCATION,
                             description: `Welcome Bonus: Received ${startingTokens} tokens on Google signup.`,
-                            tokenChange: startingTokens,
+                            token_change: startingTokens,
                         });
                     }
 
@@ -179,9 +179,9 @@ export async function GET(request: Request) {
             } else {
                 // Just a regular login
                 await adminSupabase.from('logs').insert({
-                    actorId: user.id,
-                    actorName: userProfile.name || 'Google User',
-                    actorRole: userProfile.role || 'visitor',
+                    actor_id: user.id,
+                    actor_name: userProfile.name || 'Google User',
+                    actor_role: userProfile.role || 'visitor',
                     action: LogAction.USER_LOGIN,
                     description: `User logged in via Google.`
                 });

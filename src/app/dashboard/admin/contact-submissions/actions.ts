@@ -3,7 +3,7 @@
 import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { ContactSubmission } from '@/services/contact-service';
 
-export type SerializableContactSubmission = Omit<ContactSubmission, 'createdAt'> & { id: string; createdAt: string };
+export type SerializableContactSubmission = Omit<ContactSubmission, 'created_at'> & { id: string; createdAt: string };
 
 export async function getContactSubmissions(): Promise<{ submissions?: SerializableContactSubmission[]; error?: string }> {
   const adminDb = await getAdminDb();
@@ -17,7 +17,7 @@ export async function getContactSubmissions(): Promise<{ submissions?: Serializa
     const { data: submissions, error } = await adminDb
       .from('contact_submissions')
       .select('*')
-      .order('createdAt', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     if (!submissions || submissions.length === 0) {
