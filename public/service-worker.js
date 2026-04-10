@@ -1,84 +1,78 @@
-// A unique name for our cache
-const CACHE_NAME = 'aavija-pwa-cache-v1';
+const CACHE_NAME = 'aavija-v1';
 
-// The list of files we want to cache
-const urlsToCache = [
+// Assets to eagerly cache on install
+const PRECACHE_URLS = [
   '/',
-  '/dashboard',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/apple-icon.png',
-  // You can add more critical assets here like your logo or key CSS files
 ];
 
-// Install event: opens the cache and adds our core files to it.
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
   );
 });
 
-// Activate event: cleans up old caches.
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-
-// Fetch event: This is crucial for PWA installability and offline support.
-// It implements a "cache-first, then network" strategy.
+// Network-First strategy with Fallback to Cache
 self.addEventListener('fetch', (event) => {
-  // We only want to cache GET requests.
-  if (event.request.method !== 'GET') {
-    return;
-  }
-  
-  // For navigation requests (e.g., loading a page), always try the network first
-  // to get the freshest content, but fall back to the cache if offline.
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match('/'))
-    );
-    return;
-  }
-  
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request)
-        .then((response) => {
-          // If we have a match in the cache, return it.
-          if (response) {
-            return response;
-          }
+  const url = new URL(event.request.url);
 
-          // Otherwise, fetch from the network.
-          return fetch(event.request).then((networkResponse) => {
-            // OPTIONAL: If you want to cache dynamically fetched assets (like images or API calls),
-            // you can clone the response and put it in the cache here.
-            // Be careful with this, especially for frequently changing data.
-            // For example, to cache images:
-            // if (event.request.destination === 'image') {
-            //   cache.put(event.request, networkResponse.clone());
-            // }
-            
-            return networkResponse;
+  // Skip non-GET requests, API calls, and Supabase traffic
+  if (
+    event.request.method !== 'GET' ||
+    !url.href.startsWith(self.location.origin) ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.includes('supabase')
+  ) {
+    return;
+  }
+
+  // Strategy: Network-First
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        // If we get a valid response, clone it into the cache for next time
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
           });
+        }
+        return networkResponse;
+      })
+      .catch(async () => {
+        // Fallback to cache if network is down
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        // For navigation requests, always return root if offline
+        if (event.request.mode === 'navigate') {
+          return caches.match('/');
+        }
+
+        return new Response('Offline - Network error', {
+          status: 408,
+          headers: { 'Content-Type': 'text/plain' },
         });
-    })
+      })
   );
 });

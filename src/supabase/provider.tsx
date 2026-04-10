@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -87,20 +87,10 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
     };
   }, [supabase]);
 
-  // Effect to register the PWA service worker (kept from original)
+  // Service worker registration is handled in src/components/ServiceWorkerRegistration.tsx
+  // to avoid duplication and keep this provider focused on authentication.
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/service-worker.js')
-          .then(registration => {
-            console.log('PWA Service Worker registered with scope:', registration.scope);
-          })
-          .catch(err => {
-            console.log('PWA Service Worker registration failed:', err);
-          });
-      });
-    }
+    // Registration removed from here
   }, []);
 
   const contextValue = useMemo((): SupabaseContextState => {

@@ -39,7 +39,30 @@ If deploying Google Auth, you must create new Google Cloud Credentials linked ex
 
 ---
 
-## Step 3: Frontend Deployment (Vercel)
+## Step 3: Anti-Ban Reverse Proxy (Cloudflare Worker)
+
+To ensure the app survives potential ISP bans on the `supabase.co` domain globally, we must **hide** Supabase behind Cloudflare.
+
+1. In Cloudflare, go to **Workers & Pages** -> **Create Application** -> **Create Worker**.
+2. Name it `supabase-proxy-[country_code]` (e.g., `supabase-proxy-uae`) and Deploy.
+3. Click **Edit Code** and paste the following:
+   ```javascript
+   export default {
+     async fetch(request, env) {
+       const url = new URL(request.url);
+       // Mask the request to the real Supabase backend
+       url.hostname = 'YOUR_SUPABASE_PROJECT_REF_ID.supabase.co';
+       return fetch(new Request(url, request));
+     }
+   }
+   ```
+4. Replace `YOUR_SUPABASE_PROJECT_REF_ID` with the ID from Step 1.
+5. Click **Deploy**.
+6. Copy the Worker's `*.workers.dev` URL or attach a Custom Domain to it (e.g., `api.uae.aavija.com`). You will use this in the next step.
+
+---
+
+## Step 4: Frontend Deployment (Vercel)
 
 1. Go to [Vercel](https://vercel.com) and create a New Project from the Aavija source repository.
 2. **Framework Preset**: Next.js.
@@ -47,7 +70,7 @@ If deploying Google Auth, you must create new Google Cloud Credentials linked ex
 
 | Variable Key | Source | Note |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase (Settings->API) | |
+| `NEXT_PUBLIC_SUPABASE_URL` | Cloudflare Proxy | **CRITICAL**: Use the Worker URL from Step 3, *NOT* the raw Supabase URL! |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase (Settings->API) | |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase (Settings->API) | 🛑 Server-side ONLY. |
 | `NEXT_PUBLIC_APP_URL` | Self (e.g., `https://uae.aavija.com`) | Used for hardcoded redirects |
@@ -56,13 +79,13 @@ If deploying Google Auth, you must create new Google Cloud Credentials linked ex
 | `WHATSAPP_SENDER_PHONE` | Third Party | |
 | `RAZORPAY_KEY_ID` | Payment Provider | Or region equivalent |
 | `RAZORPAY_KEY_SECRET` | Payment Provider | Or region equivalent |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry Dashboard | Get from Step 5 |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry Dashboard | Get from Step 6 |
 
 4. Click **Deploy**.
 
 ---
 
-## Step 4: Routing & Security (Cloudflare)
+## Step 5: Routing & Security (Cloudflare)
 
 To link your Vercel deployment cleanly to the country’s subdomain with maximum DDoS protection.
 
@@ -77,7 +100,7 @@ To link your Vercel deployment cleanly to the country’s subdomain with maximum
 
 ---
 
-## Step 5: Application Telemetry (Sentry)
+## Step 6: Application Telemetry (Sentry)
 
 To ensure we capture UI crashes and slow server-actions natively:
 
@@ -85,13 +108,13 @@ To ensure we capture UI crashes and slow server-actions natively:
 2. Create a **New Project** → Platform **Next.js**.
 3. Name it `aavija-web-[country_code]`.
 4. Copy the unique **DSN Key**.
-5. Add this as `NEXT_PUBLIC_SENTRY_DSN` inside the Vercel project environment variables (from Step 3) and trigger a redeployment in Vercel to burn in the new DSN.
+5. Add this as `NEXT_PUBLIC_SENTRY_DSN` inside the Vercel project environment variables (from Step 4) and trigger a redeployment in Vercel to burn in the new DSN.
 
 ---
 
-## Step 6: Post-Launch Groundwork
+## Step 7: Post-Launch Groundwork
 
-Once the domain resolves successfully in the browser (Step 4), perform the final operational setup.
+Once the domain resolves successfully in the browser (Step 5), perform the final operational setup.
 
 ### A. Create The Prime Admin
 1. Register normally through the `/signup` screen using your admin email.
