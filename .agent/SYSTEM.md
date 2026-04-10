@@ -4,9 +4,12 @@
 **Aavija Visitor Management System (VMS)** is a world-class, multi-tenant platform. It is designed to be deployed globally, starting with India and expanding to regions like Dubai (UAE).
 
 ## 🧠 Agent Operational Protocol (CRITICAL)
-1. **GPS Rule**: ALWAYS consult `.agent/MAP.md` before suggesting code. If you move/create files, update the Map IMMEDIATELY.
-2. **Token Efficiency**: Do not scan the whole tree. Target specific files in `src/services/` or `src/app/` based on the Map.
-3. **Honesty Policy**: If a task is complex, break it into small, verifiable steps for the user.
+1. **MASTER SCHEMA SYNC (CRITICAL): Whenever a new file is created to run on the Supabase SQL editor, those changes MUST ALSO be reflected and updated inside `supabase/CONSOLIDATED_FINAL_SETUP.sql`. This ensures that setting up a new database for a new country can always be done flawlessly without repeating historical migration phases.**
+2. **NEW COUNTRY SYNCHRONIZATION RULE (CRITICAL): The file `docs/AAVIJA_NEW_COUNTRY_MASTER_PROTOCOL.md` is the absolute Source of Truth for launching the product in a new region. If you add a new environment variable, a new feature that requires third-party API keys (e.g., Razorpay, WhatsApp, Sentry, Google OAuth), or modify infrastructure configurations (Vercel, Cloudflare, Supabase), you MUST update this Protocol document so future countries launch flawlessly. This is a non-negotiable rule.**
+3. **SOFT-CODING PRINCIPLE (CRITICAL)**: NEVER hardcode magic numbers for business logic, timings, or thresholds (e.g., `const timeout = 60000`). All tunable parameters MUST be created as configurable columns in the `public.settings` table so the Site Admin can adjust them dynamically from the Dashboard without touching source code.
+4. **GPS Rule**: ALWAYS consult `.agent/MAP.md` before suggesting code. **CRITICAL:** If you create, move, or delete ANY file in this project, you MUST immediately update `.agent/MAP.md` and `.agent/SYSTEM.md` to reflect the new state. This is a non-negotiable rule.
+5. **TOKEN EFFICIENCY (CRITICAL)**: NEVER read massive binary files, package locks (`package-lock.json`), or massive auto-generated folders (`.next/`, `node_modules/`). Always respect `.cursorignore` and `.agentignore` lists. If you encounter a monolithic "Mega-Page" (>30KB), you MUST break down complex Modals, Tables, and Forms into isolated subcomponents to strictly preserve AI context limits.
+6. **Honesty Policy**: If a task is complex, break it into small, verifiable steps for the user.
 
 ## 📁 Folder Conventions
 | What | Where | Notes |
@@ -18,7 +21,6 @@
 | Utility scripts (production) | `scripts/` | DB health check, SQL rebuild |
 | Debug / one-off test scripts | `scripts/debug/` | Schema inspectors, test helpers — NOT at root |
 | Database migrations (live) | `supabase/migrations/` | Managed by Supabase CLI |
-| Legacy SQL files (reference) | `database_sql_backups/` | Referenced by `scripts/rebuild-master-sql.js` — stays at root |
 | Static assets | `public/` | Icons, manifest, service-worker, sample CSVs |
 | Agent config & docs | `.agent/` | MAP.md and this file |
 
@@ -39,5 +41,5 @@
 ## 🧹 Codebase Hygiene
 - **No root clutter**: All scripts go in `scripts/` or `scripts/debug/`. All docs go in `docs/`.
 - Maintain the `src/lib/` folder for shared utilities (Supabase clients, encryption, etc.).
-- After any file move/creation, update `.agent/MAP.md` to keep it accurate.
-- The `database_sql_backups/` folder is kept at root because `scripts/rebuild-master-sql.js` uses a hardcoded relative path.
+- **Documentation Sync**: After any file relocation, creation, or deletion, you MUST update `.agent/MAP.md` and `.agent/SYSTEM.md`.
+- Active master schema lives directly at `supabase/CONSOLIDATED_FINAL_SETUP.sql`.

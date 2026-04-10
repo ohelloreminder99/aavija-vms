@@ -42,6 +42,8 @@ export interface Settings {
   phone_number_length?: number;
   allow_unverified_checkin?: boolean;
   otp_request_limit_hourly?: number;
+  otp_validity_duration_seconds?: number;
+  otp_spam_cooldown_minutes?: number;
   qr_code_expiry_seconds?: number;
   rate_limit_max_requests?: number;
   rate_limit_window_ms?: number;

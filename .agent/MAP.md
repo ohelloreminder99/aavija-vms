@@ -13,7 +13,6 @@ Aavija-main/
 ├── .github/workflows/   # CI/CD workflows
 ├── .idx/                # Project IDX (cloud IDE) config
 ├── .vscode/             # VS Code workspace settings
-├── database_sql_backups/# Deprecated/Empty directory (cleared after master SQL generation)
 ├── docs/                # 📚 All project documentation (see breakdown below)
 ├── public/              # Static assets — icons, manifest, service-worker, sample CSVs
 ├── scripts/             # Utility & debug scripts (see breakdown below)
@@ -29,12 +28,11 @@ Aavija-main/
 
 ```
 docs/
+├── AAVIJA_NEW_COUNTRY_MASTER_PROTOCOL.md # Master blueprint for deploying a new country (Vercel, Cloudflare, Sentry, Auth)
 ├── AAVIJA_SYSTEM_BLUEPRINT_MASTER.md  # Full system architecture overview
 ├── AUTH_SETUP_GUIDE.md                # Authentication setup guide
 ├── DATABASE_MASTER_REFERENCE.md       # Database schema documentation
 ├── DEVELOPER_NOTES.md                 # Developer notes & conventions
-├── NEW_COUNTRY_LAUNCH_GUIDE.md        # Multi-country deployment guide
-├── NEW_COUNTRY_SETUP.md               # Country-specific setup instructions
 ├── OPERATIONS_MANUAL.md               # Operations & maintenance manual
 ├── blueprint.md                       # Architecture blueprint
 ├── backend.json                       # Backend schema reference (JSON)
@@ -214,8 +212,7 @@ src/supabase/
 ├── error-emitter.ts      # Error event emitter
 ├── index.ts              # Re-exports
 ├── non-blocking-login.tsx # Non-blocking auth login
-├── provider.tsx          # Server-side auth provider
-└── firestore/            # (Legacy/adapter)
+└── provider.tsx          # Server-side auth provider
 ```
 
 ### Other `src/` Directories

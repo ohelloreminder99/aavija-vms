@@ -1,0 +1,16 @@
+# Prevent AI file-scanners from consuming tokens on massive compiled files
+.next
+node_modules
+package-lock.json
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.svg
+public/
+
+# Legacy and DB Backups
+database_sql_backups/
+docs/backend.json

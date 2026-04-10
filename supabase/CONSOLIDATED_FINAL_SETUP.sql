@@ -404,6 +404,8 @@ CREATE TABLE IF NOT EXISTS public.settings (
   whatsapp_rate_limit            INTEGER DEFAULT 500,
   emergency_access_timeout_mins  INTEGER DEFAULT 30,
   otp_request_limit_hourly       NUMERIC DEFAULT 5,
+  otp_validity_duration_seconds  INTEGER DEFAULT 300,
+  otp_spam_cooldown_minutes      INTEGER DEFAULT 60,
   -- Maintenance
   is_maintenance_mode            BOOLEAN DEFAULT FALSE,
   maintenance_message            TEXT DEFAULT 'System is undergoing maintenance. Please try again later.',
@@ -941,6 +943,10 @@ CREATE POLICY "roles_admin_select" ON public.roles_admin FOR SELECT USING (true)
 CREATE POLICY "roles_admin_insert" ON public.roles_admin FOR INSERT WITH CHECK (true);
 
 -- Storage policies
+DROP POLICY IF EXISTS "Allow public avatars read" ON storage.objects;
+DROP POLICY IF EXISTS "Allow public snapshots read" ON storage.objects;
+DROP POLICY IF EXISTS "Allow public premises read" ON storage.objects;
+
 CREATE POLICY "Allow public avatars read" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
 CREATE POLICY "Allow public snapshots read" ON storage.objects FOR SELECT USING (bucket_id = 'visitor-snapshots');
 CREATE POLICY "Allow public premises read" ON storage.objects FOR SELECT USING (bucket_id = 'premises');

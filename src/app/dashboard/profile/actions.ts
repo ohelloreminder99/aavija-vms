@@ -47,19 +47,20 @@ export async function sendWhatsAppOtp(payload: {
     }
 
     const { data: settingsDoc } = await adminDb.from('settings')
-      .select('otp_request_limit_hourly, mobile_verification_cost')
+      .select('otp_request_limit_hourly, mobile_verification_cost, otp_validity_duration_seconds, otp_spam_cooldown_minutes')
       .eq('id', 'global').single();
 
     const otpRequestLimit = settingsDoc?.otp_request_limit_hourly || 3;
+    const cooldownMinutes = settingsDoc?.otp_spam_cooldown_minutes || 60;
 
-    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+    const cooldownThreshold = Date.now() - cooldownMinutes * 60 * 1000;
 
     const actionTimestamps = userDoc.action_timestamps || {};
     const requestTimestamps = actionTimestamps.whatsapp_otp_requests || [];
-    const recentRequests = requestTimestamps.filter((ts: string) => new Date(ts).getTime() > oneHourAgo);
+    const recentRequests = requestTimestamps.filter((ts: string) => new Date(ts).getTime() > cooldownThreshold);
 
     if (recentRequests.length >= otpRequestLimit) {
-      throw new Error("You have requested too many OTPs. Please try again in an hour.");
+      throw new Error(`You have requested too many OTPs. Please try again in ${cooldownMinutes} minutes.`);
     }
 
     // 2.5 Ensure the phone number is not already verified by another user
@@ -77,7 +78,8 @@ export async function sendWhatsAppOtp(payload: {
 
     // 3. OTP Generation and Sending
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+    const durationSeconds = settingsDoc?.otp_validity_duration_seconds || 300;
+    const expiresAt = new Date(Date.now() + durationSeconds * 1000).toISOString();
 
     const { data: existingOtp } = await adminDb.from('whatsapp_otps').select('id').eq('id', userId).maybeSingle();
 
