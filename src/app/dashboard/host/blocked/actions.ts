@@ -5,12 +5,12 @@ import type { HostBlock } from '@/services/user-service';
 
 export type SerializableHostBlock = Omit<HostBlock, 'blockedAt'> & { id: string; blockedAt: string };
 
-export async function getBlockedVisitorsForHost(host_id: string, premiseId?: string): Promise<{
+export async function getBlockedVisitorsForHost(host_id: string, premise_id?: string): Promise<{
     success: boolean;
     blocks?: SerializableHostBlock[];
     error?: string;
 }> {
-    if (!hostId) {
+    if (!host_id) {
         return { success: false, error: 'Host ID is required.' };
     }
 
@@ -22,8 +22,8 @@ export async function getBlockedVisitorsForHost(host_id: string, premiseId?: str
     try {
         const { data: blocksSnapshot, error } = await adminDb
             .rpc('get_host_blocked_list', {
-                p_host_id: hostId,
-                p_premise_id: premiseId
+                p_host_id: host_id,
+                p_premise_id: premise_id
             });
 
         if (error) throw error;

@@ -21,7 +21,7 @@ interface RatingData {
 }
 
 export async function submitRatingAndRecalculate(data: RatingData): Promise<{ success: boolean; error?: string }> {
-  const { visitId, visitorId, hostId, premiseId, rating, actor } = data;
+  const { visit_id: visitId, visitor_id: visitorId, host_id: hostId, premise_id: premiseId, rating, actor } = data;
 
   if (rating < 1 || rating > 5) {
     return { success: false, error: 'Rating must be between 1 and 5.' };
@@ -76,12 +76,12 @@ export async function submitRatingAndRecalculate(data: RatingData): Promise<{ su
 
     // 5. Create new rating document
     const { error: insertError } = await adminDb.from('ratings').insert({
-      visitId,
-      visitorId,
-      hostId,
-      premiseId,
+      visit_id: visitId,
+      visitor_id: visitorId,
+      host_id: hostId,
+      premise_id: premiseId,
       rating,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     });
     if (insertError) throw insertError;
 
@@ -145,7 +145,7 @@ interface GetHostVisitsPayload {
 export async function getVisitsForHostInPremise(
   payload: GetHostVisitsPayload
 ): Promise<{ success: boolean; visits?: SerializableVisit[]; lastVisible?: string, error?: string }> {
-  const { hostId, premiseId, limit, startAfter, startDate } = payload;
+  const { host_id: hostId, premise_id: premiseId, limit, startAfter, startDate } = payload;
 
   if (!hostId || !premiseId) {
     return { success: false, error: 'Host ID and Premise ID are required.' };
@@ -217,7 +217,7 @@ export async function getVisitsForHostInPremise(
 }
 
 export async function setHostAvailability(payload: { host_id: string; premise_id: string; availability: string }): Promise<{ success: boolean; error?: string }> {
-  const { hostId, premiseId, availability } = payload;
+  const { host_id: hostId, premise_id: premiseId, availability } = payload;
 
   const adminDb = await getAdminDb();
   if (!adminDb) {
@@ -263,7 +263,7 @@ export async function setHostAvailability(payload: { host_id: string; premise_id
 }
 
 export async function verifyVisitByHost(payload: { visit_id: string; premise_id: string; host_id: string }): Promise<{ success: boolean; error?: string }> {
-  const { visitId, premiseId, hostId } = payload;
+  const { visit_id: visitId, premise_id: premiseId, host_id: hostId } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Server database connection failed.' };
 
@@ -291,7 +291,7 @@ export async function verifyVisitByHost(payload: { visit_id: string; premise_id:
       actor_role: 'host',
       action: LogAction.VISIT_VERIFIED_BY_HOST,
       description: `Verified meeting with visitor for visit ${visitId}.`,
-      context: { premiseId, visitId }
+      context: { premise_id: premiseId, visit_id: visitId }
     });
 
     revalidatePath('/dashboard/host/active-visits');

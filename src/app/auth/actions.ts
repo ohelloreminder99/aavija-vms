@@ -54,7 +54,7 @@ export async function handleSignupProfile(
   refCode?: string | null
 ): Promise<{ success: boolean; error?: string; welcomeTokens?: number }> {
   // 1. Server-side validation
-  const validated = SignupSchema.safeParse({ userId, email, name, refCode });
+  const validated = SignupSchema.safeParse({ user_id, email, name, refCode });
   if (!validated.success) {
     return { success: false, error: 'Invalid input: ' + validated.error.errors.map(e => e.message).join(', ') };
   }
@@ -75,7 +75,7 @@ export async function handleSignupProfile(
     }
 
     const { error: insertError } = await adminDb.from('users').insert({
-      id: userId,
+      id: user_id,
       name: name || (isAdmin ? 'Admin' : 'Unnamed User'),
       email: email,
       role: role,
@@ -89,7 +89,7 @@ export async function handleSignupProfile(
 
     // Log the signup
     await adminDb.from('logs').insert({
-      actor_id: userId,
+      actor_id: user_id,
       actor_name: name || (isAdmin ? 'Admin' : 'Unnamed User'),
       actor_role: role,
       action: LogAction.USER_SIGNUP,
@@ -98,7 +98,7 @@ export async function handleSignupProfile(
 
     if (startingTokens > 0) {
       await adminDb.from('logs').insert({
-        actor_id: userId,
+        actor_id: user_id,
         actor_name: name || 'User',
         actor_role: role,
         action: LogAction.INITIAL_TOKEN_ALLOCATION,
@@ -111,12 +111,12 @@ export async function handleSignupProfile(
     // Apply referral code if present
     if (refCode && role === 'visitor') {
       try {
-        const refResult = await applyReferralCode(refCode, userId);
+        const refResult = await applyReferralCode(refCode, user_id);
         if (refResult.success && refResult.welcomeTokens) {
           welcomeTokens = refResult.welcomeTokens;
           // Log the referral welcome token credit
           await adminDb.from('logs').insert({
-            actor_id: userId,
+            actor_id: user_id,
             actor_name: name || 'User',
             actor_role: 'visitor',
             action: LogAction.REFERRAL_WELCOME_TOKENS,
@@ -135,7 +135,7 @@ export async function handleSignupProfile(
       // we might need a variant of ensureReferralCode that takes userId.
       // For now, let's just use the RPC directly in adminDb.
       await adminDb.rpc('rpc_generate_referral_code', {
-          p_user_id: userId,
+          p_user_id: user_id,
           p_length: 8,
       });
     } catch (codeErr) {

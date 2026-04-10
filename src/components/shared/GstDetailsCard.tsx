@@ -69,10 +69,10 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
   const form = useForm<GstFormValues>({
     resolver: zodResolver(gstSchema),
     defaultValues: {
-      legal_name: initialData?.legal_name || '',
-      gst_number: initialData?.gst_number || '',
-      billing_address: initialData?.billing_address || '',
-      billing_state: initialData?.billing_state || '',
+      legal_name: initialData?.legalName || '',
+      gst_number: initialData?.gstNumber || '',
+      billing_address: initialData?.billingAddress || '',
+      billing_state: initialData?.billingState || '',
     },
   });
 
@@ -80,10 +80,10 @@ export function GstDetailsCard({ target, initialData, onSuccess }: GstDetailsCar
   React.useEffect(() => {
     if (initialData) {
       form.reset({
-        legal_name: initialData.legal_name || '',
-        gst_number: initialData.gst_number || '',
-        billing_address: initialData.billing_address || '',
-        billing_state: initialData.billing_state || '',
+        legal_name: initialData.legalName || '',
+        gst_number: initialData.gstNumber || '',
+        billing_address: initialData.billingAddress || '',
+        billing_state: initialData.billingState || '',
       });
     }
   }, [initialData, form]);

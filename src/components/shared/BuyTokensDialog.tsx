@@ -131,7 +131,10 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
   const isGstMissing = React.useMemo(() => {
     const target = role === 'owner' ? premise : userProfile;
     if (!target) return false;
-    return !target.legal_name || !target.billing_address || !target.billing_state;
+    const legalName = role === 'owner' ? (target as any).legalName : (target as any).legal_name;
+    const billingAddress = role === 'owner' ? (target as any).billingAddress : (target as any).billing_address;
+    const billingState = role === 'owner' ? (target as any).billingState : (target as any).billing_state;
+    return !legalName || !billingAddress || !billingState;
   }, [role, premise, userProfile]);
 
   const handlePayment = async (data: BuyTokensFormValues) => {
@@ -158,7 +161,7 @@ export default function BuyTokensDialog({ open, onOpenChange, role, premiseId }:
         token_amount: data.quantity,
         user_id: user.id,
         roleToCredit: role,
-        premise_id: premiseId || null,
+        premiseId: premiseId || null,
         appCheckToken: '',
       });
 

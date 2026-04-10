@@ -13,25 +13,25 @@ import { Premise } from '@/services/premise-service';
 
 interface AnnouncementsCardProps {
   role?: UserRole;
-  premiseId?: string;
+  premise_id?: string;
 }
 
-const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps) => {
+const AnnouncementsCardComponent = ({ role, premise_id }: AnnouncementsCardProps) => {
   const { user } = useUser();
   const { data: userProfile } = useUserProfile(user?.id);
 
   // If we are in a premise context (Owner/Host/Gatekeeper), load the premise to get its city/state
   const premiseDocRef = React.useMemo(() => {
-    if (!premiseId) return null;
-    return { table: 'premises', id: premiseId, __memo: true };
-  }, [premiseId]);
+    if (!premise_id) return null;
+    return { table: 'premises', id: premise_id, __memo: true };
+  }, [premise_id]);
 
   const { data: premise, isLoading: isPremiseLoading } = useDoc<Premise>(premiseDocRef);
 
   // Filter based on the current dashboard context
   const actingCity = premise?.city;
   const actingState = premise?.city_state;
-  const actingCityId = premise?.city_id;
+  const actingCityId = premise?.cityId;
 
   const { data: announcements, isLoading, error } = useAnnouncementsForUser(
     userProfile,
@@ -41,7 +41,7 @@ const AnnouncementsCardComponent = ({ role, premiseId }: AnnouncementsCardProps)
     actingState
   );
 
-  const isActuallyLoading = isLoading || (!!premiseId && isPremiseLoading);
+  const isActuallyLoading = isLoading || (!!premise_id && isPremiseLoading);
 
   return (
     <Card className="lg:col-span-5 glass-card border-white/5 overflow-hidden group relative">

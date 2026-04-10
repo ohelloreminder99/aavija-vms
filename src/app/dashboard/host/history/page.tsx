@@ -132,7 +132,7 @@ export default function HostHistoryPage() {
         const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
         const result = await getVisitsForHostInPremise({
           host_id: user.id,
-          premiseId,
+          premise_id: premiseId!,
           limit: PAGE_SIZE,
           startDate: startDateString
         });
@@ -163,7 +163,7 @@ export default function HostHistoryPage() {
       const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
       const result = await getVisitsForHostInPremise({
         host_id: user.id,
-        premiseId,
+        premise_id: premiseId!,
         limit: PAGE_SIZE,
         startAfter: lastVisible,
         startDate: startDateString,
@@ -232,7 +232,7 @@ export default function HostHistoryPage() {
       actor_name: hostProfile.name,
       actor_role: 'host',
       exportType: exportType,
-      premiseIdForLog: premiseId,
+      premise_id: premiseId,
     });
 
     if (result.success) {

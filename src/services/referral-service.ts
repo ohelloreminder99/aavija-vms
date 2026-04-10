@@ -95,10 +95,10 @@ export async function applyReferralCode(
         if (overrideUserId) {
             // Called from signup flow — user.id is known from the client-side
             // authData but server-side cookie hasn't propagated yet.
-            userId = overrideUserId;
+            user_id = overrideUserId;
         } else {
             const { user } = await requireAuth();
-            userId = user.id;
+            user_id = user.id;
         }
 
         const adminDb = await getAdminDb();
@@ -120,7 +120,7 @@ export async function applyReferralCode(
         const welcomeTokens = settings.referral_reward_tokens || 0;
 
         const { data, error } = await adminDb.rpc('rpc_apply_referral_code', {
-            p_referee_id: userId,
+            p_referee_id: user_id,
             p_referral_code: referralCode,
             p_welcome_tokens: welcomeTokens,
         });

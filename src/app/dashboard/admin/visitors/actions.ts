@@ -25,7 +25,7 @@ type SerializableVisit = {
 export async function getVisitsForVisitor(
   visitor_id: string
 ): Promise<{ success: boolean; visits?: SerializableVisit[]; error?: string }> {
-  if (!visitorId) {
+  if (!visitor_id) {
     return { success: false, error: 'Visitor ID is required.' };
   }
 
@@ -40,7 +40,7 @@ export async function getVisitsForVisitor(
     const { data: visitsSnapshot, error } = await adminDb
       .from('visits')
       .select('*')
-      .eq('visitor_id', visitorId)
+      .eq('visitor_id', visitor_id)
       .order('checkin_time', { ascending: false });
 
     if (error) throw error;

@@ -141,7 +141,7 @@ export default function AgentLedgerPage() {
     }
     setIsSubmitting(true);
     const result = await recordAgentPayout({
-      agentId,
+      agent_id: agentId,
       amount: data.amount,
       description: data.description,
       actor: { id: adminProfile.id, name: adminProfile.name }

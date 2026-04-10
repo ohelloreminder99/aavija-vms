@@ -30,7 +30,7 @@ export async function getAgentLedgerAction(agent_id: string): Promise<{
   ledger?: AgentLedgerEntry[];
   error?: string;
 }> {
-  if (!agentId) return { success: false, error: 'Agent ID is required.' };
+  if (!agent_id) return { success: false, error: 'Agent ID is required.' };
 
   const adminDb = await getAdminDb();
   if (!adminDb) {
@@ -41,7 +41,7 @@ export async function getAgentLedgerAction(agent_id: string): Promise<{
     const { data: snapshot, error } = await adminDb
       .from('agent_ledger')
       .select('*')
-      .eq('agent_id', agentId)
+      .eq('agent_id', agent_id)
       .order('timestamp', { ascending: false })
       .limit(1000);
 

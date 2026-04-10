@@ -77,10 +77,10 @@ async function getLogExpiry(adminDb: NonNullable<Awaited<ReturnType<typeof getAd
   let expires_at: string | null = null;
   const ttlDays = settings.log_ttl_days;
   if (ttlDays && Number.isInteger(ttlDays) && ttlDays > 0) {
-    expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000).toISOString();
+    expires_at = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000).toISOString();
   }
 
-  return { settings, expiresAt };
+  return { settings, expires_at };
 }
 
 
@@ -89,13 +89,13 @@ async function getLogExpiry(adminDb: NonNullable<Awaited<ReturnType<typeof getAd
 export async function blockVisitorFromPremise(
   payload: PremiseBlockPayload
 ): Promise<{ success: boolean; error?: string }> {
-  const { premiseId, visitorId, actorId, actorName, actorRole, visitorName, visitorPhotoUrl } = payload;
+  const { premise_id: premiseId, visitor_id: visitorId, actor_id: actorId, actor_name: actorName, actor_role: actorRole, visitorName, visitorPhotoUrl } = payload;
 
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
-    const { settings, expiresAt } = await getLogExpiry(adminDb);
+    const { settings, expires_at } = await getLogExpiry(adminDb);
     const blockCost = settings.block_visitor_cost ?? 0;
 
     const { data, error } = await adminDb.rpc('rpc_block_visitor_premise', {
@@ -107,7 +107,7 @@ export async function blockVisitorFromPremise(
       p_actor_role: actorRole,
       p_visitor_name: visitorName,
       p_visitor_photo: visitorPhotoUrl,
-      p_expires_at: expiresAt,
+      p_expires_at: expires_at,
     });
 
     if (error) throw error;
@@ -126,13 +126,13 @@ export async function blockVisitorFromPremise(
 export async function unblockVisitorFromPremise(
   payload: Omit<PremiseBlockPayload, 'visitorName' | 'visitorPhotoUrl'>
 ): Promise<{ success: boolean; error?: string }> {
-  const { premiseId, visitorId, actorId, actorName, actorRole } = payload;
+  const { premise_id: premiseId, visitor_id: visitorId, actor_id: actorId, actor_name: actorName, actor_role: actorRole } = payload;
 
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
-    const { settings, expiresAt } = await getLogExpiry(adminDb);
+    const { settings, expires_at } = await getLogExpiry(adminDb);
     const unblockCost = settings.unblock_visitor_cost ?? 0;
 
     const { data, error } = await adminDb.rpc('rpc_unblock_visitor_premise', {
@@ -142,7 +142,7 @@ export async function unblockVisitorFromPremise(
       p_actor_id: actorId,
       p_actor_name: actorName,
       p_actor_role: actorRole,
-      p_expires_at: expiresAt,
+      p_expires_at: expires_at,
     });
 
     if (error) throw error;
@@ -160,13 +160,13 @@ export async function unblockVisitorFromPremise(
 export async function blockVisitorFromHost(
   payload: HostBlockPayload
 ): Promise<{ success: boolean; error?: string }> {
-  const { hostId, visitorId, actorId, actorName, actorRole, visitorName, visitorPhotoUrl } = payload;
+  const { host_id: hostId, visitor_id: visitorId, actor_id: actorId, actor_name: actorName, actor_role: actorRole, visitorName, visitorPhotoUrl } = payload;
 
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
-    const { settings, expiresAt } = await getLogExpiry(adminDb);
+    const { settings, expires_at } = await getLogExpiry(adminDb);
     const blockCost = settings.block_visitor_cost_host ?? 0;
 
     const { data, error } = await adminDb.rpc('rpc_block_visitor_host', {
@@ -179,7 +179,7 @@ export async function blockVisitorFromHost(
       p_visitor_name: visitorName,
       p_visitor_photo: visitorPhotoUrl,
       p_premise_id: payload.premise_id, // Pass premiseId
-      p_expires_at: expiresAt,
+      p_expires_at: expires_at,
     });
 
     if (error) throw error;
@@ -197,13 +197,13 @@ export async function blockVisitorFromHost(
 export async function unblockVisitorFromHost(
   payload: Omit<HostBlockPayload, 'visitorName' | 'visitorPhotoUrl'>
 ): Promise<{ success: boolean; error?: string }> {
-  const { hostId, visitorId, actorId, actorName, actorRole } = payload;
+  const { host_id: hostId, visitor_id: visitorId, actor_id: actorId, actor_name: actorName, actor_role: actorRole } = payload;
 
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
-    const { settings, expiresAt } = await getLogExpiry(adminDb);
+    const { settings, expires_at } = await getLogExpiry(adminDb);
     const unblockCost = settings.unblock_visitor_cost_host ?? 0;
 
     const { data, error } = await adminDb.rpc('rpc_unblock_visitor_host', {
@@ -214,7 +214,7 @@ export async function unblockVisitorFromHost(
       p_actor_id: actorId,
       p_actor_name: actorName,
       p_actor_role: actorRole,
-      p_expires_at: expiresAt,
+      p_expires_at: expires_at,
     });
 
     if (error) throw error;

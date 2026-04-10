@@ -21,8 +21,8 @@ export default function HostDashboardPage() {
         <div className="container py-10">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-1 space-y-6">
-                    <AvailabilityCard hostProfile={hostProfile} premiseId={premiseId} />
-                    <AnnouncementsCard role="host" premiseId={premiseId} />
+                    <AvailabilityCard hostProfile={hostProfile} premise_id={premiseId} />
+                    <AnnouncementsCard role="host" premise_id={premiseId} />
                 </div>
 
                 <div className="lg:col-span-2 space-y-6">
@@ -31,21 +31,21 @@ export default function HostDashboardPage() {
                             variant="stat"
                             title="Active Visitors"
                             description="Verify current visitors"
-                            href={`/dashboard/host/active-visits?premiseId=${premiseId}`}
+                            href={`/dashboard/host/active-visits?premise_id=${premiseId}`}
                             icon={Users}
                         />
                         <DashboardCard
                             variant="stat"
                             title="Your Visit History"
                             description="View and rate visitors"
-                            href={`/dashboard/host/history?premiseId=${premiseId}`}
+                            href={`/dashboard/host/history?premise_id=${premiseId}`}
                             icon={History}
                         />
                         <DashboardCard
                             variant="stat"
                             title="Global Blocklist"
                             description="Visitors you blocked"
-                            href={`/dashboard/host/blocked?premiseId=${premiseId}`}
+                            href={`/dashboard/host/blocked?premise_id=${premiseId}`}
                             icon={UserX}
                         />
                     </div>

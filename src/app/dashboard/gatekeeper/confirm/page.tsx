@@ -141,7 +141,7 @@ export default function ConfirmPage() {
           // So we'll pass the exact token, and the backend logic in `finalizeCheckin` ignores `visitorId` and uses the token's `userId`.
           visitor_id: checkinData.visitor.id,
           host_id: selectedHostId,
-          premiseId,
+          premise_id: premiseId!,
           gatekeeperId: user.id,
           timestamp: Date.now()
         });
@@ -158,7 +158,7 @@ export default function ConfirmPage() {
       token,
       visitor_id: checkinData.visitor.id,
       host_id: selectedHostId,
-      premiseId,
+      premise_id: premiseId!,
       gatekeeperId: user.id,
     });
 
@@ -251,7 +251,7 @@ export default function ConfirmPage() {
                 </Avatar>
               </button>
               <h2 className="mt-4 text-2xl font-bold">{visitor?.name}</h2>
-              <p className="text-muted-foreground">{visitor?.company_name || 'No company'}</p>
+              <p className="text-muted-foreground">{visitor?.companyName || 'No company'}</p>
             </CardContent>
             <Separator />
             <CardContent className="p-6 text-sm space-y-4">

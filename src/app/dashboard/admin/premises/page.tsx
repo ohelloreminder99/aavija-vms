@@ -238,10 +238,10 @@ export default function PremisesPage() {
         name: data.name,
         address: data.address,
         city: selectedCityObj?.name || 'Unknown',
-        city_id: data.city_id,
+        cityId: data.city_id,
         agent_id: data.agent_id,
-        category_name: selectedCategory?.name || null,
-        category_id: data.category_id,
+        categoryName: selectedCategory?.name || null,
+        categoryId: data.category_id,
         city_state: selectedCityObj?.state_name || 'Unknown',
         is_active: data.is_active,
       };

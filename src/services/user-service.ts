@@ -32,7 +32,7 @@ export interface UserProfile {
   email: string;
   role: 'admin' | 'owner' | 'staff' | 'gatekeeper' | 'visitor' | 'host';
   phone: string;
-  countryCode?: string;
+  country_code?: string;
   is_verified: boolean;
   is_active?: boolean;
   token_balance_visitor: number;
@@ -40,18 +40,18 @@ export interface UserProfile {
   active_checkin_id: string | null;
   photo_url: string;
   city?: string;
-  cityId?: string; // New field for robust location matching
+  city_id?: string;
   city_state?: string;
-  companyName?: string;
+  company_name?: string;
   premise_roles?: { [key: string]: ('owner' | 'host' | 'gatekeeper')[] };
   vehicles?: Vehicle[];
   selected_vehicle_number?: string | null;
   products?: string[];
   // GST Details for Invoicing
-  gstNumber?: string;
-  billingAddress?: string;
-  legalName?: string;
-  billingState?: string;
+  gst_number?: string;
+  billing_address?: string;
+  legal_name?: string;
+  billing_state?: string;
   // Phase 2B — Agent & Payout fields
   is_agent?: boolean;
   agent_commission_balance?: number;
@@ -184,9 +184,9 @@ export function useUsersByRole(role: UserProfile['role'], options?: { pageSize?:
  */
 export function useUsersByRoleAndPremise(role: 'host' | 'gatekeeper', premise_id: string | undefined) {
   const docRef = React.useMemo(() => {
-    if (!premiseId) return null;
-    return { table: 'premises', id: premiseId, __memo: true };
-  }, [premiseId]);
+    if (!premise_id) return null;
+    return { table: 'premises', id: premise_id, __memo: true };
+  }, [premise_id]);
 
   const { data: premise, isLoading, error } = useDoc<Premise>(docRef);
 
@@ -231,18 +231,18 @@ export function usePremiseBlocks(premise_id: string | undefined, user_id: string
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
-    if (!premiseId) return;
+    if (!premise_id) return;
     
     const supabase = createClient();
     const channel = supabase
-      .channel(`blocked-realtime-${premiseId}`)
+      .channel(`blocked-realtime-${premise_id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'premise_blocked_visitors',
-          filter: `premise_id=eq.${premiseId}`
+          filter: `premise_id=eq.${premise_id}`
         },
         () => {
           setRefreshKey(prev => prev + 1);
@@ -253,20 +253,20 @@ export function usePremiseBlocks(premise_id: string | undefined, user_id: string
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [premiseId]);
+  }, [premise_id]);
 
   const query = React.useMemo(() => {
-    if (!premiseId || !userId) return null;
+    if (!premise_id || !user_id) return null;
     return {
       table: 'premise_blocked_visitors',
       filters: [
-        { column: 'premise_id', operator: 'eq' as const, value: premiseId },
-        { column: 'blocked_by', operator: 'eq' as const, value: userId }
+        { column: 'premise_id', operator: 'eq' as const, value: premise_id },
+        { column: 'blocked_by', operator: 'eq' as const, value: user_id }
       ],
       __memo: true,
       __refresh: refreshKey
     };
-  }, [premiseId, userId, refreshKey]);
+  }, [premise_id, user_id, refreshKey]);
 
   return useCollection<PremiseBlock>(query as any);
 }

@@ -93,9 +93,9 @@ export default function HistoryPage() {
   const { data: premise, isLoading: isLoadingPremise } = useDoc<Premise>(premiseDocRef);
 
   const categoryDocRef = React.useMemo(() => {
-    if (!premise?.category_id) return null;
-    return { table: 'premise_categories', id: premise.category_id, __memo: true };
-  }, [premise?.category_id]);
+    if (!premise?.categoryId) return null;
+    return { table: 'premise_categories', id: premise.categoryId, __memo: true };
+  }, [premise?.categoryId]);
   const { data: category, isLoading: isLoadingCategory } = useDoc<PremiseCategory>(categoryDocRef);
 
   const [visits, setVisits] = React.useState<SerializableVisit[]>([]);
@@ -148,7 +148,7 @@ export default function HistoryPage() {
         const computedStartDate = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
 
         const result = await getVisitsForPremise({
-          premiseId,
+          premise_id: (premiseId as string),
           limit: PAGE_SIZE,
           startDate: computedStartDate,
         });
@@ -190,7 +190,7 @@ export default function HistoryPage() {
       const computedStartDate = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
 
       const result = await getVisitsForPremise({
-        premiseId,
+        premise_id: (premiseId as string),
         limit: PAGE_SIZE,
         startAfter: lastVisible,
         startDate: computedStartDate,
@@ -240,7 +240,7 @@ export default function HistoryPage() {
 
     setIsBlocking(true);
     const result = await blockVisitorFromPremise({
-      premiseId,
+      premise_id: premiseId!,
       visitor_id: visitToBlock.visitor_id,
       visitorName: visitToBlock.visitor_name,
       visitorPhotoUrl: visitToBlock.visitor_snapshot_url || '',
@@ -332,11 +332,12 @@ export default function HistoryPage() {
 
     setIsExporting(exportType);
     const result = await deductTokensForExport({
-      target: { type: 'premise', id: premiseId },
+      target: { type: 'premise', id: (premiseId as string) },
       actor_id: userProfile.id,
       actor_name: userProfile.name,
       actor_role: 'owner',
       exportType: exportType,
+      premise_id: (premiseId as string),
     });
 
     if (result.success) {

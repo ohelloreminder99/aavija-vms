@@ -38,7 +38,7 @@ export interface UserSetupDialogProps {
     onComplete: () => void;
 }
 
-export function UserSetupDialog({ open, onOpenChange, userId, settings, onComplete }: UserSetupDialogProps) {
+export function UserSetupDialog({ open, onOpenChange, user_id, settings, onComplete }: UserSetupDialogProps) {
     const [citySearch, setCitySearch] = React.useState('');
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [step, setStep] = React.useState<'details' | 'otp'>('details');
@@ -81,7 +81,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
                 const selectedCityObj = cities?.find(c => c.id === data.city_id);
 
                 // 1. Save initial profile data
-                await updateUserProfile(userId, {
+                await updateUserProfile(user_id, {
                     phone: data.phone,
                     city_id: data.city_id,
                     city: selectedCityObj?.name || 'Unknown',
@@ -91,7 +91,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
 
                 // 2. Request OTP
                 const res = await sendWhatsAppOtp({
-                    userId,
+                    user_id,
                     phone: data.phone,
                     country_code: defaultCountryCode,
                 });
@@ -111,7 +111,7 @@ export function UserSetupDialog({ open, onOpenChange, userId, settings, onComple
                     throw new Error('Please enter a valid 6-digit OTP.');
                 }
                 const res = await verifyWhatsAppOtp({
-                    userId,
+                    user_id,
                     otp: data.otp,
                     phone: data.phone,
                     country_code: defaultCountryCode,

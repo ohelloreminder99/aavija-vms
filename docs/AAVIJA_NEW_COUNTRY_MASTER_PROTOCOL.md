@@ -13,8 +13,8 @@ Aavija uses Supabase as its primary backend and authentication engine. Do this *
    - `pgcrypto`
    - `uuid-ossp`
    - `pg_cron`
-3. **Execute Master SQL**: Navigate to **SQL Editor** → **New Query**, paste the entire contents of `supabase/CONSOLIDATED_FINAL_SETUP.sql`, and hit **Run**. Wait for the "Success" toast.
-   *(This ensures all schemas, roles, tables, B-Tree indexes, Row Level Security rules, and storage buckets are identical to the baseline).*
+3. **Execute Master SQL**: Navigate to **SQL Editor** → **New Query**, paste the entire contents of `database_sql_backups/MASTER_DB_SETUP.sql`, and hit **Run**. Wait for the "Success" toast.
+   *(This ensures all schemas, roles, tables, B-Tree indexes, Row Level Security rules, and all recent migration fixes are applied in one single step).*
 
 ---
 

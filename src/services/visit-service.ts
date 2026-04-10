@@ -40,9 +40,9 @@ export interface Visit {
  */
 export function useVisitByIdForUser(user_id: string | undefined, visit_id: string | null | undefined) {
     const docRef = React.useMemo(() => {
-        if (!userId || !visitId) return null;
-        return { table: 'visits', id: visitId, __memo: true };
-    }, [userId, visitId]);
+        if (!user_id || !visit_id) return null;
+        return { table: 'visits', id: visit_id, __memo: true };
+    }, [user_id, visit_id]);
 
     return useDoc<Visit>(docRef);
 }
@@ -58,18 +58,18 @@ export function useVisitsByPremise(premise_id: string | undefined, pageSize: num
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
-        if (!premiseId) return;
+        if (!premise_id) return;
         
         const supabase = createClient();
         const channel = supabase
-            .channel(`visits-premise-realtime-${premiseId}`)
+            .channel(`visits-premise-realtime-${premise_id}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'visits',
-                    filter: `premise_id=eq.${premiseId}`
+                    filter: `premise_id=eq.${premise_id}`
                 },
                 () => {
                     setRefreshKey(prev => prev + 1);
@@ -80,19 +80,19 @@ export function useVisitsByPremise(premise_id: string | undefined, pageSize: num
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [premiseId]);
+    }, [premise_id]);
 
     const query = React.useMemo(() => {
-        if (!premiseId) return null;
+        if (!premise_id) return null;
         return {
             table: 'visits',
-            filters: [{ column: 'premise_id', operator: 'eq' as const, value: premiseId }],
+            filters: [{ column: 'premise_id', operator: 'eq' as const, value: premise_id }],
             orderBy: { column: 'checkin_time', ascending: false },
             limit: pageSize,
             __memo: true,
             __refresh: refreshKey
         };
-    }, [premiseId, pageSize, refreshKey]);
+    }, [premise_id, pageSize, refreshKey]);
 
     return useCollection<Visit>(query as any);
 }
@@ -108,18 +108,18 @@ export function useVisitsForHost(host_id: string | undefined, premise_id: string
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
-        if (!hostId || !premiseId) return;
+        if (!host_id || !premise_id) return;
         
         const supabase = createClient();
         const channel = supabase
-            .channel(`visits-host-realtime-${hostId}`)
+            .channel(`visits-host-realtime-${host_id}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'visits',
-                    filter: `host_id=eq.${hostId}`
+                    filter: `host_id=eq.${host_id}`
                 },
                 () => {
                     setRefreshKey(prev => prev + 1);
@@ -130,22 +130,22 @@ export function useVisitsForHost(host_id: string | undefined, premise_id: string
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [hostId, premiseId]);
+    }, [host_id, premise_id]);
 
     const query = React.useMemo(() => {
-        if (!hostId || !premiseId) return null;
+        if (!host_id || !premise_id) return null;
         return {
             table: 'visits',
             filters: [
-                { column: 'premise_id', operator: 'eq' as const, value: premiseId },
-                { column: 'host_id', operator: 'eq' as const, value: hostId }
+                { column: 'premise_id', operator: 'eq' as const, value: premise_id },
+                { column: 'host_id', operator: 'eq' as const, value: host_id }
             ],
             orderBy: { column: 'checkin_time', ascending: false },
             limit: pageSize,
             __memo: true,
             __refresh: refreshKey
         };
-    }, [hostId, premiseId, pageSize, refreshKey]);
+    }, [host_id, premise_id, pageSize, refreshKey]);
 
     return useCollection<Visit>(query as any);
 }
@@ -159,18 +159,18 @@ export function useUserActiveVisit(user_id: string | undefined) {
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
-        if (!userId) return;
+        if (!user_id) return;
         
         const supabase = createClient();
         const channel = supabase
-            .channel(`user-active-visit-realtime-${userId}`)
+            .channel(`user-active-visit-realtime-${user_id}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'visits',
-                    filter: `visitor_id=eq.${userId}`
+                    filter: `visitor_id=eq.${user_id}`
                 },
                 () => {
                     setRefreshKey(prev => prev + 1);
@@ -181,14 +181,14 @@ export function useUserActiveVisit(user_id: string | undefined) {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [userId]);
+    }, [user_id]);
 
     const query = React.useMemo(() => {
-        if (!userId) return null;
+        if (!user_id) return null;
         return {
             table: 'visits',
             filters: [
-                { column: 'visitor_id', operator: 'eq' as const, value: userId },
+                { column: 'visitor_id', operator: 'eq' as const, value: user_id },
                 { column: 'status', operator: 'eq' as const, value: 'active' }
             ],
             orderBy: { column: 'checkin_time', ascending: false },
@@ -196,7 +196,7 @@ export function useUserActiveVisit(user_id: string | undefined) {
             __memo: true,
             __refresh: refreshKey
         };
-    }, [userId, refreshKey]);
+    }, [user_id, refreshKey]);
 
     const { data, isLoading, error } = useCollection<Visit>(query as any);
     return { data: data?.[0] || null, isLoading, error };
@@ -210,18 +210,18 @@ export function useActiveVisitsForPremise(premise_id: string | undefined, pageSi
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
-        if (!premiseId) return;
+        if (!premise_id) return;
         
         const supabase = createClient();
         const channel = supabase
-            .channel(`active-visits-realtime-${premiseId}`)
+            .channel(`active-visits-realtime-${premise_id}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'visits',
-                    filter: `premise_id=eq.${premiseId}`
+                    filter: `premise_id=eq.${premise_id}`
                 },
                 () => {
                     setRefreshKey(prev => prev + 1);
@@ -232,14 +232,14 @@ export function useActiveVisitsForPremise(premise_id: string | undefined, pageSi
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [premiseId]);
+    }, [premise_id]);
 
     const query = React.useMemo(() => {
-        if (!premiseId) return null;
+        if (!premise_id) return null;
         return {
             table: 'visits',
             filters: [
-                { column: 'premise_id', operator: 'eq' as const, value: premiseId },
+                { column: 'premise_id', operator: 'eq' as const, value: premise_id },
                 { column: 'status', operator: 'eq' as const, value: 'active' }
             ],
             orderBy: { column: 'checkin_time', ascending: false },
@@ -247,7 +247,7 @@ export function useActiveVisitsForPremise(premise_id: string | undefined, pageSi
             __memo: true,
             __refresh: refreshKey
         };
-    }, [premiseId, pageSize, refreshKey]);
+    }, [premise_id, pageSize, refreshKey]);
 
     return useCollection<Visit>(query as any);
 }

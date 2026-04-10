@@ -79,7 +79,7 @@ export async function designateAgentByEmail(
 
     const { data, error } = await adminDb.rpc('rpc_designate_agent_by_email', {
       p_agent_email: agentEmail.trim().toLowerCase(),
-      p_premise_id: premiseId,
+      p_premise_id: premise_id,
       p_admin_id: profile.id,
     });
 
@@ -100,7 +100,7 @@ export async function designateAgentByEmail(
       const { data: premiseData } = await adminDb
         .from('premises')
         .select('name')
-        .eq('id', premiseId)
+        .eq('id', premise_id)
         .single();
       if (agentUser?.phone && premiseData?.name) {
         void notifyAgentAssigned({
@@ -113,7 +113,7 @@ export async function designateAgentByEmail(
       console.error('[WhatsApp] notifyAgentAssigned failed (non-fatal):', notifyErr instanceof Error ? notifyErr.message : 'Unknown error');
     }
 
-    return { success: true, agent_id: data.agent_id, agentName: data.agentName };
+    return { success: true, agentId: data.agent_id as string, agentName: data.agentName as string };
   } catch (e: unknown) {
     console.error('Error designating agent:', e);
     return { success: false, error: e instanceof Error ? e.message : 'An unknown error occurred.' };
@@ -164,7 +164,7 @@ export async function removeAgentDesignation(
     const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
-    await adminDb.from('users').update({ is_agent: false }).eq('id', userId);
+    await adminDb.from('users').update({ is_agent: false }).eq('id', user_id);
     revalidatePath('/dashboard/admin/agents');
     return { success: true };
   } catch (e: unknown) {
@@ -502,8 +502,8 @@ export async function adminApproveKyc(
     const adminDb = await getAdminDb();
     if (!adminDb) throw new Error('Admin database not available.');
 
-    const { data: user } = await adminDb.from('users').select('name, phone').eq('id', userId).single();
-    await adminDb.from('users').update({ kyc_verified: true }).eq('id', userId);
+    const { data: user } = await adminDb.from('users').select('name, phone').eq('id', user_id).single();
+    await adminDb.from('users').update({ kyc_verified: true }).eq('id', user_id);
     
     if (user?.phone) {
       notifyKycVerified({

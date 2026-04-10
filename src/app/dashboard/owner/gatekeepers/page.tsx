@@ -145,7 +145,7 @@ export default function GatekeepersPage() {
         try {
             const result = await createGatekeeper({ 
                 ...data, 
-                premiseId, 
+                premise_id: premiseId!, 
                 actor: { id: user.id, name: userProfile.name, role: 'owner' } 
             });
             if (result.success) {
@@ -174,7 +174,7 @@ export default function GatekeepersPage() {
             const result = await assignGatekeeperRoleByEmail({ 
                 email: data.email, 
                 gateId: data.gateId,
-                premiseId, 
+                premise_id: premiseId!, 
                 actor: { id: user.id, name: userProfile.name, role: 'owner' } 
             });
             if (result.success) {
@@ -197,7 +197,7 @@ export default function GatekeepersPage() {
         setIsSubmitting(true);
         try {
             const result = await removeGatekeeperFromPremise({
-                premiseId,
+                premise_id: premiseId!,
                 user_id: gatekeeperToRemove.user_id,
                 actor: { id: user.id, name: userProfile.name, role: 'owner' }
             });
@@ -221,7 +221,7 @@ export default function GatekeepersPage() {
         try {
             const newStatus = !gatekeeperToToggle.is_active;
             const result = await toggleGatekeeperStatus({
-                premiseId,
+                premise_id: premiseId!,
                 user_id: gatekeeperToToggle.user_id,
                 isActive: newStatus,
                 actor: { id: user.id, name: userProfile.name, role: 'owner' }

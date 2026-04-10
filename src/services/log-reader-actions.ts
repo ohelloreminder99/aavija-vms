@@ -21,7 +21,7 @@ export async function getLogsForActorAction(actor_id: string, role?: string): Pr
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
       .select(LOG_LIST_COLS)
-      .eq('actor_id', actorId)
+      .eq('actor_id', actor_id)
       .order('timestamp', { ascending: false })
       .limit(500);
 
@@ -47,7 +47,7 @@ export async function getLogsForActorAction(actor_id: string, role?: string): Pr
     return { logs: filteredLogs, error: null };
 
   } catch (e: any) {
-    Sentry.captureException(e, { extra: { actorId, role } });
+    Sentry.captureException(e, { extra: { actor_id, role } });
     console.error('Error fetching logs for actor:', e);
     return { logs: null, error: e.message || "An unknown server error occurred." };
   }
@@ -67,7 +67,7 @@ export async function getLogsForPremiseAction(premise_id: string): Promise<{
     const { data: logsData, error: logsError } = await adminDb
       .from('logs')
       .select(LOG_LIST_COLS)
-      .eq('premise_id', premiseId)
+      .eq('premise_id', premise_id)
       .order('timestamp', { ascending: false })
       .limit(500);
 
@@ -79,7 +79,7 @@ export async function getLogsForPremiseAction(premise_id: string): Promise<{
     return { logs: logs.filter(l => l.token_change != null && l.token_change !== 0), error: null };
 
   } catch (e: any) {
-    Sentry.captureException(e, { extra: { premiseId } });
+    Sentry.captureException(e, { extra: { premise_id } });
     console.error('Error fetching logs for premise:', e);
     return { logs: null, error: e.message || "An unknown server error occurred." };
   }

@@ -99,7 +99,7 @@ export default function GatekeeperHistoryPage() {
         const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
 
         const result = await getVisitsForPremise({
-          premiseId,
+          premise_id: premiseId,
           limit: PAGE_SIZE,
           startDate: startDateString,
         });
@@ -130,7 +130,7 @@ export default function GatekeeperHistoryPage() {
       const startDateString = historyDays && historyDays > 0 ? subDays(new Date(), historyDays).toISOString() : undefined;
 
       const result = await getVisitsForPremise({
-        premiseId,
+        premise_id: premiseId,
         limit: PAGE_SIZE,
         startAfter: lastVisible,
         startDate: startDateString,

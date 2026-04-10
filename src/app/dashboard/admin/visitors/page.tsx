@@ -53,15 +53,15 @@ export default function VisitorsPage() {
   const filteredVisitors = React.useMemo(() => {
     if (!visitors) return [];
     return visitors.filter(
-      (v) =>
+      (v: WithId<UserProfile>) =>
         v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        v.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (v.email && v.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [visitors, searchTerm]);
 
   const premiseMap = React.useMemo(() => {
     if (!premises) return new Map<string, string>();
-    return new Map(premises.map((p) => [p.id, p.name]));
+    return new Map<string, string>(premises.map((p: any) => [p.id, p.name]));
   }, [premises]);
 
   const renderContent = () => {

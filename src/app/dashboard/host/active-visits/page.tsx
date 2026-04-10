@@ -39,11 +39,11 @@ export default function HostActiveVisitsPage() {
 
     const handleVerify = async (visit_id: string) => {
         if (!premiseId || !user) return;
-        setIsVerifying(visitId);
+        setIsVerifying(visit_id);
         try {
             const result = await verifyVisitByHost({
-                visitId,
-                premiseId,
+                visit_id: visit_id,
+                premise_id: premiseId,
                 host_id: user.id
             });
             if (result.success) {

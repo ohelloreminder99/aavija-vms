@@ -9,12 +9,12 @@ const rateLimitCache = new Map<string, { count: number, resetAt: number }>();
 
 function isRateLimited(user_id: string, maxRequests: number = 5, windowMs: number = 60000): boolean {
   const now = Date.now();
-  const record = rateLimitCache.get(userId);
+  const record = rateLimitCache.get(user_id);
   if (record && record.resetAt > now) {
     record.count++;
     if (record.count > maxRequests) return true;
   } else {
-    rateLimitCache.set(userId, { count: 1, resetAt: now + windowMs });
+    rateLimitCache.set(user_id, { count: 1, resetAt: now + windowMs });
   }
   return false;
 }
@@ -26,17 +26,17 @@ function isRateLimited(user_id: string, maxRequests: number = 5, windowMs: numbe
 export async function generateCheckinToken(user_id: string): Promise<{
   success: boolean;
   token?: string;
-  expiresAt?: number;
+  expires_at?: number;
   error?: string;
 }> {
-  if (!userId) {
+  if (!user_id) {
     return { success: false, error: 'User ID is required.' };
   }
 
   // SECURITY PATCH: Prevent IDOR
   const supabase = await createClient();
   const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user || authData.user.id !== userId) {
+  if (authError || !authData.user || authData.user.id !== user_id) {
     return { success: false, error: 'Unauthorized: You can only generate tokens for your own account.' };
   }
 
@@ -56,13 +56,13 @@ export async function generateCheckinToken(user_id: string): Promise<{
   const expirySeconds = settings?.qr_code_expiry_seconds ?? 60;
 
   // SECURITY PATCH: Rate Limiting
-  if (isRateLimited(userId, maxRequests, windowMs)) {
+  if (isRateLimited(user_id, maxRequests, windowMs)) {
     return { success: false, error: `Rate limit exceeded. Please wait before generating another QR code.` };
   }
 
   try {
     // 1. Find and delete any pre-existing 'unused' tokens for this user.
-    await adminDb.from('checkin_tokens').delete().eq('visitor_id', userId).eq('status', 'unused');
+    await adminDb.from('checkin_tokens').delete().eq('visitor_id', user_id).eq('status', 'unused');
 
     // 2. Create the new token
     const token = randomBytes(16).toString('hex');
@@ -71,7 +71,7 @@ export async function generateCheckinToken(user_id: string): Promise<{
 
     const { error } = await adminDb.from('checkin_tokens').insert({
       id: token,
-      visitor_id: userId,
+      visitor_id: user_id,
       created_at: new Date(now).toISOString(),
       expires_at: new Date(expiresAt).toISOString(),
       status: 'unused',

@@ -21,7 +21,7 @@ interface GatekeeperData {
 export async function createGatekeeper(
   data: GatekeeperData
 ): Promise<{ success: boolean; error?: string }> {
-  const { name, email, password, premiseId, gateId, actor } = data;
+  const { name, email, password, premise_id: premiseId, gateId, actor } = data;
 
   if (!name || !email || !password || !premiseId) {
     return { success: false, error: 'All fields are required.' };
@@ -118,7 +118,7 @@ interface AssignGatekeeperPayload {
 }
 
 export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperPayload): Promise<{ success: boolean; error?: string }> {
-  const { email, premiseId, gateId, actor } = payload;
+  const { email, premise_id: premiseId, gateId, actor } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
@@ -169,7 +169,7 @@ export async function assignGatekeeperRoleByEmail(payload: AssignGatekeeperPaylo
   }
 }
 
-export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: { premise_id: string; user_id: string; actor: { id: string; name: string; role: string } }) {
+export async function removeGatekeeperFromPremise({ premise_id: premiseId, user_id: userId, actor }: { premise_id: string; user_id: string; actor: { id: string; name: string; role: string } }) {
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
@@ -208,7 +208,7 @@ export async function removeGatekeeperFromPremise({ premiseId, userId, actor }: 
   }
 }
 
-export async function toggleGatekeeperStatus({ premiseId, userId, isActive, actor }: { premise_id: string; user_id: string; isActive: boolean; actor: { id: string; name: string; role: string } }) {
+export async function toggleGatekeeperStatus({ premise_id: premiseId, user_id: userId, isActive, actor }: { premise_id: string; user_id: string; isActive: boolean; actor: { id: string; name: string; role: string } }) {
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 

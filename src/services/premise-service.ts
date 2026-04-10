@@ -134,9 +134,9 @@ export function usePremises(options?: { pageSize?: number; page?: number }) {
  */
 export function usePremiseById(premise_id: string | undefined) {
   const docRef = React.useMemo(() => {
-    if (!premiseId) return null;
-    return { table: 'premises', id: premiseId, __memo: true };
-  }, [premiseId]);
+    if (!premise_id) return null;
+    return { table: 'premises', id: premise_id, __memo: true };
+  }, [premise_id]);
 
   return useDoc<Premise>(docRef);
 }
@@ -161,18 +161,18 @@ export function usePremiseGates(premise_id: string | undefined) {
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
-    if (!premiseId) return;
+    if (!premise_id) return;
     
     const supabase = createClient();
     const channel = supabase
-      .channel(`gates-realtime-${premiseId}`)
+      .channel(`gates-realtime-${premise_id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'premise_gates',
-          filter: `premise_id=eq.${premiseId}`
+          filter: `premise_id=eq.${premise_id}`
         },
         () => {
           setRefreshKey(prev => prev + 1);
@@ -183,18 +183,18 @@ export function usePremiseGates(premise_id: string | undefined) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [premiseId]);
+  }, [premise_id]);
 
   const query = React.useMemo(() => {
-    if (!premiseId) return null;
+    if (!premise_id) return null;
     return {
       table: 'premise_gates',
-      filters: [{ column: 'premise_id', operator: 'eq' as const, value: premiseId }],
+      filters: [{ column: 'premise_id', operator: 'eq' as const, value: premise_id }],
       orderBy: { column: 'name', ascending: true },
       __memo: true,
       __refresh: refreshKey // Force useCollection to re-evaluate
     };
-  }, [premiseId, refreshKey]);
+  }, [premise_id, refreshKey]);
 
   return useCollection<PremiseGate>(query as any);
 }
@@ -210,28 +210,28 @@ export function usePremiseMembers(
   const { pageSize = 50, page = 0, searchTerm = '' } = options || {};
   
   const params = React.useMemo(() => ({
-    premise_id_param: premiseId,
+    premise_id_param: premise_id,
     role_param: role,
     search_term_param: searchTerm,
     limit_param: pageSize,
     offset_param: page * pageSize
-  }), [premiseId, role, searchTerm, pageSize, page]);
+  }), [premise_id, role, searchTerm, pageSize, page]);
 
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
-    if (!premiseId) return;
+    if (!premise_id) return;
     
     const supabase = createClient();
     const channel = supabase
-      .channel(`members-realtime-${premiseId}`)
+      .channel(`members-realtime-${premise_id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'premise_members',
-          filter: `premise_id=eq.${premiseId}`
+          filter: `premise_id=eq.${premise_id}`
         },
         () => {
           setRefreshKey(prev => prev + 1);
@@ -242,7 +242,7 @@ export function usePremiseMembers(
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [premiseId]);
+  }, [premise_id]);
 
   const { data: rawData, isLoading, error } = useRpc<any[]>('search_premise_members', params, [params, refreshKey]);
 

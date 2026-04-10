@@ -33,7 +33,7 @@ export async function bulkEnrollHosts(
   
   // Permission check
   if (profile.role !== 'admin') {
-    const { data: permCheck } = await adminDb.from('premises').select('owner_id').eq('id', premiseId).single();
+    const { data: permCheck } = await adminDb.from('premises').select('owner_id').eq('id', premise_id).single();
     if (!permCheck || permCheck.owner_id !== authUser.id) {
       throw new Error('Unauthorized');
     }
@@ -78,7 +78,7 @@ export async function bulkEnrollHosts(
 
       // 2. Add to Premise Members
       const { error: memberError } = await adminDb.from('premise_members').upsert({
-        premise_id: premiseId,
+        premise_id: premise_id,
         user_id: targetUserId,
         role: 'host',
         identity: member.identity,

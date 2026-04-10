@@ -81,7 +81,7 @@ export function AddHostDialog({ premiseId, premiseCity, userId, userName }: AddH
         }
         setIsSubmitting(true);
         try {
-            const result = await createHost({ ...data, premiseId, premiseCity, actor: { id: userId, name: userName, role: 'owner' } });
+            const result = await createHost({ ...data, premise_id: premiseId, premiseCity, actor: { id: userId, name: userName, role: 'owner' } });
             if (result.success) {
                 toast({ title: 'Success', description: `Host account for ${data.name} has been created.` });
                 setIsOpen(false);
@@ -108,7 +108,7 @@ export function AddHostDialog({ premiseId, premiseCity, userId, userName }: AddH
         }
         setIsSubmitting(true);
         try {
-            const result = await assignHostRoleByEmail({ email: data.email, identity: data.identity, premiseId, actor: { id: userId, name: userName, role: 'owner' } });
+            const result = await assignHostRoleByEmail({ email: data.email, identity: data.identity, premise_id: premiseId, actor: { id: userId, name: userName, role: 'owner' } });
             if (result.success) {
                 toast({ title: 'Success', description: `Role assigned to ${data.email}.` });
                 setIsOpen(false);

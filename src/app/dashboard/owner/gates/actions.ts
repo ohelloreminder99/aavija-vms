@@ -12,7 +12,7 @@ export interface GateActionParams {
   actor: { id: string; name: string; role: string };
 }
 
-export async function createGate({ premiseId, name, description, actor }: GateActionParams) {
+export async function createGate({ premise_id: premiseId, name, description, actor }: GateActionParams) {
   const supabase = await createClient();
   
   const { data, error } = await supabase.from('premise_gates').insert({
@@ -38,7 +38,7 @@ export async function createGate({ premiseId, name, description, actor }: GateAc
   return { success: true, gate: data };
 }
 
-export async function updateGate({ gateId, name, description, actor, premiseId }: GateActionParams & { gateId: string }) {
+export async function updateGate({ gateId, name, description, actor, premise_id: premiseId }: GateActionParams & { gateId: string }) {
   const supabase = await createClient();
   
   const { data, error } = await supabase.from('premise_gates')
@@ -64,7 +64,7 @@ export async function updateGate({ gateId, name, description, actor, premiseId }
   return { success: true, gate: data };
 }
 
-export async function deleteGate({ gateId, gateName, actor, premiseId }: { gateId: string; gateName: string; actor: { id: string; name: string; role: string }; premise_id: string }) {
+export async function deleteGate({ gateId, gateName, actor, premise_id }: { gateId: string; gateName: string; actor: { id: string; name: string; role: string }; premise_id: string }) {
   const supabase = await createClient();
   
   // Check if any gatekeeper is assigned to this gate

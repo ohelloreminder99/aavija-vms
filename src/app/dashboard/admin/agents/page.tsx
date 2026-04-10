@@ -30,7 +30,7 @@ export default function AdminAgentsPage() {
 
     const handleApproveKyc = async (user_id: string, name: string) => {
         setIsSubmitting(true);
-        const res = await adminApproveKyc(userId);
+        const res = await adminApproveKyc(user_id);
         if (res.success) {
             toast({ title: 'KYC Verified', description: `${name} is now KYC verified and can request payouts.` });
             fetchAgents();

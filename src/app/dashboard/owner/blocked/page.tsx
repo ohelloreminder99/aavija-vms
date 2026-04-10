@@ -57,7 +57,7 @@ export default function BlockedVisitorsPage() {
 
         setIsUnblocking(true);
         const result = await unblockVisitorFromPremise({
-            premiseId,
+            premise_id: premiseId,
             visitor_id: visitorToUnblock.id,
             actor_id: userProfile.id,
             actor_name: userProfile.name,

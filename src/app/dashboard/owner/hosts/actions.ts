@@ -23,7 +23,7 @@ interface HostData {
 export async function createHost(
   data: HostData
 ): Promise<{ success: boolean; error?: string }> {
-  const { name, email, password, identity, premiseId, premiseCity, actor } = data;
+  const { name, email, password, identity, premise_id: premiseId, premiseCity, actor } = data;
 
   if (!name || !email || !password || !identity || !premiseId || !premiseCity) {
     return { success: false, error: 'All fields are required.' };
@@ -144,7 +144,7 @@ interface AssignHostByEmailPayload {
 }
 
 export async function assignHostRoleByEmail(payload: AssignHostByEmailPayload): Promise<{ success: boolean; error?: string }> {
-  const { email, identity, premiseId, actor } = payload;
+  const { email, identity, premise_id: premiseId, actor } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Admin database not available.' };
@@ -219,7 +219,7 @@ interface ToggleStatusPayload {
 
 
 export async function toggleHostStatus(payload: ToggleStatusPayload): Promise<{ success: boolean, error?: string }> {
-  const { hostId, hostName, newStatus, premiseId, actor } = payload;
+  const { host_id: hostId, hostName, newStatus, premise_id: premiseId, actor } = payload;
   const adminDb = await getAdminDb();
 
   if (!adminDb) {
@@ -271,7 +271,7 @@ interface RemoveHostPayload {
 }
 
 export async function removeHostFromPremise(payload: RemoveHostPayload): Promise<{ success: boolean; error?: string }> {
-  const { hostId, hostName, premiseId, actor } = payload;
+  const { host_id: hostId, hostName, premise_id: premiseId, actor } = payload;
   const adminDb = await getAdminDb();
 
   if (!adminDb) {
@@ -324,7 +324,7 @@ export async function removeHostFromPremise(payload: RemoveHostPayload): Promise
 }
 
 export async function backfillHostAvailability(premise_id: string): Promise<{ success: boolean; error?: string; message?: string; }> {
-  if (!premiseId) {
+  if (!premise_id) {
     return { success: false, error: 'Premise ID is required.' };
   }
   const adminDb = await getAdminDb();
@@ -335,11 +335,11 @@ export async function backfillHostAvailability(premise_id: string): Promise<{ su
   try {
     const { user, profile } = await requireAuth();
     if (profile.role !== 'admin') {
-      const { data: permCheck } = await adminDb.from('premises').select('owner_id').eq('id', premiseId).single();
+      const { data: permCheck } = await adminDb.from('premises').select('owner_id').eq('id', premise_id).single();
       if (!permCheck || permCheck.owner_id !== user.id) throw new Error('Unauthorized: You do not own this premise.');
     }
 
-    const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
+    const { data: premiseDoc } = await adminDb.from('premises').select('*').eq('id', premise_id).single();
     if (!premiseDoc) {
       throw new Error("Premise not found.");
     }
@@ -356,7 +356,7 @@ export async function backfillHostAvailability(premise_id: string): Promise<{ su
     });
 
     if (changesMade) {
-      await adminDb.from('premises').update({ staff: newStaff }).eq('id', premiseId);
+      await adminDb.from('premises').update({ staff: newStaff }).eq('id', premise_id);
       revalidatePath('/dashboard/owner/hosts');
       return { success: true, message: 'All hosts have been updated with a default availability status.' };
     } else {

@@ -23,14 +23,14 @@ const availabilityOptions = [
   { value: 'do-not-disturb', label: 'Do Not Disturb', color: 'bg-red-500' },
 ];
 
-export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardProps) {
+export function AvailabilityCard({ hostProfile, premise_id }: AvailabilityCardProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const docRef = React.useMemo(() => {
-    if (!premiseId) return null;
-    return { table: 'premises', id: premiseId, __memo: true };
-  }, [premiseId]);
+    if (!premise_id) return null;
+    return { table: 'premises', id: premise_id, __memo: true };
+  }, [premise_id]);
   const { data: premise, isLoading: isPremiseLoading } = useDoc<Premise>(docRef);
 
   const hostStaffInfo = React.useMemo(() => {
@@ -47,12 +47,12 @@ export function AvailabilityCard({ hostProfile, premiseId }: AvailabilityCardPro
   }, [currentDbAvailability]);
 
   const handleSave = async () => {
-    if (!hostProfile || !premiseId || selectedAvailability === currentDbAvailability) return;
+    if (!hostProfile || !premise_id || selectedAvailability === currentDbAvailability) return;
 
     setIsSubmitting(true);
     const result = await setHostAvailability({
       host_id: hostProfile.id,
-      premise_id: premiseId,
+      premise_id: premise_id,
       availability: selectedAvailability,
     });
 

@@ -16,12 +16,12 @@ export type OfflineCheckinPayload = {
 
 // --- HOSTS CACHING ---
 export async function saveCachedHosts(premise_id: string, hosts: SerializableCheckinHost[]): Promise<void> {
-    const key = `${CACHE_KEY_PREFIX}${premiseId}`;
+    const key = `${CACHE_KEY_PREFIX}${premise_id}`;
     await set(key, hosts);
 }
 
 export async function getCachedHosts(premise_id: string): Promise<SerializableCheckinHost[] | null> {
-    const key = `${CACHE_KEY_PREFIX}${premiseId}`;
+    const key = `${CACHE_KEY_PREFIX}${premise_id}`;
     return await get<SerializableCheckinHost[]>(key) || null;
 }
 

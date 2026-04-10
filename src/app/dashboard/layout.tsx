@@ -267,7 +267,7 @@ export default function DashboardLayout({
                     <UserSetupDialog
                         open={isSetupDialogOpen}
                         onOpenChange={setIsSetupDialogOpen}
-                        userId={user.id}
+                        user_id={user.id}
                         settings={globalSettings}
                         onComplete={() => setIsSetupDialogOpen(false)}
                     />

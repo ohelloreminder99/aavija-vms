@@ -4,7 +4,7 @@ import { getAdminDb, requireAuth } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 export async function removeUserPhoneNumber(user_id: string): Promise<{ success: boolean; error?: string }> {
-    if (!userId) {
+    if (!user_id) {
         return { success: false, error: 'User ID is required.' };
     }
 
@@ -21,7 +21,7 @@ export async function removeUserPhoneNumber(user_id: string): Promise<{ success:
 
     try {
         // Update Auth: Remove phone number
-        const { error: authError } = await adminDb.auth.admin.updateUserById(userId, {
+        const { error: authError } = await adminDb.auth.admin.updateUserById(user_id, {
             phone: '',
         });
         if (authError) throw authError;
@@ -30,14 +30,14 @@ export async function removeUserPhoneNumber(user_id: string): Promise<{ success:
         const { error: dbError } = await adminDb.from('users').update({
             phone: '',
             is_verified: false,
-        }).eq('id', userId);
+        }).eq('id', user_id);
         if (dbError) throw dbError;
 
         revalidatePath('/dashboard/admin/all-users');
         return { success: true };
 
     } catch (error: any) {
-        console.error(`Error removing phone number for user ${userId}:`, error);
+        console.error(`Error removing phone number for user ${user_id}:`, error);
 
         return {
             success: false,

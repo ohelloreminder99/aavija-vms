@@ -21,7 +21,7 @@ interface PayoutPayload {
  * @returns An object indicating success or failure.
  */
 export async function recordAgentPayout(payload: PayoutPayload): Promise<{ success: boolean, error?: string }> {
-    const { agentId, amount, description, actor } = payload;
+    const { agent_id: agentId, amount, description, actor } = payload;
 
     const adminDb = await getAdminDb();
     const { profile } = await requireAuth();

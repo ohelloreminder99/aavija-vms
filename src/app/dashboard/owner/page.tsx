@@ -123,7 +123,7 @@ export default function OwnerDashboardPage() {
                         />
                     </div>
 
-                    <AnnouncementsCard role="owner" premiseId={premiseId} />
+                    <AnnouncementsCard role="owner" premise_id={premiseId} />
 
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <DashboardCard

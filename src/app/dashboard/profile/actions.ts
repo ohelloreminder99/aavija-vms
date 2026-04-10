@@ -12,7 +12,7 @@ export async function sendWhatsAppOtp(payload: {
   phone: string;
   country_code: string;
 }): Promise<{ success: boolean; error?: string }> {
-  const { userId, phone, countryCode } = payload;
+  const { user_id: userId, phone, country_code: countryCode } = payload;
 
   const adminDb = await getAdminDb();
   if (!adminDb) {
@@ -128,7 +128,7 @@ export async function verifyWhatsAppOtp(payload: {
   phone: string; // The new phone number to save
   country_code: string;
 }): Promise<{ success: boolean; error?: string; message?: string }> {
-  const { userId, otp, phone, countryCode } = payload;
+  const { user_id: userId, otp, phone, country_code: countryCode } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) {
     return {
@@ -149,9 +149,9 @@ export async function verifyWhatsAppOtp(payload: {
     const { data: otpDoc } = await adminDb.from('whatsapp_otps').select('id, otp, expiresAt').eq('id', userId).single();
     if (!otpDoc) throw new Error('No OTP found. Please request a new one.');
 
-    const expiresAt = new Date(otpDoc.expires_at);
+    const expiresAtDate = new Date(otpDoc.expiresAt);
 
-    if (expiresAt < new Date()) {
+    if (expiresAtDate < new Date()) {
       await adminDb.from('whatsapp_otps').delete().eq('id', userId);
       throw new Error('The OTP has expired. Please request a new one.');
     }

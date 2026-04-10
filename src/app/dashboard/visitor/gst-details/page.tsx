@@ -37,10 +37,10 @@ export default function VisitorGstDetailsPage() {
       <GstDetailsCard
         target={{ type: 'user', id: user.id }}
         initialData={{
-          legal_name: userProfile?.legal_name,
-          gst_number: userProfile?.gst_number,
-          billing_address: userProfile?.billing_address,
-          billing_state: userProfile?.billing_state
+          legalName: userProfile?.legal_name,
+          gstNumber: userProfile?.gst_number,
+          billingAddress: userProfile?.billing_address,
+          billingState: userProfile?.billing_state
         }}
         onSuccess={() => router.push('/dashboard/visitor')}
       />

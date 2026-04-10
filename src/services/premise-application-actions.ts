@@ -228,7 +228,7 @@ export async function approvePremiseApplication(
     const _rpcStart = performance.now();
     const { data: rpcResult, error: rpcError } = await adminDb.rpc('approve_premise_application', {
       p_application_id: applicationId,
-      p_category_id:    categoryId,
+      p_category_id:    category_id,
       p_admin_id:       profile.id,
       p_admin_name:     profile.name || 'Admin',
     });
@@ -236,12 +236,12 @@ export async function approvePremiseApplication(
     if (_rpcMs > 3000) {
       Sentry.captureMessage(`[SLOW] approve_premise_application_rpc took ${_rpcMs}ms`, {
         level: 'warning',
-        extra: { duration_ms: _rpcMs, applicationId, categoryId },
+        extra: { duration_ms: _rpcMs, applicationId, category_id },
       });
     }
 
     if (rpcError) {
-      Sentry.captureException(rpcError, { extra: { applicationId, categoryId, adminId: profile.id } });
+      Sentry.captureException(rpcError, { extra: { applicationId, category_id, adminId: profile.id } });
       throw rpcError;
     }
 
@@ -290,7 +290,7 @@ export async function approvePremiseApplication(
     return { success: true };
 
   } catch (e: any) {
-    Sentry.captureException(e, { extra: { applicationId, categoryId } });
+    Sentry.captureException(e, { extra: { applicationId, category_id } });
     console.error('[PremiseApp] approvePremiseApplication failed:', e);
     return { success: false, error: e.message || 'Approval failed.' };
   }

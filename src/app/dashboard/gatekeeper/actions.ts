@@ -67,7 +67,7 @@ export async function processScannedToken(
   try {
     const { profile } = await requireAuth();
     const isOwner = profile.role === 'owner';
-    const premiseRoles = profile.premise_roles?.[premiseId] || [];
+    const premiseRoles = profile.premise_roles?.[premise_id] || [];
     if (profile.role !== 'admin' && !isOwner && !premiseRoles.includes('gatekeeper') && !premiseRoles.includes('host')) {
       throw new Error('Unauthorized: You do not have permission to process tokens for this premise.');
     }
@@ -108,17 +108,17 @@ export async function processScannedToken(
 
     const { data: premiseData, error: premiseError } = await adminDb.from('premises')
       .select('id, name, address, city, cityId, is_active, owner_id, agent_id, categoryId, token_balance, require_host_verification')
-      .eq('id', premiseId).single();
+      .eq('id', premise_id).single();
     if (premiseError || !premiseData) throw new Error('The premise you are scanning for could not be found.');
 
-    const { data: blockedDoc } = await adminDb.from('blocked_visitors').select('id').eq('premise_id', premiseId).eq('visitor_id', userId).single();
+    const { data: blockedDoc } = await adminDb.from('blocked_visitors').select('id').eq('premise_id', premise_id).eq('visitor_id', userId).single();
     if (blockedDoc) {
       throw new Error("This visitor is blocked from entering this premise.");
     }
 
     const { data: categoryData } = await adminDb.from('premise_categories')
       .select('id, name, type, deduction_rate_visitor, deduction_rate_premise')
-      .eq('id', premiseData.category_id).single();
+      .eq('id', premiseData.categoryId).single();
     let requiredTokensPremiseSide = 0;
     let requiredTokensVisitorSide = 0;
     let categoryType = 'industrial';
@@ -137,7 +137,7 @@ export async function processScannedToken(
     const { data: hostMembers, error: memberError } = await adminDb
       .from('premise_members')
       .select('user_id, identity, availability, users!inner(name, photo_url, token_balance_visitor)')
-      .eq('premise_id', premiseId)
+      .eq('premise_id', premise_id)
       .eq('role', 'host')
       .eq('is_active', true)
       .neq('availability', 'do-not-disturb');
@@ -172,7 +172,7 @@ export async function processScannedToken(
       active_checkin_id: visitorData.active_checkin_id,
       photo_url: visitorData.photo_url,
       city: visitorData.city,
-      company_name: visitorData.company_name,
+      companyName: visitorData.companyName,
       vehicles: visitorData.vehicles,
       selected_vehicle_number: visitorData.selected_vehicle_number,
       products: visitorData.products,
@@ -198,7 +198,7 @@ interface FinalizeCheckinPayload {
  * Finalizes the check-in process by creating visit records and deducting tokens.
  */
 export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<{ success: boolean, error?: string }> {
-  const { token, visitorId, hostId, premiseId, gatekeeperId } = payload;
+  const { token, visitor_id, host_id, premise_id, gatekeeperId } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) {
     return { success: false, error: 'Server database is not available.' };
@@ -210,7 +210,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
 
     const { profile } = await requireAuth();
     const isOwner = profile.role === 'owner';
-    const premiseRoles = profile.premise_roles?.[premiseId] || [];
+    const premiseRoles = profile.premise_roles?.[premise_id] || [];
     if (profile.role !== 'admin' && !isOwner && !premiseRoles.includes('gatekeeper') && !premiseRoles.includes('host')) {
       throw new Error('Unauthorized: You do not have permission to process tokens for this premise.');
     }
@@ -224,15 +224,15 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     }
 
     // If this was an offline scan, the UI passed the dummy ID. We must resolve the actual user from the token.
-    const resolvedVisitorId = visitorId === 'offline-visitor' ? tokenDoc.visitor_id : visitorId;
+    const resolvedVisitorId = visitor_id === 'offline-visitor' ? tokenDoc.visitor_id : visitor_id;
 
-    const { data: premiseData } = await adminDb.from('premises').select('*').eq('id', premiseId).single();
+    const { data: premiseData } = await adminDb.from('premises').select('*').eq('id', premise_id).single();
     if (!premiseData) throw new Error("Premise not found.");
 
     const { data: visitorData } = await adminDb.from('users').select('*').eq('id', resolvedVisitorId).single();
     if (!visitorData) throw new Error("Visitor not found.");
 
-    const { data: hostData } = await adminDb.from('users').select('*').eq('id', hostId).single();
+    const { data: hostData } = await adminDb.from('users').select('*').eq('id', host_id).single();
     if (!hostData) throw new Error("Host not found.");
 
     const { data: settingsData } = await adminDb.from('settings').select('*').eq('id', 'global').single();
@@ -241,7 +241,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     const { data: checkinCount } = await adminDb
       .from('visits')
       .select('id', { count: 'exact', head: true })
-      .eq('premise_id', premiseId)
+      .eq('premise_id', premise_id)
       .gte('checkin_time', new Date(Date.now() - 3600000).toISOString());
 
     const rateLimit = settingsData?.checkin_rate_limit || 100;
@@ -253,7 +253,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
       throw new Error("This visitor is already checked in somewhere else.");
     }
 
-    const { data: hostBlockDoc } = await adminDb.from('host_blocked_visitors').select('id').eq('host_id', hostId).eq('visitor_id', resolvedVisitorId).single();
+    const { data: hostBlockDoc } = await adminDb.from('host_blocked_visitors').select('id').eq('host_id', host_id).eq('visitor_id', resolvedVisitorId).single();
     if (hostBlockDoc) throw new Error("This visitor is blocked from seeing this specific host.");
 
     const visitorName = visitorData.name;
@@ -292,7 +292,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
 
     const now = Date.now();
     const visitTtlDays = settingsData?.visit_ttl_days;
-    let expires_at: string | undefined = undefined;
+    let expiresAt: string | undefined = undefined;
     if (visitTtlDays && Number.isInteger(visitTtlDays) && visitTtlDays > 0) {
       expiresAt = new Date(now + visitTtlDays * 24 * 60 * 60 * 1000).toISOString();
     }
@@ -301,7 +301,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     const { data: memberData } = await adminDb
       .from('premise_members')
       .select('gate_id')
-      .eq('premise_id', premiseId)
+      .eq('premise_id', premise_id)
       .eq('user_id', gatekeeperId)
       .eq('role', 'gatekeeper')
       .single();
@@ -309,9 +309,9 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     const { data: visitInsertData, error: visitError } = await adminDb.from('visits').insert({
       visitor_id: resolvedVisitorId,
       visitor_name: visitorData.name,
-      host_id: hostId,
+      host_id: host_id,
       host_name: hostData.name,
-      premise_id: premiseId,
+      premise_id: premise_id,
       checkin_time: new Date(now).toISOString(),
       checkout_time: null,
       status: 'active',
@@ -326,10 +326,10 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
 
     if (!settingsData?.hide_token_economy) {
       if (categoryType === 'residential' && premiseDeduction > 0) {
-        const { error: rpcErr } = await adminDb.rpc('deduct_user_tokens', { p_user_id: hostId, p_amount: premiseDeduction });
+        const { error: rpcErr } = await adminDb.rpc('deduct_user_tokens', { p_user_id: host_id, p_amount: premiseDeduction });
         if (rpcErr) throw new Error('Host has insufficient tokens for check-in.');
       } else if (categoryType === 'industrial' && premiseDeduction > 0) {
-        const { error: rpcErr2 } = await adminDb.rpc('deduct_premise_tokens', { p_premise_id: premiseId, p_amount: premiseDeduction });
+        const { error: rpcErr2 } = await adminDb.rpc('deduct_premise_tokens', { p_premise_id: premise_id, p_amount: premiseDeduction });
         if (rpcErr2) throw new Error("Premise has insufficient tokens for check-in.");
       }
     }
@@ -359,7 +359,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
     if (!settingsData?.hide_token_economy && premiseDeduction > 0) {
       if (categoryType === 'residential') {
         await createLogEntry({
-          actor_id: hostId,
+          actor_id: host_id,
           actor_name: hostData.name,
           actor_role: 'host',
           action: LogAction.VISITOR_CHECKIN_COST,
@@ -374,7 +374,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
           action: LogAction.PREMISE_CHECKIN_COST,
           description: `Visitor ${visitorName} checked in. Cost: ${premiseDeduction} tokens.`,
           token_change: -premiseDeduction,
-          context: { premise_id: premiseId }
+          context: { premise_id: premise_id }
         });
       }
     }
@@ -398,7 +398,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
             actor_role: 'gatekeeper',
             action: LogAction.WHATSAPP_NOTIFICATION_FAILED,
             description: `WhatsApp notification to host "${hostForNotification.name}" failed for visitor "${visitorName}". Reason: ${notificationResult.error}`,
-            context: { premise_id: premiseId, host_id: hostId, visitor_id: visitorId }
+            context: { premise_id: premise_id, host_id: host_id, visitor_id: visitor_id }
           });
         }
       }).catch(console.error);
@@ -416,7 +416,7 @@ export async function finalizeCheckin(payload: FinalizeCheckinPayload): Promise<
         actor_role: 'gatekeeper',
         action: LogAction.WHATSAPP_NOTIFICATION_FAILED,
         description: `WhatsApp notification to host was skipped. Reason: ${reason}`,
-        context: { premise_id: premiseId, host_id: hostId, visitor_id: visitorId }
+        context: { premise_id: premise_id, host_id: host_id, visitor_id: visitor_id }
       });
     }
 
@@ -453,13 +453,13 @@ interface CheckoutPayload {
 }
 
 export async function checkoutVisitor(payload: CheckoutPayload): Promise<{ success: boolean; error?: string }> {
-  const { visitId, visitorId, premiseId } = payload;
+  const { visit_id, visitor_id, premise_id } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
   try {
     const { profile } = await requireAuth();
-    const premiseRoles = profile.premise_roles?.[premiseId] || [];
+    const premiseRoles = profile.premise_roles?.[premise_id] || [];
     if (profile.role !== 'admin' && profile.role !== 'owner' && !premiseRoles.includes('gatekeeper') && !premiseRoles.includes('host')) {
       throw new Error('Unauthorized: You do not have permission to check out visitors at this premise.');
     }
@@ -470,7 +470,7 @@ export async function checkoutVisitor(payload: CheckoutPayload): Promise<{ succe
     const { data: memberData } = await adminDb
       .from('premise_members')
       .select('gate_id')
-      .eq('premise_id', premiseId)
+      .eq('premise_id', premise_id)
       .eq('user_id', profile.id)
       .eq('role', 'gatekeeper')
       .single();
@@ -479,8 +479,8 @@ export async function checkoutVisitor(payload: CheckoutPayload): Promise<{ succe
       status: 'completed', 
       checkout_time: now,
       checkout_gate_id: memberData?.gate_id 
-    }).eq('id', visitId);
-    await adminDb.from('users').update({ active_checkin_id: null }).eq('id', visitorId);
+    }).eq('id', visit_id);
+    await adminDb.from('users').update({ active_checkin_id: null }).eq('id', visitor_id);
 
     revalidatePath('/dashboard/gatekeeper/active-visits');
     return { success: true };
@@ -499,26 +499,26 @@ interface ForceCheckoutPayload extends CheckoutPayload {
 }
 
 export async function forceCheckoutVisitor(payload: ForceCheckoutPayload): Promise<{ success: boolean; error?: string }> {
-  const { visitId, visitorId, premiseId, actor } = payload;
+  const { visit_id, visitor_id, premise_id, actor } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
   try {
     const { user, profile } = await requireAuth();
     if (profile.role !== 'admin') {
-      const { data: permCheck } = await adminDb.from('premises').select('owner_id').eq('id', premiseId).single();
+      const { data: permCheck } = await adminDb.from('premises').select('owner_id').eq('id', premise_id).single();
       if (!permCheck || permCheck.owner_id !== user.id) throw new Error('Unauthorized: You do not own this premise.');
     }
 
-    const { data: visitData, error: fetchError } = await adminDb.from('visits').select('*').eq('id', visitId).single();
+    const { data: visitData, error: fetchError } = await adminDb.from('visits').select('*').eq('id', visit_id).single();
     if (fetchError || !visitData) {
       throw new Error("Visit not found.");
     }
 
     const now = new Date().toISOString();
 
-    await adminDb.from('visits').update({ status: 'force_closed', checkout_time: now }).eq('id', visitId);
-    await adminDb.from('users').update({ active_checkin_id: null }).eq('id', visitorId);
+    await adminDb.from('visits').update({ status: 'force_closed', checkout_time: now }).eq('id', visit_id);
+    await adminDb.from('users').update({ active_checkin_id: null }).eq('id', visitor_id);
 
     if (visitData) {
       await createLogEntry({
@@ -527,11 +527,11 @@ export async function forceCheckoutVisitor(payload: ForceCheckoutPayload): Promi
         actor_role: actor.role,
         action: actor.role === 'admin' ? LogAction.FORCE_CHECKOUT_ADMIN : LogAction.FORCE_CHECKOUT_OWNER,
         description: `${actor.role} "${actor.name}" forcefully checked out visitor "${visitData.visitor_name}".`,
-        context: { premise_id: premiseId }
+        context: { premise_id: premise_id }
       });
     }
 
-    revalidatePath(`/dashboard/owner/history?premiseId=${premiseId}`);
+    revalidatePath(`/dashboard/owner/history?premise_id=${premise_id}`);
     revalidatePath('/dashboard/admin/visits');
     return { success: true };
   } catch (e: any) {
@@ -555,7 +555,7 @@ export async function getEmergencyContactInfo(payload: EmergencyContactPayload):
   hostPhone?: string;
   error?: string;
 }> {
-  const { visitId, premiseId } = payload;
+  const { visit_id: visitId, premise_id: premiseId } = payload;
   const adminDb = await getAdminDb();
   if (!adminDb) return { success: false, error: "Server database connection not available." };
 
@@ -581,7 +581,7 @@ export async function getEmergencyContactInfo(payload: EmergencyContactPayload):
       actor_role: profile.role || 'gatekeeper', // or host
       action: LogAction.EMERGENCY_CONTACT_ACCESSED,
       description: `Accessed Emergency Phone Numbers for visitor "${visitData.visitor_name}" and host "${visitData.host_name}".`,
-      context: { premiseId, visitId }
+      context: { premise_id: premiseId, visit_id: visitId }
     });
 
     const { decryptPII } = await import('@/services/encryption-service');

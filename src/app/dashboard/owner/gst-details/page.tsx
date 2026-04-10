@@ -44,10 +44,10 @@ export default function OwnerGstDetailsPage() {
       <GstDetailsCard
         target={{ type: 'premise', id: premiseId }}
         initialData={{
-          legal_name: premise?.legal_name,
-          gst_number: premise?.gst_number,
-          billing_address: premise?.billing_address,
-          billing_state: premise?.billing_state
+          legalName: premise?.legalName,
+          gstNumber: premise?.gstNumber,
+          billingAddress: premise?.billingAddress,
+          billingState: premise?.billingState
         }}
         onSuccess={() => router.push(`/dashboard/owner?premiseId=${premiseId}`)}
       />

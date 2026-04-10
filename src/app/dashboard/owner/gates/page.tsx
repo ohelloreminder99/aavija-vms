@@ -119,14 +119,14 @@ export default function GatesPage() {
             if (gateToEdit) {
                 result = await updateGate({ 
                     gateId: gateToEdit.id, 
-                    premiseId, 
+                    premise_id: premiseId!, 
                     name: values.name, 
                     description: values.description, 
                     actor 
                 });
             } else {
                 result = await createGate({ 
-                    premiseId, 
+                    premise_id: premiseId!, 
                     name: values.name, 
                     description: values.description, 
                     actor 
@@ -155,7 +155,7 @@ export default function GatesPage() {
             const result = await deleteGate({ 
                 gateId: gateToDelete.id, 
                 gateName: gateToDelete.name, 
-                premiseId, 
+                premise_id: premiseId!, 
                 actor: { id: user.id, name: userProfile.name, role: 'owner' } 
             });
             if (result.success) {

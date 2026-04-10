@@ -182,7 +182,7 @@ export async function createPremiseAndNewOwner(
   data: NewOwnerPremiseData
 ): Promise<{ success: boolean; error?: string }> {
   const {
-    premiseName, premiseAddress, premiseCity, cityId, ownerName, ownerEmail, ownerPassword, agentId, categoryId, categoryName, city_state,
+    premiseName, premiseAddress, premiseCity, city_id: cityId, owner_name: ownerName, ownerEmail, ownerPassword, agentId, categoryId, categoryName, city_state,
   } = data;
 
   const adminDb = await getAdminDb();
@@ -311,7 +311,7 @@ export async function createPremiseForExistingUser(
   data: ExistingUserPremiseData
 ): Promise<{ success: boolean; error?: string }> {
   const {
-    premiseName, premiseAddress, premiseCity, cityId, ownerEmail, agentId, categoryId, categoryName, city_state,
+    premiseName, premiseAddress, premiseCity, city_id: cityId, ownerEmail, agentId, categoryId, categoryName, city_state,
   } = data;
 
   const adminDb = await getAdminDb();
@@ -423,9 +423,9 @@ export async function deletePremise(
   if (!adminDb) return { success: false, error: 'Admin database not available.' };
 
   try {
-    const { error: deleteError } = await adminDb.from('premises').delete().eq('id', premiseId);
+    const { error: deleteError } = await adminDb.from('premises').delete().eq('id', premise_id);
     if (deleteError) {
-      console.error(`Foreign key block or DB error deleting premise ${premiseId}:`, deleteError.message);
+      console.error(`Foreign key block or DB error deleting premise ${premise_id}:`, deleteError.message);
       return { success: false, error: `Delete failed: ${deleteError.message}. Ensure all related visit records and logs are cascaded or manually removed.` };
     }
 
@@ -434,7 +434,7 @@ export async function deletePremise(
       const { data: userDoc } = await adminDb.from('users').select('premise_roles').eq('id', ownerId).single();
       if (userDoc) {
         const currentRoles = (userDoc.premise_roles || {}) as Record<string, string[]>;
-        const { [premiseId]: _, ...updatedRoles } = currentRoles;
+        const { [premise_id]: _, ...updatedRoles } = currentRoles;
         await adminDb.from('users').update({ premise_roles: updatedRoles }).eq('id', ownerId);
       }
     } catch (syncError) {
@@ -459,7 +459,7 @@ interface GetVisitsPayload {
 export async function getVisitsForPremise(
   payload: GetVisitsPayload
 ): Promise<{ success: boolean; visits?: SerializableVisit[], lastVisible?: string; error?: string }> {
-  const { premiseId, limit, startAfter, startDate } = payload;
+  const { premise_id: premiseId, limit, startAfter, startDate } = payload;
   const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
@@ -508,7 +508,7 @@ export async function changePremiseOwner(payload: {
   newOwnerEmail: string;
   actor: { id: string; name: string; role: string; };
 }): Promise<{ success: boolean; error?: string }> {
-  const { premiseId, oldOwnerId, newOwnerEmail, actor } = payload;
+  const { premise_id: premiseId, oldOwnerId, newOwnerEmail, actor } = payload;
   const adminDb = await getAdminDb();
   const { profile } = await requireAuth();
   if (profile.role !== 'admin') throw new Error('Unauthorized');
@@ -601,7 +601,7 @@ export async function updatePremiseAdmin(
       const { data: current } = await adminDb
         .from('premises')
         .select('updated_at')
-        .eq('id', premiseId)
+        .eq('id', premise_id)
         .single();
 
       if (current?.updated_at && current.updated_at !== expectedUpdatedAt) {
@@ -613,14 +613,14 @@ export async function updatePremiseAdmin(
       }
     }
 
-    const { error: updateError } = await adminDb.from('premises').update(updateData).eq('id', premiseId);
+    const { error: updateError } = await adminDb.from('premises').update(updateData).eq('id', premise_id);
     if (updateError) throw updateError;
     revalidatePath('/dashboard/admin/premises');
     return { success: true };
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error('Unknown update error');
     const Sentry = await import('@sentry/nextjs');
-    Sentry.captureException(err, { extra: { premiseId, dataToUpdate } });
+    Sentry.captureException(err, { extra: { premise_id, dataToUpdate } });
     return { success: false, error: err.message };
   }
 }

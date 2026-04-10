@@ -21,7 +21,7 @@ async function maybeApplyReferral(
         const welcomeTokens = settings.referral_reward_tokens || 0;
 
         await adminClient.rpc('rpc_apply_referral_code', {
-            p_referee_id: userId,
+            p_referee_id: user_id,
             p_referral_code: refCode,
             p_welcome_tokens: welcomeTokens,
         });

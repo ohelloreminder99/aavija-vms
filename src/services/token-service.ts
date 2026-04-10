@@ -15,7 +15,7 @@ interface PurchaseTokensPayload {
   actor_name: string;
   actor_role: string;
   roleToCredit: 'visitor' | 'owner';
-  premiseId?: string;
+  premise_id?: string;
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
@@ -30,13 +30,13 @@ export async function purchaseTokens(
   payload: PurchaseTokensPayload
 ): Promise<{ success: boolean; error?: string; alreadyFulfilled?: boolean; message?: string }> {
   const {
-    userId,
-    tokenAmount,
+    user_id: userId,
+    token_amount: tokenAmount,
     currency,
-    actorName,
-    actorRole,
+    actor_name: actorName,
+    actor_role: actorRole,
     roleToCredit,
-    premiseId,
+    premise_id: premiseId,
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
@@ -103,7 +103,7 @@ export async function purchaseTokens(
     if (!settingsData) throw new Error('System configuration (settings) is unavailable. Purchase aborted for safety. Please try again.');
 
     const { data: userData } = await adminDb.from('users')
-      .select('id, name, email, phone, city_state, gstNumber, billingAddress, billingState, legalName, token_balance_visitor, premise_roles')
+      .select('id, name, email, phone, city_state, gst_number, billing_address, billing_state, legal_name, token_balance_visitor, premise_roles')
       .eq('id', userId).single();
     if (!userData) throw new Error("User profile not found.");
 
@@ -112,7 +112,7 @@ export async function purchaseTokens(
 
     if (roleToCredit === 'owner' && premiseId) {
       const { data: pData } = await adminDb.from('premises')
-        .select('id, name, token_balance, agent_id, owner_id, billingState, city_state, gstNumber, billingAddress, legalName')
+        .select('id, name, token_balance, agent_id, owner_id, billing_state, city_state, gst_number, billing_address, legal_name')
         .eq('id', premiseId).single();
       if (!pData) throw new Error("Premise not found.");
       premiseData = pData;
@@ -142,17 +142,17 @@ export async function purchaseTokens(
     const finalActorName = isWebhook ? (userData.name || actorName) : actorName;
 
     if (roleToCredit === 'owner' && premiseData) {
-      userState = premiseData.billing_state || premiseData.city_state || 'Unknown';
-      customerGstin = premiseData.gst_number || '';
-      customerBillingAddress = premiseData.billing_address || '';
-      customerLegalName = premiseData.legal_name || premiseData.name || finalActorName;
-      targetPremiseName = premiseData.name || 'Premise';
+      userState = (premiseData as any).billing_state || (premiseData as any).city_state || 'Unknown';
+      customerGstin = (premiseData as any).gst_number || '';
+      customerBillingAddress = (premiseData as any).billing_address || '';
+      customerLegalName = (premiseData as any).legal_name || (premiseData as any).name || finalActorName;
+      targetPremiseName = (premiseData as any).name || 'Premise';
       logDescription = `Purchased ${tokenAmount.toLocaleString()} tokens for premise "${targetPremiseName}". Invoice: ${invoiceId}`;
     } else {
-      userState = userData.billing_state || userData.city_state || 'Unknown';
-      customerGstin = userData.gst_number || '';
-      customerBillingAddress = userData.billing_address || '';
-      customerLegalName = userData.legal_name || userData.name || finalActorName;
+      userState = (userData as any).billing_state || (userData as any).city_state || 'Unknown';
+      customerGstin = (userData as any).gst_number || '';
+      customerBillingAddress = (userData as any).billing_address || '';
+      customerLegalName = (userData as any).legal_name || (userData as any).name || finalActorName;
       logDescription = `Purchased ${tokenAmount.toLocaleString()} tokens for visitor balance. Invoice: ${invoiceId}`;
     }
 
@@ -274,7 +274,7 @@ export async function purchaseTokens(
     // 4. Create Audit Log
     const logTtlDays = settingsData.log_ttl_days;
     const now = new Date();
-    let expires_at: string | undefined = undefined;
+    let expiresAt: string | undefined = undefined;
     if (logTtlDays && Number.isInteger(logTtlDays) && logTtlDays > 0) {
       expiresAt = new Date(now.getTime() + logTtlDays * 24 * 60 * 60 * 1000).toISOString();
     }

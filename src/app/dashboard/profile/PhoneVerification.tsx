@@ -73,7 +73,7 @@ export function PhoneVerification({
         setIsVerifying(true);
         setVerificationError(null);
         try {
-            const result = await sendWhatsAppOtp({ user_id: userProfile.id, phone, countryCode });
+            const result = await sendWhatsAppOtp({ user_id: userProfile.id, phone, country_code: countryCode });
             if (result.success) {
                 setOtpSent(true);
                 toast({ title: 'OTP Sent', description: 'Please check your WhatsApp for the verification code.' });

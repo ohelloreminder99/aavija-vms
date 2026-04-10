@@ -14,13 +14,13 @@ interface DeductTokensPayload {
   actor_name: string;
   actor_role: string;
   exportType: 'csv' | 'pdf';
-  premiseIdForLog?: string; // For context when a user (host/visitor) exports
+  premise_id?: string; // Standardized
 }
 
 export async function deductTokensForExport(
   payload: Omit<DeductTokensPayload, 'cost'>
 ): Promise<{ success: boolean; error?: string; deductedCost?: number }> {
-  const { target, actorId, actorName, actorRole, exportType, premiseIdForLog } = payload;
+  const { target, actor_id: actorId, actor_name: actorName, actor_role: actorRole, exportType, premise_id } = payload;
   let finalCost = 0;
   const adminDb = await getAdminDb();
   if (!adminDb) {
@@ -119,7 +119,7 @@ export async function deductTokensForExport(
       action: logAction,
       description: `${actorRole} "${actorName}" exported visit history as ${exportType.toUpperCase()}. Cost: ${finalCost} tokens.`,
       token_change: -finalCost,
-      context: { premise_id: premiseIdForLog || (target.type === 'premise' ? target.id : undefined) },
+      context: { premise_id: premise_id || (target.type === 'premise' ? target.id : undefined) },
     });
 
     if (target.type === 'premise') {
@@ -136,15 +136,15 @@ export async function deductTokensForExport(
 }
 
 export async function getVisitsForExport({
-  premiseId,
-  visitorId,
-  hostId,
+  premise_id,
+  visitor_id,
+  host_id,
   startDate,
   endDate
 }: {
-  premiseId?: string;
-  visitorId?: string;
-  hostId?: string;
+  premise_id?: string;
+  visitor_id?: string;
+  host_id?: string;
   startDate?: string;
   endDate?: string;
 }) {
@@ -155,19 +155,19 @@ export async function getVisitsForExport({
     const { user, profile } = await requireAuth();
 
     if (profile.role !== 'admin') {
-      if (visitorId && visitorId !== user.id) throw new Error('Unauthorized');
-      if (hostId && hostId !== user.id) throw new Error('Unauthorized');
-      if (premiseId && !visitorId && !hostId) {
-        const { data: premise } = await adminDb.from('premises').select('owner_id').eq('id', premiseId).single();
+      if (visitor_id && visitor_id !== user.id) throw new Error('Unauthorized');
+      if (host_id && host_id !== user.id) throw new Error('Unauthorized');
+      if (premise_id && !visitor_id && !host_id) {
+        const { data: premise } = await adminDb.from('premises').select('owner_id').eq('id', premise_id).single();
         if (premise?.owner_id !== user.id) throw new Error('Unauthorized');
       }
     }
 
     let query = adminDb.from('visits').select('*');
 
-    if (premiseId) query = query.eq('premise_id', premiseId);
-    if (visitorId) query = query.eq('visitor_id', visitorId);
-    if (hostId) query = query.eq('host_id', hostId);
+    if (premise_id) query = query.eq('premise_id', premise_id);
+    if (visitor_id) query = query.eq('visitor_id', visitor_id);
+    if (host_id) query = query.eq('host_id', host_id);
 
     if (startDate) query = query.gte('checkin_time', startDate);
     if (endDate) query = query.lte('checkin_time', endDate);

@@ -18,7 +18,7 @@ export async function createRazorpayOrder(payload: CreateOrderPayload): Promise<
   order?: { id: string; amount: number; currency: string };
   error?: string;
 }> {
-  const { amount, currency, tokenAmount, userId, roleToCredit, premiseId } = payload;
+  const { amount, currency, token_amount: tokenAmount, user_id: userId, roleToCredit, premiseId } = payload;
   try {
     const { NEXT_PUBLIC_RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
 

@@ -25,7 +25,7 @@ interface GetVisitsPayload {
 export async function getVisitsForVisitorAction(
   payload: GetVisitsPayload
 ): Promise<{ success: boolean; visits?: SerializableVisit[], lastVisible?: string; error?: string }> {
-  const { visitorId, limit, startAfter, startDate } = payload;
+  const { visitor_id: visitorId, limit, startAfter, startDate } = payload;
 
   if (!visitorId) {
     return { success: false, error: 'Visitor ID is required.' };

@@ -1,6 +1,6 @@
 # 🗺️ Aavija VMS — Codebase Map
 
-> **Last updated:** 2026-04-08
+> **Last updated:** 2026-04-11
 > **Purpose:** Quick-reference guide so any developer (or AI agent) can locate any file without scanning the entire tree.
 
 ---
@@ -30,23 +30,17 @@ Aavija-main/
 docs/
 ├── AAVIJA_NEW_COUNTRY_MASTER_PROTOCOL.md # Master blueprint for deploying a new country (Vercel, Cloudflare, Sentry, Auth)
 ├── AAVIJA_SYSTEM_BLUEPRINT_MASTER.md  # Full system architecture overview
-├── AUTH_SETUP_GUIDE.md                # Authentication setup guide
 ├── DATABASE_MASTER_REFERENCE.md       # Database schema documentation
 ├── DEVELOPER_NOTES.md                 # Developer notes & conventions
 ├── OPERATIONS_MANUAL.md               # Operations & maintenance manual
-├── blueprint.md                       # Architecture blueprint
-├── backend.json                       # Backend schema reference (JSON)
-├── cors-legacy.json                   # Legacy Firebase CORS config (reference only)
 ├── whatsapp-template.txt              # WhatsApp message template reference
-├── architecture/                      # Role-based architecture docs
-│   ├── README.md
-│   ├── agent_architecture.md
-│   ├── gatekeeper_architecture.md
-│   ├── host_architecture.md
-│   ├── management_architecture.md
-│   └── visitor_architecture.md
-└── reports/                           # Diagnostic & audit reports
-    └── antigravity-diagnostics.txt
+└── architecture/                      # Role-based architecture docs
+    ├── README.md
+    ├── agent_architecture.md
+    ├── gatekeeper_architecture.md
+    ├── host_architecture.md
+    ├── management_architecture.md
+    └── visitor_architecture.md
 ```
 
 ---
@@ -247,11 +241,12 @@ src/instrumentation-client.ts  # Sentry client instrumentation
 
 ```
 supabase/
-├── CONSOLIDATED_FINAL_SETUP.sql  # Full consolidated schema (snake_case clean)
-└── migrations/                   # Currently empty; new migrations go here
+└── migrations/                   # Database migrations & consolidated setup
+    └── CONSOLIDATED_FINAL_SETUP.sql # Full consolidated schema (snake_case clean)
 ```
 
-> **Note:** All legacy migration files and the `database_sql_backups/` directory contents were permanently deleted as part of the case standardization project in order to start with a fresh, clean `CONSOLIDATED_FINAL_SETUP.sql` source of truth.
+> 1. **MASTER SCHEMA SYNC (CRITICAL): Whenever a new file is created to run on the Supabase SQL editor, those changes MUST ALSO be reflected and updated inside `supabase/migrations/CONSOLIDATED_FINAL_SETUP.sql`. This ensures that setting up a new database for a new country can always be done flawlessly without repeating historical migration phases.**
+> - Active master schema lives directly at `supabase/migrations/CONSOLIDATED_FINAL_SETUP.sql`.
 
 ---
 
